@@ -137,7 +137,15 @@ def get_cfg() -> config.Config:
     if CFG is None:
         from . import settings_loader  # pylint: disable=import-outside-toplevel
 
-        cfg_file = (settings_loader.get_user_cfg_folder() or Path("/etc/searxng")) / "limiter.toml"
+        # Use platform-specific config folder
+        cfg_folder = settings_loader.get_user_cfg_folder()
+        if not cfg_folder:
+            import os
+            if sys.platform == 'win32':
+                cfg_folder = Path(os.environ.get('PROGRAMDATA', '')) / 'searxng'
+            else:
+                cfg_folder = Path('/etc/searxng')
+        cfg_file = cfg_folder / "limiter.toml"
         CFG = config.Config.from_toml(LIMITER_CFG_SCHEMA, cfg_file, searx.compat.LIMITER_CFG_DEPRECATED)
         searx.compat.limiter_fix_cfg(CFG, cfg_file)
 

@@ -30,7 +30,17 @@ def init():
     from . import config, cache, proxy
     from .. import settings_loader
 
-    cfg_file = (settings_loader.get_user_cfg_folder() or pathlib.Path("/etc/searxng")) / "favicons.toml"
+    # Use platform-specific config folder
+    import sys
+    import os
+    
+    cfg_folder = settings_loader.get_user_cfg_folder()
+    if not cfg_folder:
+        if sys.platform == 'win32':
+            cfg_folder = pathlib.Path(os.environ.get('PROGRAMDATA', '')) / 'searxng'
+        else:
+            cfg_folder = pathlib.Path('/etc/searxng')
+    cfg_file = cfg_folder / "favicons.toml"
     if not cfg_file.exists():
         if is_active():
             logger.error(f"missing favicon config: {cfg_file}")

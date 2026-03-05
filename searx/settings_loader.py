@@ -67,34 +67,22 @@ def get_user_cfg_folder() -> Path | None:
     """Returns folder where the local configurations are located.
 
     1. If the ``SEARXNG_SETTINGS_PATH`` environment is set and points to a
-       folder (e.g. ``/etc/mysxng/``), all local configurations are expected in
-       this folder.  The settings of the :ref:`SearXNG appl <searxng
-       settings.yml>` then expected in ``settings.yml``
-       (e.g. ``/etc/mysxng/settings.yml``).
+       folder, all local configurations are expected in this folder.
 
-    2. If the ``SEARXNG_SETTINGS_PATH`` environment is set and points to a file
-       (e.g. ``/etc/mysxng/myinstance.yml``), this file contains the settings of
-       the :ref:`SearXNG appl <searxng settings.yml>` and the folder
-       (e.g. ``/etc/mysxng/``) is used for all other configurations.
+    2. If the ``SEARXNG_SETTINGS_PATH`` environment is set and points to a file,
+       this file contains the settings and the parent folder is used for other
+       configurations.
 
-       This type (``SEARXNG_SETTINGS_PATH`` points to a file) is suitable for
-       use cases in which different profiles of the :ref:`SearXNG appl <searxng
-       settings.yml>` are to be managed, such as in test scenarios.
+    3. On Linux: If folder ``/etc/searxng`` exists, it is used.
+       On Windows: If folder ``%PROGRAMDATA%\\searxng`` exists, it is used.
 
-    3. If folder ``/etc/searxng`` exists, it is used.
-
-    In case none of the above path exists, ``None`` is returned.  In case of
-    environment ``SEARXNG_SETTINGS_PATH`` is set, but the (folder or file) does
-    not exists, a :py:obj:`EnvironmentError` is raised.
+    In case none of the above path exists, ``None`` is returned.
 
     """
-
+    import sys
+    
     folder = None
     settings_path = os.environ.get("SEARXNG_SETTINGS_PATH")
-
-    # Disable default /etc/searxng is intended exclusively for internal testing purposes
-    # and is therefore not documented!
-    disable_etc = os.environ.get('SEARXNG_DISABLE_ETC_SETTINGS', '').lower() in ('1', 'true')
 
     if settings_path:
         # rule 1. and 2.
@@ -106,9 +94,15 @@ def get_user_cfg_folder() -> Path | None:
         else:
             raise EnvironmentError(1, f"{settings_path} not exists!", settings_path)
 
-    if not folder and not disable_etc:
-        # default: rule 3.
-        folder = Path("/etc/searxng")
+    if not folder:
+        # default: rule 3. - Platform specific
+        if sys.platform == 'win32':
+            # Windows: use %PROGRAMDATA%\searxng (e.g., C:\ProgramData\searxng)
+            folder = Path(os.environ.get('PROGRAMDATA', '')) / 'searxng'
+        else:
+            # Linux/Unix: use /etc/searxng
+            folder = Path("/etc/searxng")
+        
         if not folder.is_dir():
             folder = None
 
