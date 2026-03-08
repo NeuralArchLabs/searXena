@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferencias - searXena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+        }
+
+        .settings-title {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .setting-group {
+            margin-bottom: 40px;
+        }
+
+        .group-title {
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .engine-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .engine-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .engine-item:hover {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .engine-item input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        .engine-name {
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .save-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin-top: 20px;
+        }
+
+        .save-btn:hover {
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: scale(1.05);
+        }
+
+        .back-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings-container">
+        <a href="/" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Volver al inicio
+        </a>
+        <h1 class="settings-title">Preferencias</h1>
+
+        <form action="/save_settings" method="post">
+            <div class="setting-group">
+                <h2 class="group-title">Motores de Búsqueda de Texto</h2>
+                <div class="engine-list">
+                    {% for engine in engines %}
+                    <label class="engine-item">
+                        <input type="checkbox" name="engines" value="{{ engine.name }}" {% if engine.enabled %}checked{%
+                            endif %}>
+                        <span class="engine-name">{{ engine.name }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <h2 class="group-title">Interfaz</h2>
+                <label class="engine-item" style="max-width: 300px;">
+                    <input type="checkbox" name="autocomplete" checked disabled>
+                    <span class="engine-name">Sugerencias automáticas</span>
+                </label>
+            </div>
+
+            <button type="submit" class="save-btn">Guardar cambios</button>
+        </form>
+    </div>
+</body>
+
+</html>

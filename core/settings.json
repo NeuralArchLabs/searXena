@@ -1,0 +1,33 @@
+{
+    "general": {
+        "instance_name": "searXena",
+        "safe_search": 0,
+        "autocomplete": "google",
+        "default_lang": "es",
+        "timeout": 5.0,
+        "cache_ttl": 600
+    },
+    "engines": [
+        { "name": "google", "enabled": true, "categories": ["general"], "weight": 1.5 },
+        { "name": "duckduckgo", "enabled": true, "categories": ["general"], "weight": 1.2 },
+        { "name": "brave", "enabled": true, "categories": ["general"], "weight": 1.4 },
+        { "name": "metager", "enabled": true, "categories": ["general"], "weight": 1.1 },
+        { "name": "wikipedia", "enabled": true, "categories": ["general", "it"], "weight": 2.5 },
+        { "name": "wikidata", "enabled": true, "categories": ["general", "it"], "weight": 4.0 },
+        { "name": "startpage", "enabled": true, "categories": ["general"], "weight": 1.0 },
+        
+        { "name": "google_news", "enabled": true, "categories": ["news"], "weight": 2.0 },
+        { "name": "duckduckgo", "enabled": true, "categories": ["news"], "weight": 1.3 },
+        
+        { "name": "google_videos", "enabled": true, "categories": ["videos"], "weight": 2.0 },
+        { "name": "vimeo", "enabled": true, "categories": ["videos"], "weight": 1.3 },
+        
+        { "name": "duckduckgo_images", "enabled": true, "categories": ["images"], "weight": 2.0 },
+        { "name": "unsplash", "enabled": true, "categories": ["images"], "weight": 1.8 },
+        { "name": "pixabay", "enabled": true, "categories": ["images"], "weight": 1.5 },
+        
+        { "name": "github", "enabled": true, "categories": ["it"], "weight": 2.5 },
+        { "name": "stackoverflow", "enabled": true, "categories": ["it"], "weight": 2.5 },
+        { "name": "reddit", "enabled": true, "categories": ["general", "social"], "weight": 1.2 }
+    ]
+}

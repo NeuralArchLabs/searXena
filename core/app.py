@@ -1,0 +1,84 @@
+from fastapi import FastAPI, Request, Form, Response
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse, RedirectResponse
+import uvicorn
+import os
+import json
+from engine_manager import EngineManager
+import engines.suggestions as suggestions
+
+app = FastAPI(title="searXena")
+
+# Configuración de base
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+# Inicializar EngineManager con persistencia
+manager = EngineManager(BASE_DIR)
+
+@app.get("/")
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/autoc")
+async def autocomplete(q: str = ""):
+    results = await suggestions.get_suggestions(q)
+    return JSONResponse(results)
+
+@app.get("/settings")
+async def get_settings(request: Request):
+    engine_list = []
+    for name, module in manager.engines.items():
+        engine_list.append({
+            "name": name,
+            "enabled": module.ENABLED,
+            "categories": module.CATEGORIES,
+            "weight": module.WEIGHT
+        })
+    return templates.TemplateResponse("settings.html", {"request": request, "engines": engine_list})
+
+@app.post("/save_settings")
+async def save_settings(request: Request):
+    form = await request.form()
+    enabled_engines = form.getlist("engines")
+    
+    current = manager.settings
+    for engine_cfg in current["engines"]:
+        engine_cfg["enabled"] = engine_cfg["name"] in enabled_engines
+    
+    manager.save_settings(current)
+    manager.load_engines() 
+    
+    return RedirectResponse(url="/settings", status_code=303)
+
+@app.get("/search")
+@app.post("/search")
+async def search(request: Request):
+    q = request.query_params.get("q")
+    category = request.query_params.get("category", "general")
+    pageno = int(request.query_params.get("pageno", 1))
+    
+    if request.method == "POST":
+        form = await request.form()
+        q = q or form.get("q")
+        category = category or form.get("category", "general")
+        pageno = int(form.get("pageno", 1))
+
+    if not q:
+        return RedirectResponse(url="/")
+
+    # Meta-búsqueda orquestada con paginación
+    results = await manager.search(q, category=category, pageno=pageno)
+    
+    return templates.TemplateResponse("results.html", {
+        "request": request, 
+        "query": q, 
+        "results": results,
+        "category": category,
+        "pageno": pageno
+    })
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
