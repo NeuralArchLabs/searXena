@@ -1,84 +1,69 @@
 import random
-import time
-import string
 from urllib.parse import urlencode, unquote
 from selectolax.parser import HTMLParser
 
 CATEGORIES = ["general", "news", "videos", "images"]
+WEIGHT = 1.5
 
-def ui_async(start: int) -> str:
-    # Simulación de identificadores de sesión de Google para mejores resultados
-    _arcid_range = string.ascii_letters + string.digits + "_-"
-    arc_rnd = "".join(random.choices(_arcid_range, k=23))
-    return f"arc_id:srp_{arc_rnd}_1{start:02},use_ac:true,_fmt:prog"
-
-def request_categorized(query, category, params):
-    # Google usa bloques de 10-20 resultados. 
-    # SearXNG suele pedir de 10 en 10, pero aquí pediremos 20 para densidad masiva.
-    start = (params.get("pageno", 1) - 1) * 20
+def request(query, params):
+    # Google estándar, robusto y limpio (Estilo SearXNG)
+    offset = (params.get("pageno", 1) - 1) * 10
     
     query_params = {
         "q": query,
         "hl": "es",
-        "start": start,
-        "num": 20, # ¡DOBLE DENSIDAD!
-        "filter": "0"
+        "start": offset,
+        "num": 20, # Pedimos 20 para asegurar que después del filtrado queden bastantes
     }
     
-    if category == "news":
+    if params.get("category") == "news":
         query_params["tbm"] = "nws"
-    elif category == "videos":
+    elif params.get("category") == "videos":
         query_params["tbm"] = "vid"
-    elif category == "images":
+    elif params.get("category") == "images":
         query_params["tbm"] = "isch"
-    else:
-        # Modo Async para resultados frescos y densos
-        query_params["asearch"] = "arc"
-        query_params["async"] = ui_async(start)
-    
+        
     params["url"] = f"https://www.google.com/search?{urlencode(query_params)}"
+    # Headers mínimos para evitar detección como bot complejo
     params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-
-def request(query, params):
-    request_categorized(query, "general", params)
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    # 1. Scraping Web denso
-    for node in tree.css('div.MjjYud, div.g, div.SoDRR, div.WlyS9b'):
-        title_node = node.css_first('h3, div[role="link"] span, .mCBkyc')
+    # Selectores universales de Google
+    for node in tree.css('div.g, div.MjjYud'):
+        title_node = node.css_first('h3')
         url_node = node.css_first('a')
-        snippet_node = node.css_first('div.VwiC3b, .GI74S, .yK77Y, .Y69UXb')
+        snippet_node = node.css_first('div.VwiC3b, .yfY60c, .itX33, .BNeawe')
         
         if title_node and url_node:
-            title = title_node.text().strip()
             url = url_node.attributes.get('href', '')
-            
-            # Limpiar redirecciones de Google
             if url.startswith('/url?q='):
                 url = unquote(url[7:].split('&sa=')[0])
             
             if url.startswith('http') and not "google.com" in url:
                 results.append({
-                    "title": title,
+                    "title": title_node.text().strip(),
                     "url": url,
-                    "content": snippet_node.text().strip() if snippet_node else "Información de Google."
+                    "content": snippet_node.text().strip() if snippet_node else "Ver más en Google.",
+                    "source": "google"
                 })
-    
-    # 2. Scraping Imágenes (si aplica)
-    if "tbm=isch" in resp.search_params.get("url", ""):
-        for node in tree.css('img.rg_i, img.Q4iVhc'):
-            src = node.attributes.get('src') or node.attributes.get('data-src')
-            if src:
-                results.append({
-                    "template": "images.html",
-                    "title": "Google Image",
-                    "url": src,
-                    "img_src": src,
-                    "thumbnail_src": src,
-                    "content": ""
-                })
+                
+    # Imágenes
+    if "tbm=isch" in resp.url:
+        for node in tree.css('div.isv-r'):
+            img_node = node.css_first('img')
+            link_node = node.css_first('a[href^="http"]')
+            if img_node:
+                src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
+                if src:
+                    results.append({
+                        "template": "images.html",
+                        "title": "Imagen de Google",
+                        "url": link_node.attributes.get('href', '#') if link_node else "#",
+                        "img_src": src,
+                        "source": "google"
+                    })
 
     return results

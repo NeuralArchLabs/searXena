@@ -4,37 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>searXena</title>
+    <title>searXena Pro - Privacidad Total</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
-    <style>
-        .settings-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .settings-btn:hover {
-            color: white;
-            border-color: var(--accent);
-            background: var(--accent-glow);
-        }
-    </style>
+    <link rel="stylesheet" href="/static/style.css?v=2.5">
+    <meta name="referrer" content="no-referrer">
 </head>
 
 <body>
-    <a href="/settings" class="settings-btn">
+    <!-- El botón de preferencias ahora usa la clase settings-btn (Top Right) -->
+    <a href="/settings" class="settings-btn" title="Configurar motores y privacidad">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path
@@ -49,58 +27,23 @@
         <div class="search-box">
             <form action="/search" method="get" id="search-form">
                 <input type="text" name="q" class="search-input" id="search-input" placeholder="¿Qué estás buscando?"
-                    autocomplete="off" autofocus>
+                    autocomplete="off" autofocus title="Búsqueda privada">
+                <input type="hidden" name="category" id="cat-input" value="general">
                 <div id="suggestions-box"></div>
             </form>
         </div>
+
+        <div class="text-muted" style="margin-top: 30px; font-size: 0.85rem; opacity: 0.7;">
+            Sin rastreo. Sin publicidad. Solo resultados.
+        </div>
     </div>
 
-    <script>
-        const searchInput = document.getElementById('search-input');
-        const suggestionsBox = document.getElementById('suggestions-box');
-        let timeout = null;
+    <footer class="footer">
+        <p>Copyright © 2026 searXena Pro — Developed by <a href="https://github.com/martinezpalomera92"
+                class="credit-link" target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
+    </footer>
 
-        searchInput.addEventListener('input', () => {
-            clearTimeout(timeout);
-            const query = searchInput.value.trim();
-
-            if (query.length < 2) {
-                suggestionsBox.style.display = 'none';
-                return;
-            }
-
-            timeout = setTimeout(async () => {
-                try {
-                    const response = await fetch(`/autoc?q=${encodeURIComponent(query)}`);
-                    const suggestions = await response.json();
-
-                    if (suggestions.length > 0) {
-                        suggestionsBox.innerHTML = suggestions.map(s =>
-                            `<div class="suggestion-item">${s}</div>`
-                        ).join('');
-                        suggestionsBox.style.display = 'block';
-
-                        document.querySelectorAll('.suggestion-item').forEach(item => {
-                            item.addEventListener('click', () => {
-                                searchInput.value = item.innerText;
-                                document.getElementById('search-form').submit();
-                            });
-                        });
-                    } else {
-                        suggestionsBox.style.display = 'none';
-                    }
-                } catch (e) {
-                    console.error('Error fetching suggestions', e);
-                }
-            }, 300);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.style.display = 'none';
-            }
-        });
-    </script>
+    <script src="/static/main.js?v=2.5"></script>
 </body>
 
 </html>

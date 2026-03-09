@@ -1,28 +1,31 @@
 from selectolax.parser import HTMLParser
-from urllib.parse import urlencode
 
-CATEGORIES = ["general"]
+CATEGORIES = ["general", "news"]
+WEIGHT = 2.2
 
 def request(query, params):
-    pageno = params.get("pageno", 1)
-    params["url"] = f"https://search.brave.com/search?{urlencode({'q': query, 'offset': (pageno-1)*20})}"
+    # Brave Search
+    offset = (params.get("pageno", 1) - 1) * 20
+    params["url"] = f"https://search.brave.com/search?q={query}&offset={offset}"
+    params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    # Brave usa clases de estilo 'result-title' y 'result-details'
-    for node in tree.css('div.snippet, div.result'):
-        title_node = node.css_first('a.title, a.result-link h2, .heading-sm')
-        snippet_node = node.css_first('p.snippet-description, .result-content, .description')
+    for node in tree.css('div.snippet'):
+        title_link = node.css_first('a.search-result_link, a[href^="http"]')
+        title_text = node.css_first('span.name, h2, .title')
+        snippet_node = node.css_first('.snippet-description, .result-content, .description')
         
-        if title_node:
-            url = title_node.attributes.get('href', '') or (node.css_first('a').attributes.get('href') if node.css_first('a') else '')
-            if url and url.startswith('http') and not "brave.com" in url:
+        if title_link:
+            url = title_link.attributes.get('href', '')
+            # Evitar enlaces internos de brave
+            if url and "brave.com" not in url and url.startswith('http'):
                 results.append({
-                    "title": title_node.text().strip(),
+                    "title": title_text.text().strip() if title_text else title_link.text().strip(),
                     "url": url,
                     "content": snippet_node.text().strip() if snippet_node else "Información de Brave Search.",
-                    "score": 1.2
+                    "source": "brave"
                 })
     return results

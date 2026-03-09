@@ -46,11 +46,11 @@ Paso 3: Ejecutar instalador
 
     .\win_setup.ps1
 
-Paso 4: Iniciar SearXNG
+Paso 4: Iniciar searXena
 
-    .\manage.ps1 webapp.run
+    .\run.ps1
 
-El navegador se abrira automaticamente en http://127.0.0.1:8888/
+El navegador se abrira automaticamente en http://127.0.0.1:8000/
 
 ================================================================================
 INSTALACION MANUAL PASO A PASO

@@ -8,6 +8,8 @@ import time
 from typing import List, Dict, Any, Set
 from collections import defaultdict
 
+from utils import gen_useragent
+
 class EngineManager:
     def __init__(self, base_dir: str):
         self.base_dir = base_dir
@@ -20,17 +22,34 @@ class EngineManager:
 
         # Bangs map (SearXNG style)
         self.bangs = {
-            "!g": "google", "!w": "wikipedia", "!yt": "videos", 
+            "!g": "google", "!w": "wikipedia", "!yt": "youtube", 
             "!gh": "github", "!so": "stackoverflow", "!i": "images",
             "!n": "news", "!ddg": "duckduckgo", "!bi": "bing",
-            "!red": "reddit", "!py": "pypi", "!npm": "npm"
+            "!red": "reddit", "!py": "pypi", "!npm": "npm",
+            "!qw": "qwant", "!wa": "wolframalpha", "!v": "videos",
+            "!sc": "swisscows", "!ec": "ecosia", "!mo": "mojeek",
+            "!sp": "startpage", "!ya": "yahoo", "!ak": "ask",
+            "!ba": "baidu", "!na": "naver", "!se": "seznam",
+            "!gb": "gigablast", "!ar": "arxiv", "!md": "mdn",
+            "!pd": "pydoc", "!gl": "gitlab", "!sf": "sourceforge",
+            "!do": "docker", "!eb": "ebay", "!wh": "wallhaven",
+            "!ls": "librestock", "!fl": "flickr", "!gp": "giphy",
+            "!pi": "pinterest", "!un": "unsplash"
         }
 
         # Ad-block global list (SearXNG style)
         self.ad_patterns = [
             "googleads", "pagead", "doubleclick", "partner.googleadservices",
-            "adservice", "sponsored", "ads-", "ad-content", "promocionado",
-            "publicidad", "anuncio"
+            "adservice", "sponsored", "ads-", "ad-content", "amazon-ad", 
+            "bingads", "yandex.ru/ads", "facebook.com/ads", "taboola", 
+            "outbrain", "aclk?", "gampad/"
+        ]
+        
+        # User-Agent rotation list (if needed globally)
+        self.ua_list = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
         ]
 
     def load_settings(self):
@@ -70,10 +89,15 @@ class EngineManager:
                         importlib.reload(sys.modules[f"engines.{engine_name}"])
                     module = importlib.import_module(f"engines.{engine_name}")
                     
-                    cfg = config_engines.get(engine_name, {"enabled": True, "categories": ["general"], "weight": 1.0})
-                    module.ENABLED = cfg.get("enabled", True)
-                    module.CATEGORIES = cfg.get("categories", ["general"])
-                    module.WEIGHT = cfg.get("weight", 1.0)
+                    # Module defaults
+                    default_enabled = getattr(module, "ENABLED", True)
+                    default_categories = getattr(module, "CATEGORIES", ["general"])
+                    default_weight = getattr(module, "WEIGHT", 1.0)
+
+                    cfg = config_engines.get(engine_name, {})
+                    module.ENABLED = cfg.get("enabled", default_enabled)
+                    module.CATEGORIES = cfg.get("categories", default_categories)
+                    module.WEIGHT = cfg.get("weight", default_weight)
                     module.NAME = engine_name
                     
                     if hasattr(module, "request") and hasattr(module, "response"):
@@ -103,32 +127,41 @@ class EngineManager:
             if now < expiry:
                 return results
 
-        # 3. Parallel Search
+        # 3. Parallel Search - Mejor selección de motores (Estilo SearXNG)
         tasks = []
         timeout_limit = self.settings["general"].get("timeout", 4.0)
-
-        if target_engine:
-            # Si hay un bang, forzamos ese motor o categoria
-            if target_engine in self.engines:
-                tasks.append(self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit))
-            else:
-                # Si el bang es una categoria, buscamos en esa categoria
-                category = target_engine 
-
-        if not tasks:
-            for name, engine in self.engines.items():
-                if engine.ENABLED and category in engine.CATEGORIES:
-                    tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit))
         
-        # Fallback
-        if not tasks:
+        # Filtro de motores por categoría (Mejorado)
+        category_engines = []
+        for name, engine in self.engines.items():
+            if engine.ENABLED and category in engine.CATEGORIES:
+                category_engines.append(engine)
+        
+        # Si no hay motores en la categoría, buscar en general (Fallback)
+        if not category_engines:
             for name, engine in self.engines.items():
                 if engine.ENABLED and "general" in engine.CATEGORIES:
-                    tasks.append(self.call_engine(engine, clean_query, "general", pageno, timeout_limit))
+                    category_engines.append(engine)
+                    
+        # PRIORIZACIÓN (SearXNG): 
+        # No corremos todos los motores a la vez si son masivos, 
+        # ordenamos por PESO y tomamos los mejores para evitar latencias extremas.
+        category_engines.sort(key=lambda x: x.WEIGHT, reverse=True)
+        # Pool ampliado (SearXNG suele correr 20+ pero aquí mantendremos 15 por CPU)
+        selection = category_engines[:15]
+        
+        if target_engine and target_engine in self.engines:
+             tasks = [self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit)]
+        else:
+            for engine in selection:
+                tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit))
 
-        # Parallel Wait
-        results_list = await asyncio.gather(*tasks, return_exceptions=True)
-        valid_results = [r for r in results_list if isinstance(r, list)]
+        # Parallel Wait (Buscamos que sean ultra-veloces)
+        try:
+            results_list = await asyncio.gather(*tasks, return_exceptions=True)
+            valid_results = [r for r in results_list if isinstance(r, list)]
+        except Exception:
+            valid_results = []
         
         ranked = self.process_and_rank(valid_results)
         
@@ -141,62 +174,81 @@ class EngineManager:
     async def call_engine(self, engine, query, category, pageno, timeout_limit):
         try:
             params = {
+                "query": query,
                 "pageno": pageno,
                 "category": category,
+                "safesearch": self.settings.get("general", {}).get("safe_search", 1),
+                "language": self.settings.get("general", {}).get("default_lang", "es"),
+                "time_range": None,
                 "url": None,
                 "method": "GET",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-                    "Accept-Language": "en-US,en;q=0.9,es;q=0.8",
+                    "User-Agent": gen_useragent(),
+                    "Accept-Language": f"{self.settings.get('general', {}).get('default_lang', 'es')},es;q=0.9,en;q=0.8",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                     "Connection": "keep-alive"
                 },
                 "data": {},
                 "cookies": {},
-                "timeout": timeout_limit
+                "timeout": timeout_limit,
+                "engine_data": {}
             }
             
             # Ejecutar lógica del motor
             if hasattr(engine, "request_categorized"):
-                engine.request_categorized(query, category, params)
-            else:
-                engine.request(query, params)
-            
-            if not params["url"]:
-                return []
-
-            async with httpx.AsyncClient(
-                follow_redirects=True, 
-                timeout=params["timeout"],
-                limits=httpx.Limits(max_keepalive_connections=50, max_connections=200),
-                http2=True
-            ) as client:
-                if params["method"] == "POST":
-                    resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"])
+                if asyncio.iscoroutinefunction(engine.request_categorized):
+                    await engine.request_categorized(query, category, params)
                 else:
-                    resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"])
-                
-                if resp.status_code != 200:
-                    return []
-
-                class ResponseWrapper:
-                    def __init__(self, r, p):
-                        self.text = r.text
-                        self.status_code = r.status_code
+                    engine.request_categorized(query, category, params)
+            else:
+                if asyncio.iscoroutinefunction(engine.request):
+                    await engine.request(query, params)
+                else:
+                    engine.request(query, params)
+            
+            results = []
+            if params.get("url") and params["url"].startswith("internal://"):
+                class FakeResponse:
+                    def __init__(self, p):
+                        self.text = ""
+                        self.status_code = 200
                         self.search_params = p
-                        self.url = r.url
-                    def json(self):
-                        return json.loads(self.text)
+                        self.url = p["url"]
+                    def json(self): return {}
+                results = engine.response(FakeResponse(params))
+            elif params.get("url"):
+                async with httpx.AsyncClient(
+                    follow_redirects=True, 
+                    timeout=params["timeout"],
+                    limits=httpx.Limits(max_keepalive_connections=50, max_connections=200),
+                    http2=True,
+                    verify=False # Evitar errores SSL en entornos restringidos
+                ) as client:
+                    if params["method"] == "POST":
+                        resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"])
+                    else:
+                        resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"])
+                    
+                    if resp.status_code == 200:
+                        class ResponseWrapper:
+                            def __init__(self, r, p):
+                                self.text = r.text
+                                self.status_code = r.status_code
+                                self.search_params = p
+                                self.url = str(r.url)
+                            def json(self):
+                                return json.loads(self.text)
+                        
+                        results = engine.response(ResponseWrapper(resp, params))
                 
-                results = engine.response(ResponseWrapper(resp, params))
-                
-                clean = []
+            clean = []
+            if isinstance(results, list):
                 for r in results:
                     r["source"] = engine.NAME
                     r["engine_weight"] = engine.WEIGHT
                     if self.is_legit(r):
                         clean.append(r)
-                return clean
+            return clean
         except Exception:
             return []
 
@@ -205,43 +257,90 @@ class EngineManager:
         title = result.get('title', '').lower()
         content = result.get('content', '').lower()
 
-        # Filtrado de anuncios avanzado
+        # 1. Filtrado de anuncios (Solo si el patrón es muy específico o en URL)
         for pattern in self.ad_patterns:
-            if pattern in url or (pattern in title and len(title) < 45) or (pattern in content[:40]):
+            if pattern in url:
+                return False
+            # Solo filtrar por título/contenido si es corto (anuncios típicos)
+            if (pattern in title and len(title) < 40) or (pattern in content[:20]):
                 return False
                 
-        if not url.startswith('http'):
+        # 2. Relaxed Legitimacy - No tirar resultados legítimos
+        if len(title) < 3: return False
+        if "..." in title and len(title) < 15: return False
+        
+        # 3. Solo URLs de confianza o útiles
+        if not url.startswith('http') and not url.startswith('#'):
             return False
             
         return True
 
     def process_and_rank(self, results_groups):
-        score_map = defaultdict(lambda: {"title": "", "url": "", "content": "", "score": 0.0, "sources": set(), "img_src": None})
+        score_map = defaultdict(lambda: {"title": "", "url": "", "content": "", "score": 0.0, "sources": set(), "engine_positions": []})
+        infoboxes = [] # Resultados destacados (Wiki, Calculadora, OSM)
         
         for results in results_groups:
             for position, res in enumerate(results):
-                # Normalización de URL para deduplicación
-                url = res['url'].lower().replace('https://', '').replace('http://', '').replace('www.', '').split('#')[0].rstrip('/')
+                # 1. Extraer INFOTOOLS (Respuestas Destacadas Reales)
+                if res.get("template") == "infobox.html":
+                    # Evitar duplicar infoboxes exactos de la misma fuente
+                    if not any(i['title'] == res['title'] and i['source'] == res['source'] for i in infoboxes):
+                        infoboxes.append(res)
+                    continue
+
+                # 2. Normalización de URL para deduplicación robusta (SearXNG style)
+                raw_url = res.get('url', '').lower()
+                clean_url = raw_url.replace('https://', '').replace('http://', '').replace('www.', '').split('#')[0].rstrip('/')
+                if not clean_url: continue
                 
-                item = score_map[url]
-                if not item["content"] or len(res['content']) > len(item['content']):
-                    item["title"] = res['title']
-                    item["url"] = res['url']
-                    item["content"] = res['content']
+                item = score_map[clean_url]
                 
-                if res.get("img_src"):
-                    item["img_src"] = res["img_src"]
+                # Preservar el título más limpio y descripción más rica
+                if not item["title"] or (len(res.get('content', '')) > len(item.get('content', '')) and len(res.get('title', '')) > 5):
+                    for key, val in res.items():
+                        if key not in ["score", "sources", "engine_positions"]:
+                            item[key] = val
                 
-                weight = res.get("engine_weight", 1.0)
-                # Ranking Armónico: Mayor peso si aparece arriba en motores confiables
-                item["score"] += (weight / (position + 1))
+                # 3. Ranking Armónico Ponderado
+                # SearXNG recompensa mucho aparecer en el TOP 1 de cualquier motor confiable.
+                engine_weight = res.get("engine_weight", 1.0)
+                
+                # Bonus por Dominios de Autoridad Superior
+                auth_bonus = 1.0
+                trusted_list = [".edu", ".org", ".gov", "wikipedia.org", "reuters.com", "arxiv.org", "stackoverflow.com", "github.com"]
+                if any(ext in clean_url for ext in trusted_list):
+                    auth_bonus = 1.25
+                
+                # Penalización por snippets "con puntos suspensivos" iniciales que no aportan valor
+                snippet_penalty = 1.0
+                content = res.get('content', '')
+                if content.startswith('...') or len(content) < 40:
+                    snippet_penalty = 0.8
+
+                # Fórmula: (Peso Motor * Bonus Auth * Snippet Penalty) / Raiz(Posición + 1)
+                # La raíz cuadrada de la posición suaviza la caída de relevancia, pero prioriza el top 3.
+                item["score"] += (engine_weight * auth_bonus * snippet_penalty) / ((position + 1) ** 0.5)
                 item["sources"].add(res['source'])
+                item["engine_positions"].append(position)
         
+        # 4. Consolidar y Aplicar Bonus de Diversidad (Si aparece en muchos motores)
         final = []
         for url, data in score_map.items():
             data["sources"] = list(data["sources"])
-            # Bonus por diversidad de fuentes
-            data["score"] *= (1 + 0.15 * (len(data["sources"]) - 1))
+            # Bonus de Consenso: Si aparece en muchos motores, es fiable.
+            consensus_bonus = 1.0 + (0.5 * (len(data["sources"]) - 1))
+            data["score"] *= consensus_bonus
+            
+            # Penalización por URL de poca profundidad (homes/meta-urls suelen ser menos relevantes que artículos)
+            if url.count('/') < 2: data["score"] *= 0.85
+
             final.append(data)
             
-        return sorted(final, key=lambda x: x['score'], reverse=True)
+        # Ordenación Final por Score
+        final.sort(key=lambda x: x["score"], reverse=True)
+        
+        # Limitar resultados para limpieza absoluta (25 es el dulce punto de SearXNG)
+        limited_results = final[:25]
+        
+        # Inyectar Infoboxes de primero (Featured Answers)
+        return infoboxes + limited_results

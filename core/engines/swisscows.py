@@ -1,25 +1,29 @@
 from selectolax.parser import HTMLParser
-import urllib.parse
+from urllib.parse import urlencode
+
+CATEGORIES = ["general"]
+WEIGHT = 1.0
 
 def request(query, params):
-    encoded_query = urllib.parse.quote(query)
-    params["url"] = f"https://swisscows.com/en/web?query={encoded_query}"
+    query_params = {
+        "query": query,
+        "region": "es-ES"
+    }
+    params["url"] = f"https://swisscows.com/es/web?{urlencode(query_params)}"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    for node in tree.css('article.web-item'):
-        title = node.css_first('h2, a.title')
-        link = node.css_first('a')
-        snippet = node.css_first('p.description, div.snippet')
+    for node in tree.css('article.web-result'):
+        title_node = node.css_first('h2 a')
+        snippet_node = node.css_first('p')
         
-        if title and link:
-            href = link.attributes.get('href', '')
-            if href.startswith('http'):
-                results.append({
-                    "title": title.text().strip(),
-                    "url": href,
-                    "content": snippet.text().strip() if snippet else "Swisscows web result."
-                })
+        if title_node:
+            results.append({
+                "title": title_node.text().strip(),
+                "url": title_node.attributes.get('href', ''),
+                "content": snippet_node.text().strip() if snippet_node else "",
+                "source": "swisscows"
+            })
     return results

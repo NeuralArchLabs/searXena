@@ -45,14 +45,44 @@ async def save_settings(request: Request):
     enabled_engines = form.getlist("engines")
     
     current = manager.settings
+    # Guardar motores
     for engine_cfg in current["engines"]:
         engine_cfg["enabled"] = engine_cfg["name"] in enabled_engines
     
+    # Guardar preferencias generales
+    general = current.get("general", {})
+    general["safe_search"] = int(form.get("safesearch", 0))
+    general["default_lang"] = form.get("language", "es")
+    general["autocomplete"] = form.get("autocomplete", "google")
+    current["general"] = general
+
     manager.save_settings(current)
     manager.load_engines() 
     
     return RedirectResponse(url="/settings", status_code=303)
 
+import httpx
+from fastapi.responses import StreamingResponse
+
+@app.get("/proxify")
+async def proxify(url: str):
+    """Proxy local para imágenes y recursos externos para proteger la IP del usuario."""
+    if not url: return Response(status_code=400)
+    
+    async def stream_resource():
+        async with httpx.AsyncClient() as client:
+            try:
+                # Omitimos enviar cookies del usuario al destino original
+                async with client.stream("GET", url, timeout=10.0, follow_redirects=True) as resp:
+                    if resp.status_code == 200:
+                        async for chunk in resp.aiter_bytes():
+                            yield chunk
+            except Exception:
+                pass
+
+    return StreamingResponse(stream_resource())
+
+# Meta-búsqueda orquestada con paginación
 @app.get("/search")
 @app.post("/search")
 async def search(request: Request):
@@ -69,16 +99,31 @@ async def search(request: Request):
     if not q:
         return RedirectResponse(url="/")
 
-    # Meta-búsqueda orquestada con paginación
+    # Sistema de Bangs (SearXNG style)
+    if q.startswith("!"):
+        parts = q.split(" ", 1)
+        bang = parts[0].lower()
+        if bang in manager.bangs:
+            target = manager.bangs[bang]
+            q = parts[1] if len(parts) > 1 else ""
+            if target in ["images", "videos", "news", "it"]:
+                category = target
+
     results = await manager.search(q, category=category, pageno=pageno)
     
-    return templates.TemplateResponse("results.html", {
+    response = templates.TemplateResponse("results.html", {
         "request": request, 
         "query": q, 
         "results": results,
         "category": category,
         "pageno": pageno
     })
+    
+    # Cabeceras de Privacidad Estrictas
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    return response
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")

@@ -1,7 +1,8 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
-CATEGORIES = ["it"]
+CATEGORIES = ["social", "general"]
+WEIGHT = 1.0
 
 def request(query, params):
     params["url"] = f"https://stackoverflow.com/search?{urlencode({'q': query})}"
@@ -18,7 +19,7 @@ def response(resp):
             results.append({
                 "title": title_node.text().strip(),
                 "url": "https://stackoverflow.com" + title_node.attributes.get('href', ''),
-                "content": snippet_node.text().strip() if snippet_node else "",
-                "score": 2.0 # Importante para desarrolladores
+                "content": snippet_node.text().strip() if snippet_node else "Pregunta en StackOverflow.",
+                "source": "stackoverflow"
             })
     return results

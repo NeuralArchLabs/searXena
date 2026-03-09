@@ -1,33 +1,27 @@
-import re
 from selectolax.parser import HTMLParser
 
+CATEGORIES = ["general"]
+WEIGHT = 3.0
+
 def request(query, params):
-    # Startpage requiere una peticion POST compleja para evitar el bloqueo inmediato
-    # Usamos la version "device" que es mas ligera
-    params["method"] = "POST"
-    params["url"] = "https://www.startpage.com/sp/search"
-    params["data"] = {
-        "query": query,
-        "cat": "web",
-        "sc": "TLsB0oITjZ8F21", # Token estatico aproximado, en produccion se extrae dinamicamente
-        "language": "english"
-    }
-    params["headers"]["Referer"] = "https://www.startpage.com/"
+    # Startpage (Proxied Google results)
+    params["url"] = f"https://www.startpage.com/sp/search?query={query}"
+    params["headers"]["Accept"] = "text/html"
 
 def response(resp):
     results = []
-    # Startpage a veces inyecta resultados en un script React o como HTML
-    # Buscamos el patron de resultados estandar
     tree = HTMLParser(resp.text)
     
-    for node in tree.css('div.result'):
-        title_node = node.css_first('a.result-link, a.w-gl__result-title')
-        snippet_node = node.css_first('p.result-snippet, div.w-gl__description')
+    # Selector probado en debug: div.w-gl__result
+    for node in tree.css('div.w-gl__result'):
+        title_link = node.css_first('a.w-gl__result-title')
+        snippet_node = node.css_first('p.w-gl__description')
         
-        if title_node:
+        if title_link:
             results.append({
-                "title": title_node.text().strip(),
-                "url": title_node.attributes.get('href', ''),
-                "content": snippet_node.text().strip() if snippet_node else ""
+                "title": title_link.text().strip(),
+                "url": title_link.attributes.get('href', ''),
+                "content": snippet_node.text().strip() if snippet_node else "",
+                "source": "startpage"
             })
     return results

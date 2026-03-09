@@ -4,144 +4,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preferencias - searXena</title>
+    <title>Preferencias - searXena Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=2.5">
+    <meta name="referrer" content="no-referrer">
     <style>
-        .settings-container {
-            max-width: 800px;
-            margin: 60px auto;
-            padding: 40px;
+        .settings-page {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .settings-card {
             background: var(--bg-card);
             border: 1px solid var(--glass-border);
-            border-radius: 30px;
+            border-radius: 24px;
+            padding: 40px;
+            -webkit-backdrop-filter: blur(20px);
             backdrop-filter: blur(20px);
         }
 
-        .settings-title {
-            font-size: 2.2rem;
-            margin-bottom: 30px;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-        }
-
-        .setting-group {
-            margin-bottom: 40px;
-        }
-
-        .group-title {
-            font-size: 1.2rem;
-            color: var(--accent);
-            margin-bottom: 20px;
-            font-weight: 600;
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 10px;
-        }
-
-        .engine-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .engine-item {
+        .settings-tabs {
             display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        .settings-tab {
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .settings-tab.active {
+            background: var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .setting-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .setting-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .select-custom {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .engine-item:hover {
-            border-color: var(--accent);
-            background: var(--accent-glow);
-        }
-
-        .engine-item input {
-            cursor: pointer;
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent);
-        }
-
-        .engine-name {
-            font-weight: 500;
-            text-transform: capitalize;
-        }
-
-        .save-btn {
-            background: var(--accent);
             color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: block;
-            margin-top: 20px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            outline: none;
         }
 
-        .save-btn:hover {
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: scale(1.05);
+        .engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
         }
 
-        .back-link {
-            color: var(--text-secondary);
-            text-decoration: none;
+        .engine-label {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .engine-label:hover {
+            border-color: var(--accent);
+        }
+
+        .engine-label input {
+            accent-color: var(--accent);
+        }
+
+        .save-bar {
+            position: sticky;
+            bottom: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 30px var(--accent-glow);
+            margin-top: 40px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .save-bar:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
 
 <body>
-    <div class="settings-container">
-        <a href="/" class="back-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Volver al inicio
+    <div class="settings-page">
+        <a href="/" class="tab"
+            style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; text-decoration: none;">
+            ← Volver al Inicio
         </a>
-        <h1 class="settings-title">Preferencias</h1>
 
-        <form action="/save_settings" method="post">
-            <div class="setting-group">
-                <h2 class="group-title">Motores de Búsqueda de Texto</h2>
-                <div class="engine-list">
-                    {% for engine in engines %}
-                    <label class="engine-item">
-                        <input type="checkbox" name="engines" value="{{ engine.name }}" {% if engine.enabled %}checked{%
-                            endif %}>
-                        <span class="engine-name">{{ engine.name }}</span>
-                    </label>
-                    {% endfor %}
+        <div class="settings-card">
+            <h1 class="logo-main" style="font-size: 2.5rem; text-align: left; margin-bottom: 20px;">Preferencias</h1>
+
+            <div class="settings-tabs" role="tablist">
+                <div class="settings-tab active" onclick="showSection('general')" role="tab">General</div>
+                <div class="settings-tab" onclick="showSection('engines')" role="tab">Motores ({{ engines|length }})
                 </div>
+                <div class="settings-tab" onclick="showSection('about')" role="tab">Privacidad y Acerca de</div>
             </div>
 
-            <div class="setting-group">
-                <h2 class="group-title">Interfaz</h2>
-                <label class="engine-item" style="max-width: 300px;">
-                    <input type="checkbox" name="autocomplete" checked disabled>
-                    <span class="engine-name">Sugerencias automáticas</span>
-                </label>
-            </div>
+            <form action="/save_settings" method="post">
+                <div id="section-general" class="settings-section active">
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h3>Idioma de búsqueda</h3>
+                            <p>Priorizar resultados en este idioma.</p>
+                        </div>
+                        <select name="language" class="select-custom" title="Seleccionar idioma">
+                            <option value="es" selected>Español</option>
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                    </div>
 
-            <button type="submit" class="save-btn">Guardar cambios</button>
-        </form>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h3>Búsqueda Segura</h3>
+                            <p>Filtrar contenido explícito de los resultados.</p>
+                        </div>
+                        <select name="safesearch" class="select-custom" title="Configurar búsqueda segura">
+                            <option value="0">Desactivado</option>
+                            <option value="1" selected>Moderado</option>
+                            <option value="2">Estricto</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <h3>Autocompletado</h3>
+                            <p>Las sugerencias se procesan localmente para proteger tu privacidad.</p>
+                        </div>
+                        <select name="autocomplete" class="select-custom" title="Motor de sugerencias">
+                            <option value="google">Google (Proxy)</option>
+                            <option value="duckduckgo">DuckDuckGo (Proxy)</option>
+                            <option value="none">Desactivado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="section-engines" class="settings-section">
+                    <div style="margin-bottom: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+                        Configura el comportamiento de la meta-búsqueda.
+                    </div>
+                    <div class="engine-grid">
+                        {% for engine in engines %}
+                        <label class="engine-label">
+                            <input type="checkbox" name="engines" value="{{ engine.name }}" {% if engine.enabled
+                                %}checked{% endif %}>
+                            <span style="text-transform: capitalize;">{{ engine.name.replace('_', ' ') }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div id="section-about" class="settings-section">
+                    <div class="infobox-container" style="background: rgba(129, 140, 248, 0.1);">
+                        <h2 style="color: var(--accent);">Compromiso de Privacidad</h2>
+                        <ul style="margin-left: 20px; margin-top: 20px; color: var(--text-primary); line-height: 1.8;">
+                            <li><b>Proxy de Recursos:</b> Todas las imágenes y favicons pasan por nuestro servidor.
+                                Ningún host de terceros ve tu IP.</li>
+                            <li><b>Sin Rastreo:</b> No guardamos logs de búsqueda, ni IPs, ni perfiles de usuario.</li>
+                            <li><b>Cero Cookies Externas:</b> El backend actúa como un cortafuegos, filtrando las
+                                cookies de motores externos.</li>
+                            <li><b>Referrer Policy:</b> Bloqueamos el envío de datos de origen a los sitios que visitas.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button type="submit" class="save-bar">Aplicar cambios y Proteger sesión</button>
+            </form>
+        </div>
     </div>
+
+    <footer class="footer">
+        <p>Copyright © 2026 searXena Pro — Developed by <a href="https://github.com/martinezpalomera92"
+                class="credit-link" target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
+    </footer>
+
+    <script>
+        function showSection(name) {
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('section-' + name).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 
 </html>

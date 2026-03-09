@@ -1,35 +1,73 @@
 import httpx
 import json
 import asyncio
+from typing import List
 
-# Usar el backend de Google Autocomplete (usado por SearXNG como predeterminado por su velocidad)
-AUTOCOMPLETE_URL = "https://suggestqueries.google.com/complete/search?client=chrome&q="
+# Cache simple en memoria
+suggestion_cache = {}
+# Timeout ultra corto para sugerencias (SearXNG style)
+client = httpx.AsyncClient(http2=True, timeout=0.6)
 
-# Cache simple para sugerencias (evitar peticiones repetitivas en ms)
-_suggestion_cache = {}
-
-async def get_suggestions(query: str):
+async def get_suggestions(query: str) -> List[str]:
     if not query or len(query) < 2:
         return []
-    
-    # Check cache
-    if query in _suggestion_cache:
-        val, ts = _suggestion_cache[query]
-        if asyncio.get_event_loop().time() - ts < 3600:
-            return val
+        
+    # Soporte para Bangs (Sugerir atajos)
+    if query.startswith("!"):
+        bangs = {
+            "!g": "Google", "!w": "Wikipedia", "!yt": "YouTube", 
+            "!gh": "GitHub", "!so": "StackOverflow", "!i": "Imágenes",
+            "!n": "Noticias", "!v": "Videos", "!red": "Reddit",
+            "!py": "Python", "!npm": "NPM", "!wa": "WolframAlpha"
+        }
+        matches = [f"{b} ({name})" for b, name in bangs.items() if b.startswith(query.lower())]
+        if matches: return matches[:8]
 
+    if query in suggestion_cache:
+        return suggestion_cache[query]
+        
+    # Consultar fuentes rápidas en paralelo (Google y DDG son las más veloces)
+    tasks = [
+        _fetch_google(query),
+        _fetch_duckduckgo(query)
+    ]
+    
     try:
-        # Petición ultra-veloz con timeout agresivo de 0.5s
-        async with httpx.AsyncClient(timeout=0.5) as client:
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-            }
-            resp = await client.get(f"{AUTOCOMPLETE_URL}{query}", headers=headers)
-            if resp.status_code == 200:
-                data = resp.json()
-                suggestions = data[1][:6] # Top 6 sugerencias
-                _suggestion_cache[query] = (suggestions, asyncio.get_event_loop().time())
-                return suggestions
+        results = await asyncio.gather(*tasks, return_exceptions=True)
     except Exception:
-        pass
-    return []
+        results = []
+    
+    # Combinar y desduplicar
+    all_suggestions = []
+    for res in results:
+        if isinstance(res, list):
+            all_suggestions.extend(res)
+            
+    # Mantener orden de relevancia y eliminar duplicados
+    seen = set()
+    unique_suggestions = []
+    for s in all_suggestions:
+        s_low = s.lower().strip()
+        if s_low not in seen:
+            seen.add(s_low)
+            unique_suggestions.append(s)
+            
+    # Limitar a 8 para no saturar la UI
+    final = unique_suggestions[:8]
+    suggestion_cache[query] = final
+    return final
+
+async def _fetch_google(q: str):
+    try:
+        url = f"https://suggestqueries.google.com/complete/search?client=firefox&q={q}"
+        resp = await client.get(url)
+        return resp.json()[1]
+    except: return []
+
+async def _fetch_duckduckgo(q: str):
+    try:
+        # DDG es extremadamente rápido y privado
+        url = f"https://duckduckgo.com/ac/?q={q}&type=list"
+        resp = await client.get(url)
+        return resp.json()[1]
+    except: return []
