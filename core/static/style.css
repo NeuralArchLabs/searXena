@@ -388,15 +388,14 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 24px 24px 60px 24px;
-    /* Extrapadding at bottom for absolute tags */
+    padding: 24px;
     margin-bottom: 24px;
     transition: all 0.3s ease;
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
     overflow: hidden;
     position: relative;
-    /* Anchor for absolute source-tags */
+    /* Anchor for .result-count absolute positioning */
 }
 
 .result-card-inner {
@@ -473,6 +472,9 @@ body {
     border-radius: 10px;
     border: 1px solid var(--glass-border);
     flex-shrink: 0;
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
 }
 
 .result-url {
@@ -488,8 +490,7 @@ body {
 .result-content {
     color: var(--text-secondary);
     line-height: 1.5;
-    margin-bottom: 0px;
-    /* Removes margin since tags are now absolute below */
+    margin-bottom: 16px;
 }
 
 /* Source Tags */
@@ -500,10 +501,7 @@ body {
 }
 
 .result-card .source-tags {
-    position: absolute;
-    bottom: 16px;
-    right: 24px;
-    justify-content: flex-end;
+    margin-top: 12px;
 }
 
 .source-tag {

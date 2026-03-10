@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ query }} - searXena Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=2.7">
+    <link rel="stylesheet" href="/static/style.css?v=2.8">
     <meta name="referrer" content="no-referrer">
 </head>
 
@@ -203,7 +203,6 @@
                                 <a href="{{ result.url }}" class="result-title" target="_blank"
                                     rel="noopener noreferrer nofollow">{{ result.title|safe }}</a>
                             </div>
-                            <span class="result-count">{{ result.sources|length }} fuentes</span>
                         </div>
                         <div class="result-url" title="{{ result.url }}">{{ result.url }}</div>
 
@@ -228,6 +227,7 @@
                     </div>
                     {% endif %}
                 </div>
+                <span class="result-count">{{ result.sources|length }} fuentes</span>
             </div>
             {% endfor %}
             {% endif %}
@@ -294,7 +294,7 @@
                 class="credit-link" target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
     </footer>
 
-    <script src="/static/main.js?v=2.7"></script>
+    <script src="/static/main.js?v=2.8"></script>
 </body>
 
 </html>
