@@ -1,27 +1,36 @@
 from selectolax.parser import HTMLParser
+from urllib.parse import urlencode
 
 CATEGORIES = ["general"]
 WEIGHT = 3.0
 
 def request(query, params):
     # Startpage (Proxied Google results)
-    params["url"] = f"https://www.startpage.com/sp/search?query={query}"
-    params["headers"]["Accept"] = "text/html"
+    query_params = {
+        "query": query,
+        "cat": "web",
+        "t": "device",
+        "lui": "english"
+    }
+    params["url"] = f"https://www.startpage.com/sp/search?{urlencode(query_params)}"
+    params["headers"]["Referer"] = "https://www.startpage.com/"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    # Selector probado en debug: div.w-gl__result
-    for node in tree.css('div.w-gl__result'):
-        title_link = node.css_first('a.w-gl__result-title')
-        snippet_node = node.css_first('p.w-gl__description')
+    # Robust selectors for Startpage
+    for node in tree.css('div.result, .result, article.result'):
+        title_link = node.css_first('a.result-link, a.result-title, h2 a')
+        snippet_node = node.css_first('p.description, .result-snippet, .description')
         
         if title_link:
-            results.append({
-                "title": title_link.text().strip(),
-                "url": title_link.attributes.get('href', ''),
-                "content": snippet_node.text().strip() if snippet_node else "",
-                "source": "startpage"
-            })
+            url = title_link.attributes.get('href', '')
+            if url.startswith('http') and not "startpage.com" in url:
+                results.append({
+                    "title": title_link.text().strip(),
+                    "url": url,
+                    "content": snippet_node.text().strip() if snippet_node else "",
+                    "source": "startpage"
+                })
     return results

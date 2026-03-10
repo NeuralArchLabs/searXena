@@ -1,7 +1,7 @@
 import json
 
 NAME = "hackernews"
-CATEGORIES = ["news", "general"]
+CATEGORIES = ['news', 'general', 'it', 'social']
 WEIGHT = 1.0
 ENABLED = True
 

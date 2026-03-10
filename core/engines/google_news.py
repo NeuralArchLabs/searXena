@@ -38,7 +38,8 @@ def response(resp):
                 results.append({
                     "title": title_text,
                     "url": url,
-                    "content": snippet_node.text().strip() if snippet_node else "Noticia de Google News."
+                    "content": snippet_node.text().strip() if snippet_node else "Noticia de Google News.",
+                    "source": "google_news"
                 })
                 
     return results

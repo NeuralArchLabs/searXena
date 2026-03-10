@@ -1,7 +1,7 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
-CATEGORIES = ["social", "general"]
+CATEGORIES = ['social', 'general', 'it']
 WEIGHT = 1.0
 
 def request(query, params):
@@ -12,10 +12,10 @@ def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    # GitHub cambió su layout recientemente a React, pero suele dejar fragmentos
-    for node in tree.css('div.search-title, div[data-testid="results-list"] div.Box-sc-dq7h35-0'):
-        title_node = node.css_first('a')
-        desc_node = node.css_first('p')
+    # GitHub results layout (React)
+    for node in tree.css('div.search-title, div[data-testid="results-list"] div[class*="Box"], .repo-list-item, div.search-result'):
+        title_node = node.css_first('a, h3 a, h4 a')
+        desc_node = node.css_first('p, div[class*="Text"], .description')
         
         if title_node:
             results.append({

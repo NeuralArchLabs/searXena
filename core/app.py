@@ -8,12 +8,17 @@ import json
 from engine_manager import EngineManager
 import engines.suggestions as suggestions
 
+from urllib.parse import quote_plus
+
 app = FastAPI(title="searXena")
 
 # Configuración de base
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+# Register filters
+templates.env.filters["urlencode"] = lambda s: quote_plus(str(s)) if s else ""
 
 # Inicializar EngineManager con persistencia
 manager = EngineManager(BASE_DIR)
@@ -109,12 +114,16 @@ async def search(request: Request):
             if target in ["images", "videos", "news", "it"]:
                 category = target
 
-    results = await manager.search(q, category=category, pageno=pageno)
+    results, infoboxes = await manager.search(q, category=category, pageno=pageno)
     
+    # Combinamos para la plantilla (que ya hace su propio filtrado por template)
+    # o pasamos ambos si queremos limpiar el HTML. Por ahora combinamos para no romper el CSS/Layout.
+    full_results = infoboxes + results
+
     response = templates.TemplateResponse("results.html", {
         "request": request, 
         "query": q, 
-        "results": results,
+        "results": full_results,
         "category": category,
         "pageno": pageno
     })

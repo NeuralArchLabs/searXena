@@ -15,9 +15,9 @@ def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    for node in tree.css('div.dd.algo'):
-        title_node = node.css_first('h3 a')
-        snippet_node = node.css_first('div.compText, span.fc-recos')
+    for node in tree.css('div.dd.algo, .algo-sr, li div.compTitle'):
+        title_node = node.css_first('h3 a, a.d-ib')
+        snippet_node = node.css_first('div.compText, span.fc-recos, .compText')
         
         if title_node:
             url = title_node.attributes.get('href', '')
@@ -25,13 +25,14 @@ def response(resp):
             if "r.search.yahoo.com" in url:
                 try:
                     # Intento de limpieza rapida
-                    url = unquote(url.split('/RU=')[1].split('/RK=')[0])
+                    if '/RU=' in url:
+                        url = unquote(url.split('/RU=')[1].split('/RK=')[0])
                 except: pass
                 
             results.append({
                 "title": title_node.text().strip(),
                 "url": url,
-                "content": snippet_node.text().strip() if snippet_node else "",
+                "content": snippet_node.text().strip() if snippet_node else "Información de Yahoo Search.",
                 "source": "yahoo"
             })
     return results

@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 NAME = "wikipedia"
-CATEGORIES = ["general", "it", "news"]
+CATEGORIES = ['general', 'it', 'news', 'science']
 WEIGHT = 3.0
 
 def request(query, params):
@@ -20,6 +20,7 @@ def request(query, params):
         "gsrlimit": 3
     }
     params["url"] = f"https://{lang}.wikipedia.org/w/api.php?{urlencode(query_params)}"
+    params["headers"]["User-Agent"] = "searXena/1.0 (https://github.com/martinezpalomera92/searXena; contact: user@example.com) modern-browser-style"
 
 def response(resp):
     results = []

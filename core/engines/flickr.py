@@ -22,10 +22,14 @@ def response(resp):
             src = img.attributes.get('src')
             if src and not src.startswith('http'): src = "https:" + src
             
+            # Safe extraction
+            link_node = node.css_first('a')
+            href = link_node.attributes.get('href', '') if link_node else ''
+            
             results.append({
                 "template": "images.html",
                 "title": img.attributes.get('alt', 'Flickr Image'),
-                "url": "https://www.flickr.com" + node.css_first('a').attributes.get('href', ''),
+                "url": "https://www.flickr.com" + href,
                 "img_src": src,
                 "thumbnail_src": src,
                 "source": "flickr"

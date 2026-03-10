@@ -19,6 +19,7 @@ def response(resp):
         
         if title_node and link_node:
             results.append({
+                "template": "shopping.html",
                 "title": f"eBay: {title_node.text().strip()}",
                 "url": link_node.attributes.get('href', ''),
                 "content": f"Precio: {price_node.text().strip()}" if price_node else "Producto en eBay.",

@@ -163,13 +163,13 @@ class EngineManager:
         except Exception:
             valid_results = []
         
-        ranked = self.process_and_rank(valid_results)
+        results, infoboxes = self.process_and_rank(valid_results)
         
         # Cache Result
         ttl = self.settings["general"].get("cache_ttl", 600)
-        self._cache[cache_key] = (ranked, now + ttl)
+        self._cache[cache_key] = ((results, infoboxes), now + ttl)
         
-        return ranked
+        return results, infoboxes
 
     async def call_engine(self, engine, query, category, pageno, timeout_limit):
         try:
@@ -229,7 +229,11 @@ class EngineManager:
                     else:
                         resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"])
                     
-                    if resp.status_code == 200:
+                    engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-2] if '.' in engine.__name__ else engine.__name__)
+                    if engine_name in ["google", "bing", "duckduckgo"]:
+                         print(f"DEBUG: {engine_name} status: {resp.status_code}")
+                    
+                    if resp.status_code in [200, 202]:
                         class ResponseWrapper:
                             def __init__(self, r, p):
                                 self.text = r.text
@@ -243,13 +247,19 @@ class EngineManager:
                 
             clean = []
             if isinstance(results, list):
+                engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-1])
+                engine_weight = getattr(engine, "WEIGHT", 1.0)
                 for r in results:
-                    r["source"] = engine.NAME
-                    r["engine_weight"] = engine.WEIGHT
+                    r["source"] = engine_name
+                    r["engine_weight"] = engine_weight
                     if self.is_legit(r):
                         clean.append(r)
             return clean
-        except Exception:
+        except Exception as e:
+            eng_name = getattr(engine, "NAME", "unknown")
+            print(f"ERROR in engine {eng_name}: {repr(e)}")
+            import traceback
+            traceback.print_exc()
             return []
 
     def is_legit(self, result: Dict) -> bool:
@@ -339,8 +349,7 @@ class EngineManager:
         # Ordenación Final por Score
         final.sort(key=lambda x: x["score"], reverse=True)
         
-        # Limitar resultados para limpieza absoluta (25 es el dulce punto de SearXNG)
-        limited_results = final[:25]
+        # Limitar resultados para limpieza absoluta
+        limited_results = final[:40]
         
-        # Inyectar Infoboxes de primero (Featured Answers)
-        return infoboxes + limited_results
+        return limited_results, infoboxes

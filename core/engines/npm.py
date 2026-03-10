@@ -1,26 +1,30 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
-CATEGORIES = ["general"]
+CATEGORIES = ['general', 'it']
 WEIGHT = 1.0
 
 def request(query, params):
-    params["url"] = f"https://www.npmjs.com/search?{urlencode({'q': query})}"
+    # Use registry.npmjs.org API (super reliable)
+    query_params = {
+        "text": query,
+        "size": 10,
+        "from": (params.get("pageno", 1) - 1) * 10
+    }
+    params["url"] = f"https://registry.npmjs.org/-/v1/search?{urlencode(query_params)}"
 
 def response(resp):
     results = []
-    tree = HTMLParser(resp.text)
-    
-    for node in tree.css('div._356262b9'):
-        title_node = node.css_first('h3')
-        desc_node = node.css_first('p')
-        url_node = node.css_first('a')
-        
-        if title_node and url_node:
+    try:
+        data = resp.json()
+        for item in data.get("objects", []):
+            pkg = item.get("package", {})
             results.append({
-                "title": f"NPM: {title_node.text().strip()}",
-                "url": "https://www.npmjs.com" + url_node.attributes.get('href', ''),
-                "content": desc_node.text().strip() if desc_node else "Paquete de Node.js.",
+                "title": f"NPM: {pkg.get('name')} {pkg.get('version')}",
+                "url": pkg.get("links", {}).get("npm", f"https://www.npmjs.com/package/{pkg.get('name')}"),
+                "content": pkg.get("description", "Paquete de Node.js."),
                 "source": "npm"
             })
+    except Exception:
+        pass
     return results

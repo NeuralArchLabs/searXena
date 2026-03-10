@@ -14,7 +14,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 2.5
+            "weight": 4.0
         },
         {
             "name": "duckduckgo",
@@ -22,7 +22,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 1.8
+            "weight": 2.5
         },
         {
             "name": "brave",
@@ -30,7 +30,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 2.2
+            "weight": 3.5
         },
         {
             "name": "qwant",
@@ -46,7 +46,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 2.0
+            "weight": 3.0
         },
         {
             "name": "startpage",
@@ -54,7 +54,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 1.4
+            "weight": 3.0
         },
         {
             "name": "yahoo",
@@ -62,7 +62,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 1.0
+            "weight": 3.0
         },
         {
             "name": "ecosia",
@@ -78,7 +78,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 1.0
+            "weight": 2.0
         },
         {
             "name": "swisscows",
@@ -168,7 +168,7 @@
                 "it",
                 "news"
             ],
-            "weight": 3.0
+            "weight": 1.2
         },
         {
             "name": "wikidata",
@@ -176,7 +176,7 @@
             "categories": [
                 "general"
             ],
-            "weight": 4.0
+            "weight": 1.0
         },
         {
             "name": "wolframalpha",
@@ -448,7 +448,7 @@
             "categories": [
                 "news"
             ],
-            "weight": 0.8
+            "weight": 0.5
         },
         {
             "name": "brave_news",
@@ -473,7 +473,7 @@
                 "general",
                 "maps"
             ],
-            "weight": 3.0
+            "weight": 1.2
         }
     ]
 }
