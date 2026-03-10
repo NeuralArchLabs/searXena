@@ -43,7 +43,12 @@ async def get_settings(request: Request):
             "categories": module.CATEGORIES,
             "weight": module.WEIGHT
         })
-    return templates.TemplateResponse("settings.html", {"request": request, "engines": engine_list})
+    general_settings = manager.settings.get("general", {})
+    return templates.TemplateResponse("settings.html", {
+        "request": request, 
+        "engines": engine_list,
+        "general": general_settings
+    })
 
 @app.post("/save_settings")
 async def save_settings(request: Request):

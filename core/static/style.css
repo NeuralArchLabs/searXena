@@ -968,6 +968,11 @@ body {
     cursor: pointer;
 }
 
+.select-custom option {
+    background: var(--bg-card);
+    color: white;
+}
+
 .engine-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
