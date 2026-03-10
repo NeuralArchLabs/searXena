@@ -56,9 +56,25 @@ async def save_settings(request: Request):
     enabled_engines = form.getlist("engines")
     
     current = manager.settings
-    # Guardar motores
-    for engine_cfg in current["engines"]:
-        engine_cfg["enabled"] = engine_cfg["name"] in enabled_engines
+    if "engines" not in current:
+        current["engines"] = []
+        
+    # Guardar motores de forma segura y evitar conflictos de categorías
+    for name, module in manager.engines.items():
+        found = False
+        for cfg in current["engines"]:
+            if cfg.get("name") == name:
+                cfg["enabled"] = name in enabled_engines
+                # Eliminar las categorías cacheadas en JSON si existen, para que siempre lea del .py
+                if "categories" in cfg:
+                    del cfg["categories"]
+                found = True
+                break
+        if not found:
+            current["engines"].append({
+                "name": name,
+                "enabled": name in enabled_engines
+            })
     
     # Guardar preferencias generales
     general = current.get("general", {})
