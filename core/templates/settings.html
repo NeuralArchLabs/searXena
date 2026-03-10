@@ -6,8 +6,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Preferencias - searXena Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=3.6">
+    <link rel="stylesheet" href="/static/style.css?v=3.7">
     <meta name="referrer" content="no-referrer">
+
+    <!-- Animación de ojos parpadeantes para el logo estático -->
+    <style>
+        .dog-eye {
+            animation: blinkEye 4s infinite;
+            transform-origin: center;
+            transform-box: fill-box;
+            display: inline-block;
+        }
+
+        @keyframes blinkEye {
+
+            0%,
+            46%,
+            54%,
+            100% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+
+            50% {
+                opacity: 0;
+                transform: scaleY(0.1);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -22,10 +48,50 @@
         </a>
 
         <div class="settings-card">
-            <div class="settings-header">
-                <h1 class="logo-main" style="font-size: 2.5rem; text-align: left; margin-bottom: 5px;">Preferencias</h1>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">Personaliza tu experiencia de búsqueda
-                    privada</p>
+            <div class="settings-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h1 class="logo-main"
+                        style="font-size: 2.5rem; text-align: left; margin-bottom: 5px; margin-top: 0;">Preferencias
+                    </h1>
+                    <p style="color: var(--text-secondary); margin: 0;">Personaliza tu experiencia de búsqueda privada
+                    </p>
+                </div>
+
+                <div class="settings-mascot"
+                    style="position: relative; width: 220px; height: 80px; transform: scale(0.95); margin-right: -20px; pointer-events: none;">
+                    <svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" aria-label="searXena Mascot">
+                        <defs>
+                            <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#818cf8" />
+                                <stop offset="50%" stop-color="#c084fc" />
+                                <stop offset="100%" stop-color="#e879f9" />
+                            </linearGradient>
+                        </defs>
+                        <g transform="translate(150, 80)" font-family="'Outfit', sans-serif">
+                            <g class="text-dog-wrapper">
+                                <!-- Lupa alineada a la izquierda del perrito (posición del final de animación) -->
+                                <g transform="translate(-115, 8)">
+                                    <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
+                                    <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4"
+                                        stroke-linecap="round" />
+                                </g>
+
+                                <!-- Rostro del Perrito (Estado final) -->
+                                <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
+                                    font-weight="700" fill="url(#neonGrad)">
+                                    V<tspan class="dog-eye">•</tspan>
+                                    <tspan style="opacity: 0;">ᴥ</tspan>
+                                    <tspan class="dog-eye">•</tspan>V
+                                </text>
+                                <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
+                                    font-weight="700" fill="url(#neonGrad)">
+                                    ᴥ
+                                </text>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
             </div>
 
             <div class="settings-tabs" role="tablist">
