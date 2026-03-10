@@ -1,6 +1,6 @@
 from selectolax.parser import HTMLParser
 
-CATEGORIES = ["general", "news"]
+CATEGORIES = ["general"]
 WEIGHT = 2.2
 
 def request(query, params):

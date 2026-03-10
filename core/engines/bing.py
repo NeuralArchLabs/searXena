@@ -3,7 +3,7 @@ from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, urlparse, parse_qs, unquote
 import base64
 
-CATEGORIES = ["general", "news"]
+CATEGORIES = ["general"]
 WEIGHT = 3.0
 
 def request(query, params):

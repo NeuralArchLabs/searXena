@@ -2,7 +2,7 @@ STATUS = "experimental"
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
 
-CATEGORIES = ["general", "news"]
+CATEGORIES = ["general"]
 WEIGHT = 1.8
 
 def request(query, params):
