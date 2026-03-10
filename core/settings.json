@@ -34,7 +34,7 @@
         },
         {
             "name": "qwant",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -66,7 +66,7 @@
         },
         {
             "name": "ecosia",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -82,7 +82,7 @@
         },
         {
             "name": "swisscows",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -90,7 +90,7 @@
         },
         {
             "name": "metager",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -98,7 +98,7 @@
         },
         {
             "name": "ask",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -114,7 +114,7 @@
         },
         {
             "name": "naver",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -122,7 +122,7 @@
         },
         {
             "name": "seznam",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -130,7 +130,7 @@
         },
         {
             "name": "gigablast",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -154,7 +154,7 @@
         },
         {
             "name": "pydoc",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -180,7 +180,7 @@
         },
         {
             "name": "wolframalpha",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -212,7 +212,7 @@
         },
         {
             "name": "qwant",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "news"
             ],
@@ -252,7 +252,7 @@
         },
         {
             "name": "vimeo",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "videos"
             ],
@@ -260,7 +260,7 @@
         },
         {
             "name": "dailymotion",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "videos"
             ],
@@ -300,7 +300,7 @@
         },
         {
             "name": "unsplash",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "images"
             ],
@@ -316,7 +316,7 @@
         },
         {
             "name": "pixabay",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "images"
             ],
@@ -324,7 +324,7 @@
         },
         {
             "name": "giphy",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "images"
             ],
@@ -332,7 +332,7 @@
         },
         {
             "name": "pinterest",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "images"
             ],
@@ -348,7 +348,7 @@
         },
         {
             "name": "librestock",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "images"
             ],
@@ -383,7 +383,7 @@
         },
         {
             "name": "gitlab",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -391,7 +391,7 @@
         },
         {
             "name": "sourceforge",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -399,7 +399,7 @@
         },
         {
             "name": "pypi",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -415,7 +415,7 @@
         },
         {
             "name": "docker",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -423,7 +423,7 @@
         },
         {
             "name": "ebay",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general"
             ],
@@ -431,7 +431,7 @@
         },
         {
             "name": "instant_answers",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general",
                 "news",
@@ -452,7 +452,7 @@
         },
         {
             "name": "brave_news",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "news"
             ],
@@ -460,7 +460,7 @@
         },
         {
             "name": "amazon",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "shopping"
             ],
@@ -468,7 +468,7 @@
         },
         {
             "name": "osm",
-            "enabled": true,
+            "enabled": false,
             "categories": [
                 "general",
                 "maps"
