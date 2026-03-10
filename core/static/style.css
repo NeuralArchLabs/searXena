@@ -113,6 +113,7 @@ body {
     line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -120,6 +121,7 @@ body {
 
 .read-more-checkbox:checked~.infobox-content {
     -webkit-line-clamp: unset;
+    line-clamp: unset;
     display: block;
 }
 
@@ -244,6 +246,7 @@ body {
     margin-bottom: 8px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -867,4 +870,148 @@ body {
     .mobile-only {
         display: none;
     }
+}
+
+/* Settings Page Styles */
+.settings-page {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.settings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 40px;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 15px;
+}
+
+.settings-tab {
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.settings-tab.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+}
+
+.settings-section {
+    display: none;
+}
+
+.settings-section.active {
+    display: block;
+}
+
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.setting-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.setting-info p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.select-custom {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+.engine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.engine-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.engine-label:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+}
+
+.engine-label input {
+    accent-color: var(--accent);
+}
+
+.save-bar {
+    position: sticky;
+    bottom: 20px;
+    background: var(--accent);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 30px var(--accent-glow);
+    margin-top: 40px;
+    width: 100%;
+    transition: transform 0.2s;
+}
+
+.save-bar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px var(--accent-glow);
+}
+
+/* Back button in settings */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: var(--glass);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    color: white;
+    border-color: var(--accent);
+    background: var(--accent-glow);
 }
