@@ -11,7 +11,7 @@ def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    for node in tree.css('div.img-result, .image-result, div[data-testid*='image']'):
+    for node in tree.css("div.img-result, .image-result, div[data-testid*='image']"):
         img = node.css_first('img')
         link = node.css_first('a')
         if img and link:

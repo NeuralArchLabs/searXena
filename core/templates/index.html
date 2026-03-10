@@ -39,6 +39,7 @@
             opacity: 1;
             filter: blur(0px);
             transform: scale(1);
+            transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
             will-change: transform, opacity, filter;
         }
 
@@ -46,12 +47,14 @@
             opacity: 0;
             filter: blur(12px);
             transform: scale(0.95);
+            transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
             will-change: transform, opacity, filter;
         }
 
         .mag-glass {
             opacity: 0;
             transform: translateX(140px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
             will-change: transform, opacity;
         }
 
@@ -100,16 +103,49 @@
         }
 
         /* ANIMACIÓN 1: INICIO Y CLIC (.is-animating) */
-        .is-animating .text-searxena-wrapper {
+        .is-animating .intro-layer .text-searxena-wrapper {
             animation: morphSearxena 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .is-animating .text-dog-wrapper {
+        .is-animating .intro-layer .text-dog-wrapper {
             animation: morphDog 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .is-animating .mag-glass {
+        .is-animating .intro-layer .mag-glass {
             animation: sweepGlass 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* LÓGICA DE TRANSICIÓN PREMIUM: FUNDIDO Y REVERSA */
+        .intro-layer {
+            transition: opacity 0.8s ease-in-out, filter 0.8s ease-in-out, transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            filter: blur(0px);
+        }
+
+        /* Cuando entra el modo carga, pausamos la intro y la mandamos a 'base' mientras se difumina */
+        .is-loading .intro-layer {
+            opacity: 0;
+            filter: blur(15px);
+            transform: scale(0.9) !important;
+            /* Efecto de alejamiento mientras desaparece */
+            pointer-events: none;
+        }
+
+        .is-loading .intro-layer * {
+            animation-play-state: paused !important;
+            /* Detiene el movimiento brusco de los keyframes */
+        }
+
+        /* CAPA DE CARGA (Oculta por defecto) */
+        .loader-layer {
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
+        }
+
+        .is-loading .loader-layer {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         @keyframes sweepGlass {
@@ -201,15 +237,15 @@
         }
 
         /* ANIMACIÓN 2: ESTADO DE CARGA (.is-loading) */
-        .is-loading .text-searxena-wrapper {
+        .is-loading .loader-layer .text-searxena-wrapper {
             animation: fadeOutSearxenaLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .is-loading .text-dog-wrapper {
+        .is-loading .loader-layer .text-dog-wrapper {
             animation: fadeInDogLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
-        .is-loading .mag-glass {
+        .is-loading .loader-layer .mag-glass {
             animation: sweepInGlassLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
 
@@ -348,41 +384,74 @@
 
                 <g transform="translate(325, 80)" font-family="'Outfit', sans-serif">
 
-                    <g class="mag-glass">
-                        <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
-                        <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4"
-                            stroke-linecap="round" />
+                    <!-- CAPA INICIAL (Intro) -->
+                    <g class="intro-layer">
+                        <g class="mag-glass">
+                            <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
+                            <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4"
+                                stroke-linecap="round" />
+                        </g>
+
+                        <g class="text-searxena-wrapper">
+                            <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80"
+                                font-weight="700" fill="url(#neonGrad)" letter-spacing="-2">
+                                searXena
+                            </text>
+                        </g>
+
+                        <g class="text-dog-wrapper">
+                            <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
+                                font-weight="700" fill="url(#neonGrad)">
+                                V<tspan class="dog-eye">•</tspan>
+                                <tspan style="opacity: 0;">ᴥ</tspan>
+                                <tspan class="dog-eye">•</tspan>V
+                            </text>
+                            <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central"
+                                font-size="52" font-weight="700" fill="url(#neonGrad)">
+                                ᴥ
+                            </text>
+                        </g>
                     </g>
 
-                    <g class="text-searxena-wrapper">
-                        <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80"
-                            font-weight="700" fill="url(#neonGrad)" letter-spacing="-2">
-                            searXena
-                        </text>
-                    </g>
+                    <!-- CAPA DE BUSQUEDA (Carga) -->
+                    <g class="loader-layer">
+                        <g class="mag-glass">
+                            <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
+                            <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4"
+                                stroke-linecap="round" />
+                        </g>
 
-                    <g class="text-dog-wrapper">
-                        <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
-                            font-weight="700" fill="url(#neonGrad)">
-                            V<tspan class="dog-eye">•</tspan>
-                            <tspan style="opacity: 0;">ᴥ</tspan>
-                            <tspan class="dog-eye">•</tspan>V
-                        </text>
-                        <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central"
-                            font-size="52" font-weight="700" fill="url(#neonGrad)">
-                            ᴥ
-                        </text>
-                    </g>
+                        <g class="text-searxena-wrapper">
+                            <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80"
+                                font-weight="700" fill="url(#neonGrad)" letter-spacing="-2">
+                                searXena
+                            </text>
+                        </g>
 
-                    <g class="footprints-box">
-                        <use href="#paw-print" class="footprint footprint-1"
-                            transform="translate(131, 28) scale(0.65) rotate(15)" />
-                        <use href="#paw-print" class="footprint footprint-2"
-                            transform="translate(161, 8) scale(0.65) rotate(25)" />
-                        <use href="#paw-print" class="footprint footprint-3"
-                            transform="translate(131, 8) scale(0.65) rotate(10)" />
-                        <use href="#paw-print" class="footprint footprint-4"
-                            transform="translate(161, 28) scale(0.65) rotate(20)" />
+                        <g class="text-dog-wrapper">
+                            <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
+                                font-weight="700" fill="url(#neonGrad)">
+                                V<tspan class="dog-eye">•</tspan>
+                                <tspan style="opacity: 0;">ᴥ</tspan>
+                                <tspan class="dog-eye">•</tspan>V
+                            </text>
+                            <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central"
+                                font-size="52" font-weight="700" fill="url(#neonGrad)">
+                                ᴥ
+                            </text>
+                        </g>
+
+                        <!-- Huellas (Solo en capa de carga) -->
+                        <g class="footprints-box">
+                            <use href="#paw-print" class="footprint footprint-1"
+                                transform="translate(131, 28) scale(0.65) rotate(15)" />
+                            <use href="#paw-print" class="footprint footprint-2"
+                                transform="translate(161, 8) scale(0.65) rotate(25)" />
+                            <use href="#paw-print" class="footprint footprint-3"
+                                transform="translate(131, 8) scale(0.65) rotate(10)" />
+                            <use href="#paw-print" class="footprint footprint-4"
+                                transform="translate(161, 28) scale(0.65) rotate(20)" />
+                        </g>
                     </g>
 
                 </g>
@@ -426,11 +495,10 @@
                 logoContainer.classList.add('is-animating');
             });
 
-            // 3. Activar animación de carga
+            // 3. Activar animación de carga (Layered Transition)
             if (searchForm) {
                 const triggerLoading = () => {
-                    logoContainer.classList.remove('is-animating');
-                    void logoContainer.offsetWidth;
+                    // Ponemos el logo en modo carga: la capa intro se difumina y pausa, la capa loader aparece
                     logoContainer.classList.add('is-loading');
                 };
 

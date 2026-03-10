@@ -36,7 +36,7 @@ def response(resp):
                     "template": "videos.html",
                     "title": title_node.text().strip(),
                     "url": url,
-                    "img_src": img_node.attributes.get('src') if img_node else None,
+                    "img_src": img_node.attributes.get('src') or img_node.attributes.get('data-src') if img_node else None,
                     "content": snippet_node.text().strip() if snippet_node else "Video de Google.",
                     "source": "google_videos"
                 })

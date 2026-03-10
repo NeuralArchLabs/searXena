@@ -203,17 +203,35 @@
                 </div>
 
                 <div id="section-about" class="settings-section">
-                    <div class="infobox-container" style="background: rgba(129, 140, 248, 0.1);">
-                        <h2 style="color: var(--accent);">Compromiso de Privacidad</h2>
-                        <ul style="margin-left: 20px; margin-top: 20px; color: var(--text-primary); line-height: 1.8;">
-                            <li><b>Proxy de Recursos:</b> Todas las imágenes y favicons pasan por nuestro servidor.
-                                Ningún host de terceros ve tu IP.</li>
-                            <li><b>Sin Rastreo:</b> No guardamos logs de búsqueda, ni IPs, ni perfiles de usuario.</li>
-                            <li><b>Cero Cookies Externas:</b> El backend actúa como un cortafuegos, filtrando las
-                                cookies de motores externos.</li>
-                            <li><b>Referrer Policy:</b> Bloqueamos el envío de datos de origen a los sitios que visitas.
-                            </li>
+                    <div class="infobox-container"
+                        style="background: rgba(129, 140, 248, 0.1); padding: 30px; border-radius: 20px;">
+                        <h2 style="color: var(--accent);">Privacidad Local y Soberanía</h2>
+                        <p style="margin-top: 15px; color: var(--text-primary); font-size: 1rem; line-height: 1.6;">
+                            searXena Pro es un meta-buscador <b>privado y descentralizado</b> diseñado para ejecutarse
+                            localmente.
+                            A diferencia de los buscadores comerciales o servicios "en la nube", aquí tú tienes el
+                            control absoluto:
+                            esta instancia corre en <b>tu propio hardware</b>.
+                        </p>
+                        <ul
+                            style="margin-left: 20px; margin-top: 20px; color: var(--text-primary); line-height: 1.8; font-size: 0.95rem;">
+                            <li><b>Ejecución 100% Local:</b> Tus búsquedas no se envían a ningún servidor central ajeno.
+                                Todo el procesamiento, ranking y filtrado ocurre en tu máquina.</li>
+                            <li><b>Aislamiento de Recursos:</b> Las imágenes y favicons pasan por un proxy en tu
+                                instancia local. Esto evita que sitios de terceros rastreen tu navegación al cargar
+                                contenido visual.</li>
+                            <li><b>Cero Persistencia:</b> No guardamos logs, ni historiales, ni IPs, ni perfiles. Al
+                                cerrar la aplicación, tu rastro digital es inexistente.</li>
+                            <li><b>Referrer Policy:</b> Implementamos cabeceras <i>no-referrer</i> estrictas para
+                                asegurar que los sitios que visitas no sepan de dónde vienes.</li>
+                            <li><b>Backend Seguro:</b> El código actúa como un cortafuegos que filtra cookies y scripts
+                                de rastreo de motores externos antes de mostrarte los resultados.</li>
                         </ul>
+                        <div
+                            style="margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: var(--text-secondary);">
+                            <p>Versión 2.5 — <a href="https://github.com/martinezpalomera92"
+                                    style="color: var(--accent); text-decoration: none;">Neural Arch Labs</a></p>
+                        </div>
                     </div>
                 </div>
 

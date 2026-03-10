@@ -60,6 +60,7 @@
             {% endif %}
 
             <!-- Resultado Destacado Principal (Featured Answer) -->
+            {% if category == 'general' or not category %}
             {% set featured = results | selectattr('template', 'equalto', 'infobox.html') | first %}
             {% if featured %}
             <div class="infobox-container featured-answer">
@@ -70,13 +71,15 @@
                     {% endif %}
                     <div class="infobox-body-main">
                         <div class="infobox-title">{{ featured.title }}</div>
-                        <p class="infobox-content">{{ featured.content }}</p>
+                        <p class="infobox-content" style="max-height: 150px; overflow-y: auto;">{{ featured.content }}
+                        </p>
                         {% if featured.url %}<a href="{{ featured.url }}" target="_blank" class="infobox-link"
                             rel="noopener noreferrer nofollow">Leer más en {{
                             featured.source or 'la fuente' }} →</a>{% endif %}
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endif %}
 
             <!-- Otros Infoboxes Móvil (Omitir el ya destacado) -->
@@ -114,7 +117,7 @@
                     {% if result.img_src or result.thumbnail_src %}
                     <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer nofollow">
                         <img src="/proxify?url={{ result.img_src or result.thumbnail_src | urlencode }}"
-                            class="video-thumb" alt="{{ result.title }}">
+                            class="video-thumb" alt="{{ result.title }}" onerror="this.src='/static/placeholder.png';">
                     </a>
                     {% endif %}
                     <div class="video-details">
@@ -176,7 +179,7 @@
                         <div class="result-header">
                             <div class="title-container">
                                 <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=32&domain=' ~ result.url) | urlencode }}"
-                                    alt="Favicon" class="result-favicon">
+                                    alt="Favicon" class="result-favicon" onerror="this.style.opacity='0';">
                                 <a href="{{ result.url }}" class="result-title" target="_blank"
                                     rel="noopener noreferrer nofollow">{{ result.title|safe }}</a>
                             </div>
@@ -208,6 +211,7 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
+            {% if category == 'general' or not category %}
             {% set infoboxes = results | selectattr('template', 'equalto', 'infobox.html') | list %}
             {% if infoboxes %}
             {% for info in infoboxes %}
@@ -227,6 +231,12 @@
             <div class="infobox-container sidebar-empty">
                 <h3 class="sidebar-empty-title">Más información</h3>
                 <p class="sidebar-empty-text">No hay datos adicionales disponibles para esta consulta.</p>
+            </div>
+            {% endif %}
+            {% else %}
+            <div class="infobox-container sidebar-empty">
+                <h3 class="sidebar-empty-title">Más información</h3>
+                <p class="sidebar-empty-text">En esta categoría solo se muestran resultados directos.</p>
             </div>
             {% endif %}
 

@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
 NAME = "wikipedia"
-CATEGORIES = ['general', 'it', 'news', 'science']
+CATEGORIES = ['general', 'it', 'science']
 WEIGHT = 3.0
 
 def request(query, params):
@@ -12,7 +12,7 @@ def request(query, params):
         "prop": "extracts|info|pageimages",
         "exintro": True,
         "explaintext": True,
-        "exsentences": 5,
+        "exsentences": 3,
         "inprop": "url",
         "pithumbsize": 400,
         "generator": "search",

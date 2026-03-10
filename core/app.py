@@ -74,18 +74,25 @@ async def proxify(url: str):
     """Proxy local para imágenes y recursos externos para proteger la IP del usuario."""
     if not url: return Response(status_code=400)
     
+    # Intentar limpiar URLs de Google que a veces vienen mal
+    if "google.com/url?q=" in url:
+        from urllib.parse import unquote
+        url = unquote(url.split("?q=")[1].split("&")[0])
+
     async def stream_resource():
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(verify=False, timeout=15.0, follow_redirects=True) as client:
             try:
-                # Omitimos enviar cookies del usuario al destino original
-                async with client.stream("GET", url, timeout=10.0, follow_redirects=True) as resp:
+                async with client.stream("GET", url) as resp:
                     if resp.status_code == 200:
                         async for chunk in resp.aiter_bytes():
                             yield chunk
+                    else:
+                        # Fallback simple
+                        pass
             except Exception:
                 pass
 
-    return StreamingResponse(stream_resource())
+    return StreamingResponse(stream_resource(), media_type="image/png")
 
 # Meta-búsqueda orquestada con paginación
 @app.get("/search")
@@ -116,9 +123,11 @@ async def search(request: Request):
 
     results, infoboxes = await manager.search(q, category=category, pageno=pageno)
     
-    # Combinamos para la plantilla (que ya hace su propio filtrado por template)
-    # o pasamos ambos si queremos limpiar el HTML. Por ahora combinamos para no romper el CSS/Layout.
-    full_results = infoboxes + results
+    # Solo mostrar infoboxes (respuestas destacadas) en la categoría GENERAL
+    if category == "general":
+        full_results = infoboxes + results
+    else:
+        full_results = results
 
     response = templates.TemplateResponse("results.html", {
         "request": request, 
