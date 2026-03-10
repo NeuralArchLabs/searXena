@@ -2,7 +2,7 @@ from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
 CATEGORIES = ['it_science']
-WEIGHT = 1.0
+WEIGHT = 0.5
 
 def request(query, params):
     # Use MDN JSON API (v1)
@@ -26,4 +26,4 @@ def response(resp):
             })
     except Exception:
         pass
-    return results
+    return results[:3]

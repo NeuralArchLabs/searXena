@@ -2,7 +2,7 @@ from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
 CATEGORIES = ['social', 'it_science']
-WEIGHT = 1.0
+WEIGHT = 0.5
 
 def request(query, params):
     # Usar búsqueda de repositorios de GitHub
@@ -24,4 +24,4 @@ def response(resp):
                 "content": desc_node.text().strip() if desc_node else "Repositorio en GitHub.",
                 "source": "github"
             })
-    return results
+    return results[:3]
