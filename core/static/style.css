@@ -912,8 +912,9 @@ body {
 
 .settings-section {
     display: none;
-    min-height: 450px;
-    /* Tamaño consistente para evitar saltos de página */
+    min-height: 480px;
+    /* Estabiliza el alto para que la tarjeta no cambie de tamaño */
+    padding: 10px 0;
 }
 
 .settings-section.active {
@@ -950,20 +951,25 @@ body {
 
 .engine-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .engine-label {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 15px;
+    padding: 0 15px;
+    height: 48px;
+    /* Altura fija estándar */
     background: var(--glass);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     cursor: pointer;
     transition: 0.2s;
+    font-size: 0.9rem;
+    overflow: hidden;
 }
 
 .engine-label:hover {
