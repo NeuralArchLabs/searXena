@@ -912,6 +912,8 @@ body {
 
 .settings-section {
     display: none;
+    min-height: 450px;
+    /* Tamaño consistente para evitar saltos de página */
 }
 
 .settings-section.active {
