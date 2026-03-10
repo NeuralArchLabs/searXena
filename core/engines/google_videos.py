@@ -32,16 +32,31 @@ def response(resp):
                 url = unquote(url[7:].split('&sa=')[0])
                 
             if url.startswith('http') and not "google.com" in url:
-                img_src = img_node.attributes.get('src') or img_node.attributes.get('data-src') if img_node else None
+                img_src = None
                 
-                # Try to get high quality youtube thumbnails directly
-                if "youtube.com/watch?v=" in url:
+                # 1. YouTube HQ Extraction (Priority)
+                import re
+                yt_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+                if yt_match and ("youtube.com" in url or "youtu.be" in url):
                     try:
-                        v_id = url.split("v=")[1].split("&")[0]
-                        img_src = f"https://img.youtube.com/vi/{v_id}/mqdefault.jpg"
-                    except Exception:
-                        pass
+                        v_id = yt_match.group(1)
+                        img_src = f"https://i.ytimg.com/vi/{v_id}/mqdefault.jpg"
+                    except: pass
                 
+                # 2. Generic attributes fallback
+                if not img_src and img_node:
+                    img_src = img_node.attributes.get('src') or \
+                              img_node.attributes.get('data-src') or \
+                              img_node.attributes.get('data-iurl') or \
+                              img_node.attributes.get('imgsrc')
+                
+                # 3. Clean Google tracking from img_src if it's there
+                if img_src and img_src.startswith('/url?'):
+                    try:
+                        from urllib.parse import parse_qs, urlparse
+                        img_src = parse_qs(urlparse(img_src).query).get('q', [None])[0]
+                    except: pass
+
                 results.append({
                     "template": "videos.html",
                     "title": title_node.text().strip(),

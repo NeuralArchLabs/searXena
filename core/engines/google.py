@@ -63,9 +63,20 @@ def response(resp):
                         "source": "google"
                     }
                     if img_node:
-                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
+                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src') or img_node.attributes.get('data-iurl')
                         if src and 'http' in src:
                             item["thumbnail_src"] = src
+                            item["img_src"] = src
+                    
+                    # Bonus: Si es video en motor general, forzar template y miniatura HQ si es Youtube
+                    if params.get("category") == "videos" or "youtube.com" in url or "youtu.be" in url:
+                        item["template"] = "videos.html"
+                        import re
+                        yt_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
+                        if yt_match and ("youtube.com" in url or "youtu.be" in url):
+                            item["img_src"] = f"https://i.ytimg.com/vi/{yt_match.group(1)}/mqdefault.jpg"
+                            item["thumbnail_src"] = item["img_src"]
+                        
                     if price_node:
                         item["price"] = price_node.text().strip()
                         

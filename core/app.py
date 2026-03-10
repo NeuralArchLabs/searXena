@@ -1,7 +1,9 @@
-from fastapi import FastAPI, Request, Form, Response
+from fastapi import FastAPI, Request, Form, Response, Query, Body
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, RedirectResponse
+from pydantic import BaseModel, Field
+from typing import List, Optional, Any
 import uvicorn
 import os
 import json
@@ -136,7 +138,9 @@ async def search(request: Request):
         q = q or form.get("q")
         category = category or form.get("category", "general")
         pageno = int(form.get("pageno", 1))
-
+    if category == "it_science":
+        category = "it"
+        
     if not q:
         return RedirectResponse(url="/")
 
@@ -219,6 +223,99 @@ async def search(request: Request):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     return response
+
+# --- API endpoints para IA / LLMs ---
+
+class ToolSearchRequest(BaseModel):
+    query: str = Field(..., description="Query string for search")
+    category: str = Field("general", description="Category of search: general, images, videos, news, it, shopping")
+    pageno: int = Field(1, description="Page number/offset for the search results")
+    include_engines: Optional[List[str]] = Field(None, description="List of specific engine names to use (e.g. ['google', 'github']). Ignored if empty.")
+    exclude_engines: Optional[List[str]] = Field(None, description="List of specific engine names to exclude. Ignored if empty.")
+    limit: int = Field(10, description="Cantidad máxima de resultados a retornar (default 10 para ahorrar contexto).")
+
+@app.post("/api/v1/search")
+async def api_search(request_data: ToolSearchRequest):
+    """
+    Endpoint nativo en JSON estructurado para Agentes de IA
+    """
+    results, infoboxes = await manager.search(
+        request_data.query,
+        category=request_data.category,
+        pageno=request_data.pageno,
+        include_engines=request_data.include_engines,
+        exclude_engines=request_data.exclude_engines
+    )
+    
+    # Limpiamos resultados para IA
+    keys_to_remove = ["template", "engine_positions", "score", "sources"]
+    
+    clean_results = []
+    # Convertimos los results de dicts, omitiendo las llaves para front end
+    for r in infoboxes + results:
+        clean_r = {k: v for k, v in r.items() if k not in keys_to_remove}
+        clean_results.append(clean_r)
+        
+    total = len(clean_results)
+    limited = clean_results[:request_data.limit]
+    
+    return {
+        "results": limited,
+        "meta": {
+            "total_found": total,
+            "limit_applied": request_data.limit,
+            "has_more": total > request_data.limit,
+            "suggestion": f"Hay {total} resultados en total guardados en cache. Estas viendo solo los primeros {request_data.limit}. Para ver el resto, repite esta misma llamada a la herramienta pero cambia el parametro 'limit' a {total} o superior." if total > request_data.limit else None
+        }
+    }
+
+@app.get("/api/v1/tools_schema")
+async def api_tools_schema():
+    """
+    Devuelve el esquema nativo listando la herramienta general del buscador 
+    para ser mapeada directamente en APIs de LLMs modernos (OpenAI, Anthropic, Gemini, etc.)
+    """
+    engines_list = [name for name, _ in manager.engines.items()]
+    return {
+      "type": "function",
+      "function": {
+        "name": "searxena_search",
+        "description": "Realiza una meta-búsqueda en la web. Útil para obtener información general, código, noticias, o buscar bibliotecas de IT y productos.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "El término de búsqueda"
+            },
+            "category": {
+              "type": "string",
+              "enum": ["general", "it", "shopping", "news", "images", "videos"],
+              "description": "El canal de búsqueda a utilizar según la intención. General es el default."
+            },
+            "pageno": {
+              "type": "integer",
+              "description": "Número de página de resultados (1 por defecto)."
+            },
+            "include_engines": {
+              "type": "array",
+              "items": {"type": "string", "enum": engines_list},
+              "description": "Opcional. Exige el uso exclusivo de este arreglo de motores."
+            },
+            "exclude_engines": {
+              "type": "array",
+              "items": {"type": "string", "enum": engines_list},
+              "description": "Opcional. Motores específicos a excluir de los resultados."
+            },
+            "limit": {
+              "type": "integer",
+              "description": "Cantidad máxima de resultados para ahorrar contexto (default 10)."
+            }
+          },
+          "required": ["query"]
+        }
+      }
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")

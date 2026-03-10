@@ -105,7 +105,7 @@ class EngineManager:
                 except Exception:
                     pass
 
-    async def search(self, query: str, category: str = "general", pageno: int = 1):
+    async def search(self, query: str, category: str = "general", pageno: int = 1, include_engines: list = None, exclude_engines: list = None):
         # 1. Handle Bangs
         target_engine = None
         clean_query = query
@@ -133,13 +133,27 @@ class EngineManager:
         
         # Filtro de motores por categoría (Mejorado)
         category_engines = []
+        include_engines = include_engines or []
+        exclude_engines = exclude_engines or []
+
         for name, engine in self.engines.items():
-            if engine.ENABLED and category in engine.CATEGORIES:
+            if exclude_engines and name in exclude_engines:
+                continue
+            if include_engines and name not in include_engines:
+                continue
+            
+            # Si incluimos explícitamente motores, saltamos el check de categoría si es general o específico.
+            real_category = "it_science" if category == "it" else category
+            if include_engines:
+                category_engines.append(engine)
+            elif engine.ENABLED and real_category in engine.CATEGORIES:
                 category_engines.append(engine)
         
         # Si no hay motores en la categoría, buscar en general (Fallback)
-        if not category_engines:
+        if not category_engines and not include_engines:
             for name, engine in self.engines.items():
+                if exclude_engines and name in exclude_engines:
+                    continue
                 if engine.ENABLED and "general" in engine.CATEGORIES:
                     category_engines.append(engine)
                     
@@ -163,7 +177,7 @@ class EngineManager:
         except Exception:
             valid_results = []
         
-        results, infoboxes = self.process_and_rank(valid_results)
+        results, infoboxes = self.process_and_rank(valid_results, category)
         
         # Cache Result
         ttl = self.settings["general"].get("cache_ttl", 600)
@@ -285,7 +299,7 @@ class EngineManager:
             
         return True
 
-    def process_and_rank(self, results_groups):
+    def process_and_rank(self, results_groups, category="general"):
         score_map = defaultdict(lambda: {"title": "", "url": "", "content": "", "score": 0.0, "sources": set(), "engine_positions": []})
         infoboxes = [] # Resultados destacados (Wiki, Calculadora, OSM)
         
@@ -314,12 +328,26 @@ class EngineManager:
                 # 3. Ranking Armónico Ponderado
                 # SearXNG recompensa mucho aparecer en el TOP 1 de cualquier motor confiable.
                 engine_weight = res.get("engine_weight", 1.0)
+                source_engine = res.get("source", "")
+                
+                # Ajustes Dinámicos de Pesos por Categoría
+                if category == "it":
+                    # Reducir drásticamente el peso de motores ruidosos/repositorios en IT
+                    if source_engine in ["github", "npm", "mdn", "arxiv"]:
+                        engine_weight *= 0.2
+                    # Aumentar peso de motores con menos ruido / alta curación
+                    elif source_engine in ["hackernews", "wikipedia", "stackoverflow"]:
+                        engine_weight *= 1.5
                 
                 # Bonus por Dominios de Autoridad Superior
                 auth_bonus = 1.0
                 trusted_list = [".edu", ".org", ".gov", "wikipedia.org", "reuters.com", "arxiv.org", "stackoverflow.com", "github.com"]
                 if any(ext in clean_url for ext in trusted_list):
                     auth_bonus = 1.25
+                
+                # Descuento en dominios ruidosos de IT (Uncondicional)
+                if category == "it" and any(d in clean_url for d in ["github.com", "npmjs.com", "github.io", "developer.mozilla.org", "arxiv.org"]):
+                    auth_bonus *= 0.15 # Castigo severo directo a la URL de repositorios o crudos
                 
                 # Penalización por snippets "con puntos suspensivos" iniciales que no aportan valor
                 snippet_penalty = 1.0
