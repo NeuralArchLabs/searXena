@@ -97,7 +97,10 @@ async def proxify(url: str):
             except Exception:
                 pass
 
-    return StreamingResponse(stream_resource(), media_type="image/png")
+    headers = {
+        "Cache-Control": "public, max-age=604800" # Cachear localmente por una semana
+    }
+    return StreamingResponse(stream_resource(), media_type="image/png", headers=headers)
 
 # Meta-búsqueda orquestada con paginación
 @app.get("/search")
