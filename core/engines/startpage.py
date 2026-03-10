@@ -5,15 +5,22 @@ CATEGORIES = ["general"]
 WEIGHT = 3.0
 
 def request(query, params):
-    # Startpage (Proxied Google results)
+    # Startpage requires POST for search recently to prevent basic scraping
     query_params = {
         "query": query,
         "cat": "web",
+        "cmd": "process_search",
+        "language": "english",
+        "engine0": "v1all",
         "t": "device",
-        "lui": "english"
+        "abp": "-1"
     }
-    params["url"] = f"https://www.startpage.com/sp/search?{urlencode(query_params)}"
+    params["url"] = "https://www.startpage.com/sp/search"
+    params["method"] = "POST"
+    params["data"] = query_params
     params["headers"]["Referer"] = "https://www.startpage.com/"
+    params["headers"]["Origin"] = "https://www.startpage.com"
+    params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
 
 def response(resp):
     results = []

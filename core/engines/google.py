@@ -31,9 +31,10 @@ def request(query, params):
     params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
     params["headers"]["Referer"] = "https://www.google.com/"
     
+    import random
+    cb_val = random.randint(20230000, 20249999)
     # Consent cookies to bypass 'Before you continue'
-    params["cookies"]["CONSENT"] = "YES+"
-    params["cookies"]["SOCS"] = "CAISHAgBEhJnd3NfMjAyNDA0MTYtMF9SQzIaAnp6IAEaBgiA_LGsBg"
+    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.en+FX+414"
 
 def response(resp):
     results = []
