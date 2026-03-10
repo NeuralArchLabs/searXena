@@ -1,7 +1,7 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
 
-CATEGORIES = ['social', 'general', 'it']
+CATEGORIES = ['it_science']
 WEIGHT = 1.0
 
 def request(query, params):

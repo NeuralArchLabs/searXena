@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ query }} - searXena Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/style.css?v=3.8">
+    <link rel="stylesheet" href="/static/style.css?v=3.6">
     <meta name="referrer" content="no-referrer">
 </head>
 
@@ -42,6 +42,8 @@
             <div class="tabs-container">
                 <a class="tab {% if not category or category == 'general' %}active{% endif %}"
                     onclick="changeCat('general')">General</a>
+                <a class="tab {% if category == 'it_science' %}active{% endif %}"
+                    onclick="changeCat('it_science')">TI/Ciencia</a>
                 <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">Noticias</a>
                 <a class="tab {% if category == 'videos' %}active{% endif %}" onclick="changeCat('videos')">Videos</a>
                 <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">Imágenes</a>
@@ -60,7 +62,7 @@
             {% endif %}
 
             <!-- Resultado Destacado Principal (Featured Answer) -->
-            {% if category == 'general' or not category %}
+            {% if category in ('general', 'it_science') or not category %}
             {% set featured = results | selectattr('template', 'equalto', 'infobox.html') | first %}
             {% if featured %}
             <div class="infobox-container featured-answer">
@@ -246,7 +248,7 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
-            {% if category == 'general' or not category %}
+            {% if category in ('general', 'it_science') or not category %}
             {% set infoboxes = results | selectattr('template', 'equalto', 'infobox.html') | list %}
             {% if infoboxes %}
             {% for info in infoboxes %}
@@ -294,7 +296,7 @@
                 class="credit-link" target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
     </footer>
 
-    <script src="/static/main.js?v=3.8"></script>
+    <script src="/static/main.js?v=3.6"></script>
 </body>
 
 </html>

@@ -1,7 +1,7 @@
 import httpx
 from urllib.parse import urlencode
 
-CATEGORIES = ['general', 'it', 'science']
+CATEGORIES = ['general', 'it_science']
 
 def request(query, params):
     # Wikidata para Infobox
