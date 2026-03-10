@@ -8,10 +8,304 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css?v=2.5">
     <meta name="referrer" content="no-referrer">
+
+    <!-- ESTILOS EXCLUSIVOS DE LA ANIMACIÓN DEL LOGO -->
+    <style>
+        .logo-wrapper {
+            width: 100%;
+            max-width: 600px;
+            height: 160px;
+            margin: 0 auto 1rem auto;
+            /* Centrado */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            /* Reseteamos efectos del CSS global que puedan chocar con el SVG */
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            background-clip: initial !important;
+            -webkit-text-fill-color: initial !important;
+            filter: none !important;
+        }
+
+        .logo-wrapper:hover {
+            opacity: 0.95;
+        }
+
+        /* ESTADOS BASE */
+        .text-searxena-wrapper {
+            opacity: 1;
+            filter: blur(0px);
+            transform: scale(1);
+            will-change: transform, opacity, filter;
+        }
+
+        .text-dog-wrapper {
+            opacity: 0;
+            filter: blur(12px);
+            transform: scale(0.95);
+            will-change: transform, opacity, filter;
+        }
+
+        .mag-glass {
+            opacity: 0;
+            transform: translateX(140px);
+            will-change: transform, opacity;
+        }
+
+        /* ROSTRO DEL PERRITO */
+        .dog-eye {
+            animation: blinkEye 4s infinite;
+            transform-origin: center;
+            transform-box: fill-box;
+            display: inline-block;
+        }
+
+        @keyframes blinkEye {
+
+            0%,
+            46%,
+            54%,
+            100% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+
+            50% {
+                opacity: 0;
+                transform: scaleY(0.1);
+            }
+        }
+
+        .dog-nose {
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        /* OLFATEO DISCRETO Y SUTIL */
+        .is-loading .dog-nose {
+            animation: sniff 0.25s infinite alternate ease-in-out;
+        }
+
+        @keyframes sniff {
+            from {
+                transform: translateY(0px) scale(1);
+            }
+
+            to {
+                transform: translateY(-1.5px) scale(1.02);
+            }
+        }
+
+        /* ANIMACIÓN 1: INICIO Y CLIC (.is-animating) */
+        .is-animating .text-searxena-wrapper {
+            animation: morphSearxena 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .is-animating .text-dog-wrapper {
+            animation: morphDog 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .is-animating .mag-glass {
+            animation: sweepGlass 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes sweepGlass {
+            0% {
+                transform: translate(145px, 8px);
+                opacity: 0;
+            }
+
+            12% {
+                transform: translate(145px, 8px);
+                opacity: 1;
+            }
+
+            30%,
+            70% {
+                transform: translate(-115px, 8px);
+                opacity: 1;
+            }
+
+            88% {
+                transform: translate(145px, 8px);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(145px, 8px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes morphSearxena {
+
+            0%,
+            12% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+
+            30%,
+            70% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.96);
+            }
+
+            88%,
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes morphDog {
+
+            0%,
+            12% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.95);
+            }
+
+            30% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1.1) rotate(-3deg);
+            }
+
+            40%,
+            60% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1) rotate(0deg);
+            }
+
+            70% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1.1) rotate(3deg);
+            }
+
+            88%,
+            100% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: scale(0.95);
+            }
+        }
+
+        /* ANIMACIÓN 2: ESTADO DE CARGA (.is-loading) */
+        .is-loading .text-searxena-wrapper {
+            animation: fadeOutSearxenaLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .is-loading .text-dog-wrapper {
+            animation: fadeInDogLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .is-loading .mag-glass {
+            animation: sweepInGlassLoad 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes fadeOutSearxenaLoad {
+            0% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: scale(0.95);
+            }
+        }
+
+        @keyframes fadeInDogLoad {
+            0% {
+                opacity: 0;
+                filter: blur(12px);
+                transform: scale(0.95);
+            }
+
+            100% {
+                opacity: 1;
+                filter: blur(0px);
+                transform: scale(1);
+            }
+        }
+
+        @keyframes sweepInGlassLoad {
+            0% {
+                transform: translate(145px, 8px);
+                opacity: 0;
+            }
+
+            15% {
+                transform: translate(145px, 8px);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-115px, 8px);
+                opacity: 1;
+            }
+        }
+
+        /* HUELLAS DE PATITAS */
+        .footprint {
+            opacity: 0;
+        }
+
+        .is-loading .footprint {
+            animation: pawStep 1.6s infinite;
+        }
+
+        .is-loading .footprint-1 {
+            animation-delay: 0s;
+        }
+
+        .is-loading .footprint-2 {
+            animation-delay: 0.4s;
+        }
+
+        .is-loading .footprint-3 {
+            animation-delay: 0.8s;
+        }
+
+        .is-loading .footprint-4 {
+            animation-delay: 1.2s;
+        }
+
+        @keyframes pawStep {
+            0% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0px transparent);
+            }
+
+            10%,
+            25% {
+                opacity: 1;
+                filter: drop-shadow(0 0 6px rgba(232, 121, 249, 0.8));
+            }
+
+            35%,
+            100% {
+                opacity: 0;
+                filter: drop-shadow(0 0 0px transparent);
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <!-- El botón de preferencias ahora usa la clase settings-btn (Top Right) -->
+    <!-- Botón de Preferencias (Top Right) -->
     <a href="/settings" class="settings-btn" title="Configurar motores y privacidad">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -23,7 +317,78 @@
     </a>
 
     <div class="home-container">
-        <h1 class="logo-main">searXena</h1>
+
+        <!-- === SVG ANIMADO INCORPORADO AQUÍ === -->
+        <h1 class="logo-main logo-wrapper" id="logoAnimator" style="margin: 0;">
+            <svg viewBox="0 0 650 160" xmlns="http://www.w3.org/2000/svg" aria-label="searXena">
+                <defs>
+                    <linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#818cf8" />
+                        <stop offset="50%" stop-color="#c084fc" />
+                        <stop offset="100%" stop-color="#e879f9" />
+                    </linearGradient>
+
+                    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="6" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+
+                    <g id="paw-print">
+                        <path d="M 0,-1 C -3,-1 -5,1 -5,4 C -5,7 -1,9 0,9 C 1,9 5,7 5,4 C 5,1 3,-1 0,-1 Z"
+                            fill="url(#neonGrad)" />
+                        <circle cx="-6" cy="-4" r="2.5" fill="url(#neonGrad)" />
+                        <circle cx="-2" cy="-8" r="2.5" fill="url(#neonGrad)" />
+                        <circle cx="2" cy="-8" r="2.5" fill="url(#neonGrad)" />
+                        <circle cx="6" cy="-4" r="2.5" fill="url(#neonGrad)" />
+                    </g>
+                </defs>
+
+                <g transform="translate(325, 80)" font-family="'Outfit', sans-serif">
+
+                    <g class="mag-glass">
+                        <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
+                        <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4"
+                            stroke-linecap="round" />
+                    </g>
+
+                    <g class="text-searxena-wrapper">
+                        <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80"
+                            font-weight="700" fill="url(#neonGrad)" letter-spacing="-2">
+                            searXena
+                        </text>
+                    </g>
+
+                    <g class="text-dog-wrapper">
+                        <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52"
+                            font-weight="700" fill="url(#neonGrad)">
+                            V<tspan class="dog-eye">•</tspan>
+                            <tspan style="opacity: 0;">ᴥ</tspan>
+                            <tspan class="dog-eye">•</tspan>V
+                        </text>
+                        <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central"
+                            font-size="52" font-weight="700" fill="url(#neonGrad)">
+                            ᴥ
+                        </text>
+                    </g>
+
+                    <g class="footprints-box">
+                        <use href="#paw-print" class="footprint footprint-1"
+                            transform="translate(131, 28) scale(0.65) rotate(15)" />
+                        <use href="#paw-print" class="footprint footprint-2"
+                            transform="translate(161, 8) scale(0.65) rotate(25)" />
+                        <use href="#paw-print" class="footprint footprint-3"
+                            transform="translate(131, 8) scale(0.65) rotate(10)" />
+                        <use href="#paw-print" class="footprint footprint-4"
+                            transform="translate(161, 28) scale(0.65) rotate(20)" />
+                    </g>
+
+                </g>
+            </svg>
+        </h1>
+
         <div class="search-box">
             <form action="/search" method="get" id="search-form">
                 <input type="text" name="q" class="search-input" id="search-input" placeholder="¿Qué estás buscando?"
@@ -44,6 +409,42 @@
     </footer>
 
     <script src="/static/main.js?v=2.5"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoContainer = document.getElementById('logoAnimator');
+            const searchForm = document.getElementById('search-form');
+
+            // 1. Animación al cargar la página
+            setTimeout(() => { logoContainer.classList.add('is-animating'); }, 500);
+
+            // 2. Animación al hacer clic en el logo
+            logoContainer.addEventListener('click', () => {
+                if (logoContainer.classList.contains('is-loading')) return;
+                logoContainer.classList.remove('is-animating');
+                void logoContainer.offsetWidth; // Fuerza el reinicio de CSS
+                logoContainer.classList.add('is-animating');
+            });
+
+            // 3. Activar animación de carga
+            if (searchForm) {
+                const triggerLoading = () => {
+                    logoContainer.classList.remove('is-animating');
+                    void logoContainer.offsetWidth;
+                    logoContainer.classList.add('is-loading');
+                };
+
+                searchForm.addEventListener('submit', triggerLoading);
+
+                // Interceptar submit() manual de JS si es necesario
+                const originalSubmit = searchForm.submit;
+                searchForm.submit = function () {
+                    triggerLoading();
+                    originalSubmit.apply(searchForm);
+                };
+            }
+        });
+    </script>
 </body>
 
 </html>
