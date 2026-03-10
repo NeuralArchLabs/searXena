@@ -43,11 +43,14 @@
                             <p>Priorizar resultados en este idioma.</p>
                         </div>
                         <select name="language" class="select-custom" title="Seleccionar idioma">
-                            <option value="es" {% if general.default_lang=='es' or not general.default_lang %}selected{%
-                                endif %}>Español</option>
-                            <option value="en" {% if general.default_lang=='en' %}selected{% endif %}>English</option>
-                            <option value="fr" {% if general.default_lang=='fr' %}selected{% endif %}>Français</option>
-                            <option value="de" {% if general.default_lang=='de' %}selected{% endif %}>Deutsch</option>
+                            <option value="es" {% if general.get('default_lang', 'es' )=='es' %}selected{% endif %}>
+                                Español</option>
+                            <option value="en" {% if general.get('default_lang')=='en' %}selected{% endif %}>English
+                            </option>
+                            <option value="fr" {% if general.get('default_lang')=='fr' %}selected{% endif %}>Français
+                            </option>
+                            <option value="de" {% if general.get('default_lang')=='de' %}selected{% endif %}>Deutsch
+                            </option>
                         </select>
                     </div>
 
@@ -57,10 +60,12 @@
                             <p>Filtrar contenido explícito de los resultados.</p>
                         </div>
                         <select name="safesearch" class="select-custom" title="Configurar búsqueda segura">
-                            <option value="0" {% if general.safe_search==0 %}selected{% endif %}>Desactivado</option>
-                            <option value="1" {% if general.safe_search==1 or general.safe_search is not defined
-                                %}selected{% endif %}>Moderado</option>
-                            <option value="2" {% if general.safe_search==2 %}selected{% endif %}>Estricto</option>
+                            <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>Desactivado
+                            </option>
+                            <option value="1" {% if general.get('safe_search', 1)==1 %}selected{% endif %}>Moderado
+                            </option>
+                            <option value="2" {% if general.get('safe_search')==2 %}selected{% endif %}>Estricto
+                            </option>
                         </select>
                     </div>
 
@@ -70,12 +75,12 @@
                             <p>Las sugerencias se procesan localmente para proteger tu privacidad.</p>
                         </div>
                         <select name="autocomplete" class="select-custom" title="Motor de sugerencias">
-                            <option value="google" {% if general.autocomplete=='google' or not general.autocomplete
-                                %}selected{% endif %}>Google (Proxy)</option>
-                            <option value="duckduckgo" {% if general.autocomplete=='duckduckgo' %}selected{% endif %}>
-                                DuckDuckGo (Proxy)</option>
-                            <option value="none" {% if general.autocomplete=='none' %}selected{% endif %}>Desactivado
-                            </option>
+                            <option value="google" {% if general.get('autocomplete', 'google' )=='google' %}selected{%
+                                endif %}>Google (Proxy)</option>
+                            <option value="duckduckgo" {% if general.get('autocomplete')=='duckduckgo' %}selected{%
+                                endif %}>DuckDuckGo (Proxy)</option>
+                            <option value="none" {% if general.get('autocomplete')=='none' %}selected{% endif %}>
+                                Desactivado</option>
                         </select>
                     </div>
                 </div>
