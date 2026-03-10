@@ -874,9 +874,14 @@ body {
 
 /* Settings Page Styles */
 .settings-page {
-    max-width: 1000px;
+    width: 100%;
+    max-width: 900px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Empuja el footer siempre hacia la base */
 }
 
 .settings-card {
@@ -886,6 +891,18 @@ body {
     padding: 40px;
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    height: 75vh;
+    /* Altura relativa al viewport */
+    min-height: 500px;
+}
+
+.settings-card form {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 .settings-tabs {
@@ -912,9 +929,11 @@ body {
 
 .settings-section {
     display: none;
-    min-height: 480px;
-    /* Estabiliza el alto para que la tarjeta no cambie de tamaño */
-    padding: 10px 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+    /* Margen para el scrollbar */
+    margin-bottom: 20px;
 }
 
 .settings-section.active {
@@ -951,9 +970,8 @@ body {
 
 .engine-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-    margin-top: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
 }
 
 .engine-label {
@@ -982,8 +1000,8 @@ body {
 }
 
 .save-bar {
-    position: sticky;
-    bottom: 20px;
+    margin-top: auto;
+    /* Ancla al fondo */
     background: var(--accent);
     color: white;
     padding: 15px 30px;
@@ -993,9 +1011,10 @@ body {
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 10px 30px var(--accent-glow);
-    margin-top: 40px;
-    width: 100%;
     transition: transform 0.2s;
+    flex-shrink: 0;
+    align-self: center;
+    /* Centra el botón y evita que se estire al 100% de la tarjeta */
 }
 
 .save-bar:hover {
@@ -1016,6 +1035,7 @@ body {
     background: var(--glass);
     border: 1px solid transparent;
     transition: all 0.3s ease;
+    align-self: flex-start;
 }
 
 .back-btn:hover {
