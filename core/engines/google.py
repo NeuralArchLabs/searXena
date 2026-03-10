@@ -46,17 +46,29 @@ def response(resp):
         # Snippet can be in several places
         snippet_node = node.css_first('div.VwiC3b, .VwiC3b, .BNeawe, .s3v9rd, span.st')
         
+        # Buscar miniatura y precio usando solo selectores DOM seguros
+        img_node = node.css_first('img')
+        price_node = node.css_first('.a8Pemb, .HRLxBb')
+        
         if title_node and url_node:
             url = _clean_url(url_node.attributes.get('href', ''))
             if _valid_url(url):
                 title = title_node.text().strip()
                 if title:
-                    results.append({
+                    item = {
                         "title": title,
                         "url": url,
                         "content": snippet_node.text().strip() if snippet_node else "Información de Google.",
                         "source": "google"
-                    })
+                    }
+                    if img_node:
+                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
+                        if src and 'http' in src:
+                            item["thumbnail_src"] = src
+                    if price_node:
+                        item["price"] = price_node.text().strip()
+                        
+                    results.append(item)
     
     # Fallback to any h3 link
     if not results:

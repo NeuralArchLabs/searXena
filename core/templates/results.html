@@ -67,12 +67,20 @@
                 <div class="featured-badge">Respuesta Destacada</div>
                 <div class="infobox-header-main">
                     {% if featured.img_src %}
-                    <img src="/proxify?url={{ featured.img_src | urlencode }}" alt="Info Image" class="featured-image">
+                    {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
+                    <img src="{{ featured.img_src if featured.img_src.startswith('http') else 'https:' ~ featured.img_src }}"
+                        alt="Info Image" class="featured-image"
+                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                    {% else %}
+                    <img src="/proxify?url={{ featured.img_src | urlencode }}" alt="Info Image" class="featured-image"
+                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                    {% endif %}
                     {% endif %}
                     <div class="infobox-body-main">
                         <div class="infobox-title">{{ featured.title }}</div>
-                        <p class="infobox-content" style="max-height: 150px; overflow-y: auto;">{{ featured.content }}
-                        </p>
+                        <input type="checkbox" id="read-more-toggle" class="read-more-checkbox">
+                        <p class="infobox-content">{{ featured.content }}</p>
+                        <label for="read-more-toggle" class="read-more-label">Continuar Leyendo</label>
                         {% if featured.url %}<a href="{{ featured.url }}" target="_blank" class="infobox-link"
                             rel="noopener noreferrer nofollow">Leer más en {{
                             featured.source or 'la fuente' }} →</a>{% endif %}
@@ -98,7 +106,7 @@
             <div class="images-grid">
                 {% for result in results if result.template == 'images.html' or result.img_src %}
                 <a href="{{ result.url }}" target="_blank" class="image-card" rel="noopener noreferrer nofollow">
-                    <img src="/proxify?url={{ result.thumbnail_src or result.img_src | urlencode }}"
+                    <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
                         alt="{{ result.title }}" loading="lazy" onerror="this.src='/static/placeholder.png';">
                     <div class="image-info">
                         <div class="image-source">{{ result.sources|join(', ') }}</div>
@@ -116,7 +124,7 @@
                 <div class="video-card">
                     {% if result.img_src or result.thumbnail_src %}
                     <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer nofollow">
-                        <img src="/proxify?url={{ result.img_src or result.thumbnail_src | urlencode }}"
+                        <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
                             class="video-thumb" alt="{{ result.title }}" onerror="this.src='/static/placeholder.png';">
                     </a>
                     {% endif %}
@@ -136,15 +144,33 @@
             {% elif category == 'shopping' %}
             <!-- Vista de Shopping -->
             <div class="shopping-grid">
-                {% for result in results if result.template == 'shopping.html' or result.source == 'ebay' or
-                result.source == 'amazon' %}
+                {% for result in results if result.template == 'shopping.html' or category == 'shopping' %}
                 <div class="shopping-card">
-                    <div class="shopping-title">{{ result.title|safe }}</div>
-                    <p class="result-content">{{ result.content|safe }}</p>
-                    <div class="shopping-meta">
-                        <span class="shopping-source">{{ (result.source or 'Tienda')|capitalize }}</span>
-                        <a href="{{ result.url }}" target="_blank" class="shopping-btn-go"
-                            rel="noopener noreferrer nofollow">Ver producto →</a>
+                    {% if result.img_src or result.thumbnail_src %}
+                    <div class="shopping-image-container">
+                        <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
+                            class="shopping-thumb" alt="{{ result.title }}"
+                            onerror="this.parentElement.style.display='none';">
+                    </div>
+                    {% else %}
+                    <div class="shopping-image-container no-image">
+                        <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=128&domain=' ~ result.url) | urlencode }}"
+                            class="shopping-store-icon" alt="Favicon" onerror="this.style.display='none';">
+                    </div>
+                    {% endif %}
+                    <div class="shopping-body">
+                        <div class="shopping-title">{{ result.title|safe }}</div>
+                        {% if result.price %}
+                        <div class="shopping-price">{{ result.price }}</div>
+                        {% endif %}
+                        <p class="shopping-content">{{ (result.content|striptags|truncate(80)) if result.content else
+                            "Producto disponible." }}</p>
+                        <div class="shopping-meta">
+                            <span class="source-tag {{ result.shopping_store or result.source }}">{{
+                                (result.shopping_store or result.source)|capitalize }}</span>
+                            <a href="{{ result.url }}" target="_blank" class="shopping-link"
+                                rel="noopener noreferrer nofollow">Ver producto →</a>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -169,12 +195,6 @@
             result.template != 'videos.html' %}
             <div class="result-card">
                 <div class="result-card-inner">
-                    {% if result.img_src or result.thumbnail_src %}
-                    <div class="result-thumbnail-container">
-                        <img src="/proxify?url={{ result.thumbnail_src or result.img_src | urlencode }}"
-                            alt="{{ result.title }}" class="result-thumbnail">
-                    </div>
-                    {% endif %}
                     <div class="result-body">
                         <div class="result-header">
                             <div class="title-container">
@@ -186,12 +206,27 @@
                             <span class="result-count">{{ result.sources|length }} fuentes</span>
                         </div>
                         <div class="result-url" title="{{ result.url }}">{{ result.url }}</div>
+
+                        {% if result.price %}
+                        <div class="general-price-tag"
+                            style="color: var(--accent); font-weight: bold; margin: 4px 0 6px 0;">
+                            {{ result.price }}
+                        </div>
+                        {% endif %}
+
                         <p class="result-content">{{ result.content|safe }}</p>
                         <div class="source-tags">
                             {% for source in result.sources %}<span class="source-tag {{ source }}">{{ source
                                 }}</span>{% endfor %}
                         </div>
                     </div>
+                    {% if result.img_src or result.thumbnail_src %}
+                    <div class="result-thumbnail-container">
+                        <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
+                            alt="{{ result.title }}" class="result-thumbnail"
+                            onerror="this.parentElement.style.display='none';">
+                    </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -218,7 +253,14 @@
             <div class="infobox-container sidebar-box">
                 <div class="infobox-title-sidebar">{{ info.title }}</div>
                 {% if info.img_src %}
-                <img src="/proxify?url={{ info.img_src | urlencode }}" alt="Info Image" class="infobox-image">
+                {% if info.source == 'wikipedia' or 'wikimedia' in info.img_src %}
+                <img src="{{ info.img_src if info.img_src.startswith('http') else 'https:' ~ info.img_src }}"
+                    alt="Info Image" class="infobox-image"
+                    onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                {% else %}
+                <img src="/proxify?url={{ info.img_src | urlencode }}" alt="Info Image" class="infobox-image"
+                    onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                {% endif %}
                 {% endif %}
                 <p class="infobox-content-sidebar">{{ info.content }}</p>
                 {% if info.url %}

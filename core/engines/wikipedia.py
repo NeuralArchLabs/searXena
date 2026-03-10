@@ -12,7 +12,7 @@ def request(query, params):
         "prop": "extracts|info|pageimages",
         "exintro": True,
         "explaintext": True,
-        "exsentences": 3,
+        "exsentences": 5,
         "inprop": "url",
         "pithumbsize": 400,
         "generator": "search",

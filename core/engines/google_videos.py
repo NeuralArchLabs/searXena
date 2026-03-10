@@ -32,11 +32,21 @@ def response(resp):
                 url = unquote(url[7:].split('&sa=')[0])
                 
             if url.startswith('http') and not "google.com" in url:
+                img_src = img_node.attributes.get('src') or img_node.attributes.get('data-src') if img_node else None
+                
+                # Try to get high quality youtube thumbnails directly
+                if "youtube.com/watch?v=" in url:
+                    try:
+                        v_id = url.split("v=")[1].split("&")[0]
+                        img_src = f"https://img.youtube.com/vi/{v_id}/mqdefault.jpg"
+                    except Exception:
+                        pass
+                
                 results.append({
                     "template": "videos.html",
                     "title": title_node.text().strip(),
                     "url": url,
-                    "img_src": img_node.attributes.get('src') or img_node.attributes.get('data-src') if img_node else None,
+                    "img_src": img_src,
                     "content": snippet_node.text().strip() if snippet_node else "Video de Google.",
                     "source": "google_videos"
                 })

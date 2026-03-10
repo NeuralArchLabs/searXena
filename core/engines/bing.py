@@ -38,6 +38,9 @@ def response(resp):
         title_tag = node.css_first('h2 a, h3 a, .title a, a')
         snippet_tag = node.css_first('div.b_caption p, .b_caption p, div.b_snippet, p')
         
+        img_node = node.css_first('img')
+        price_node = node.css_first('.b_price, .promoted-price')
+        
         if title_tag:
             url = title_tag.attributes.get('href', '')
             
@@ -46,12 +49,21 @@ def response(resp):
                 url = _decode_bing_url(url)
             
             if url and url.startswith('http') and 'bing.com' not in url:
-                results.append({
+                item = {
                     "title": title_tag.text().strip(),
                     "url": url,
                     "content": snippet_tag.text().strip() if snippet_tag else "Resultado de Bing.",
                     "source": "bing"
-                })
+                }
+                
+                if img_node:
+                    src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
+                    if src and src.startswith('http'):
+                        item["thumbnail_src"] = src
+                if price_node:
+                    item["price"] = price_node.text().strip()
+                    
+                results.append(item)
     return results
 
 def _decode_bing_url(url):
