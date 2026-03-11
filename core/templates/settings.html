@@ -44,7 +44,7 @@
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            Volver al Inicio
+            {{ 'Back to Home' if lang == 'en' else 'Volver al Inicio' }}
         </a>
 
         <div class="settings-card">
@@ -52,9 +52,11 @@
                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
                     <h1 class="logo-main"
-                        style="font-size: 2.5rem; text-align: left; margin-bottom: 5px; margin-top: 0;">Preferencias
+                        style="font-size: 2.5rem; text-align: left; margin-bottom: 5px; margin-top: 0;">{{ 'Preferences'
+                        if lang == 'en' else 'Preferencias' }}
                     </h1>
-                    <p style="color: var(--text-secondary); margin: 0;">Personaliza tu experiencia de búsqueda privada
+                    <p style="color: var(--text-secondary); margin: 0;">{{ 'Customize your private search experience' if
+                        lang == 'en' else 'Personaliza tu experiencia de búsqueda privada' }}
                     </p>
                 </div>
 
@@ -95,22 +97,26 @@
             </div>
 
             <div class="settings-tabs" role="tablist">
-                <div class="settings-tab active" onclick="showSection('general')" role="tab">General</div>
-                <div class="settings-tab" onclick="showSection('engines')" role="tab">Motores ({{ engines|length }})
+                <div class="settings-tab active" onclick="showSection('general')" role="tab">{{ 'General' if lang ==
+                    'en' else 'General' }}</div>
+                <div class="settings-tab" onclick="showSection('engines')" role="tab">{{ 'Engines' if lang == 'en' else
+                    'Motores' }} ({{ engines|length }})
                 </div>
-                <div class="settings-tab" onclick="showSection('about')" role="tab">Privacidad y Seguridad</div>
+                <div class="settings-tab" onclick="showSection('about')" role="tab">{{ 'Privacy & Security' if lang ==
+                    'en' else 'Privacidad y Seguridad' }}</div>
             </div>
 
             <form action="/save_settings" method="post">
                 <div id="section-general" class="settings-section active">
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>Idioma de búsqueda</h3>
-                            <p>Priorizar resultados en este idioma.</p>
+                            <h3>{{ 'Search Language' if lang == 'en' else 'Idioma de búsqueda' }}</h3>
+                            <p>{{ 'Prioritize results in this language.' if lang == 'en' else 'Priorizar resultados en
+                                este idioma.' }}</p>
                         </div>
                         <select name="language" class="select-custom" title="Seleccionar idioma">
                             <option value="es" {% if general.get('default_lang', 'es' )=='es' %}selected{% endif %}>
-                                Español</option>
+                                {{ 'Spanish' if lang == 'en' else 'Español' }}</option>
                             <option value="en" {% if general.get('default_lang')=='en' %}selected{% endif %}>English
                             </option>
                             <option value="fr" {% if general.get('default_lang')=='fr' %}selected{% endif %}>Français
@@ -122,23 +128,27 @@
 
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>Búsqueda Segura</h3>
-                            <p>Filtrar contenido explícito de los resultados.</p>
+                            <h3>{{ 'Safe Search' if lang == 'en' else 'Búsqueda Segura' }}</h3>
+                            <p>{{ 'Filter explicit content from results.' if lang == 'en' else 'Filtrar contenido
+                                explícito de los resultados.' }}</p>
                         </div>
                         <select name="safesearch" class="select-custom" title="Configurar búsqueda segura">
-                            <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>Desactivado
+                            <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>{{ 'Disabled' if
+                                lang == 'en' else 'Desactivado' }}
                             </option>
                             <option value="1" {% if general.get('safe_search', 1)==1 %}selected{% endif %}>Moderado
                             </option>
-                            <option value="2" {% if general.get('safe_search')==2 %}selected{% endif %}>Estricto
+                            <option value="2" {% if general.get('safe_search')==2 %}selected{% endif %}>{{ 'Strict' if
+                                lang == 'en' else 'Estricto' }}
                             </option>
                         </select>
                     </div>
 
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>Autocompletado</h3>
-                            <p>Las sugerencias se procesan localmente para proteger tu privacidad.</p>
+                            <h3>{{ 'Autocomplete' if lang == 'en' else 'Autocompletado' }}</h3>
+                            <p>{{ 'Suggestions are processed locally to protect your privacy.' if lang == 'en' else 'Las
+                                sugerencias se procesan localmente para proteger tu privacidad.' }}</p>
                         </div>
                         <select name="autocomplete" class="select-custom" title="Motor de sugerencias">
                             <option value="google" {% if general.get('autocomplete', 'google' )=='google' %}selected{%
@@ -146,14 +156,15 @@
                             <option value="duckduckgo" {% if general.get('autocomplete')=='duckduckgo' %}selected{%
                                 endif %}>DuckDuckGo (Proxy)</option>
                             <option value="none" {% if general.get('autocomplete')=='none' %}selected{% endif %}>
-                                Desactivado</option>
+                                {{ 'Disabled' if lang == 'en' else 'Desactivado' }}</option>
                         </select>
                     </div>
                 </div>
 
                 <div id="section-engines" class="settings-section">
                     <div style="margin-bottom: 20px; color: var(--text-secondary); font-size: 0.9rem;">
-                        Selecciona los motores de búsqueda que searXena consultará simultáneamente.
+                        {{ 'Select the search engines searXena will query simultaneously.' if lang == 'en' else
+                        'Selecciona los motores de búsqueda que searXena consultará simultáneamente.' }}
                     </div>
                     <div class="engine-grid">
                         {% for engine in engines %}
@@ -168,6 +179,25 @@
 
                 <div id="section-about" class="settings-section">
                     <div class="infobox-container" style="background: rgba(129, 140, 248, 0.05);">
+                        {% if lang == 'en' %}
+                        <h2 style="color: var(--accent); margin-bottom: 15px;">Local Privacy & Sovereignty</h2>
+                        <p style="color: var(--text-primary); font-size: 1rem; line-height: 1.6;">
+                            searXena Pro is a <b>private and decentralized</b> meta-search engine designed to run
+                            locally.
+                            Unlike commercial search engines or "cloud" services, here you have absolute control:
+                            this instance runs on <b>your own hardware</b>.
+                        </p>
+                        <ul
+                            style="margin-left: 20px; margin-top: 20px; color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem;">
+                            <li><b>100% Local Execution:</b> Your searches are not sent to any external central server.
+                            </li>
+                            <li><b>Resource Isolation:</b> Images and favicons go through a local proxy.</li>
+                            <li><b>Zero Persistence:</b> We don't keep logs, histories, or user profiles.</li>
+                            <li><b>Referrer Policy:</b> We implement strict <i>no-referrer</i> headers.</li>
+                            <li><b>Secure Backend:</b> Integrated firewall against external tracking cookies and
+                                scripts.</li>
+                        </ul>
+                        {% else %}
                         <h2 style="color: var(--accent); margin-bottom: 15px;">Privacidad Local y Soberanía</h2>
                         <p style="color: var(--text-primary); font-size: 1rem; line-height: 1.6;">
                             searXena Pro es un meta-buscador <b>privado y descentralizado</b> diseñado para ejecutarse
@@ -187,6 +217,7 @@
                             <li><b>Backend Seguro:</b> Cortafuegos integrado contra cookies y scripts de rastreo
                                 externos.</li>
                         </ul>
+                        {% endif %}
                         <div
                             style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--glass-border); font-size: 0.85rem; color: var(--text-secondary);">
                             <p>Versión 3.0 — <a href="https://github.com/martinezpalomera92" class="credit-link">Neural
@@ -195,7 +226,8 @@
                     </div>
                 </div>
 
-                <button type="submit" class="save-bar">Guardar Preferencias y Proteger sesión</button>
+                <button type="submit" class="save-bar">{{ 'Save Preferences' if lang == 'en' else 'Guardar Preferencias'
+                    }} y Proteger sesión</button>
             </form>
         </div>
     </div>

@@ -28,7 +28,8 @@ manager = EngineManager(BASE_DIR)
 
 @app.get("/")
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    lang = manager.settings.get("general", {}).get("default_lang", "es")
+    return templates.TemplateResponse("index.html", {"request": request, "lang": lang})
 
 @app.get("/autoc")
 async def autocomplete(q: str = ""):
@@ -49,7 +50,8 @@ async def get_settings(request: Request):
     return templates.TemplateResponse("settings.html", {
         "request": request, 
         "engines": engine_list,
-        "general": general_settings
+        "general": general_settings,
+        "lang": manager.settings.get("general", {}).get("default_lang", "es")
     })
 
 @app.post("/save_settings")
@@ -215,7 +217,8 @@ async def search(request: Request):
         "query": q, 
         "results": full_results,
         "category": category,
-        "pageno": pageno
+        "pageno": pageno,
+        "lang": manager.settings.get("general", {}).get("default_lang", "es")
     })
     
     # Cabeceras de Privacidad Estrictas

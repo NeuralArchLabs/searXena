@@ -16,7 +16,7 @@
         <div class="search-box-header">
             <form action="/search" method="get" id="search-form">
                 <input type="text" name="q" class="search-input" id="search-input" value="{{ query }}"
-                    autocomplete="off" placeholder="Busca en la web..." title="Query de búsqueda">
+                    autocomplete="off" placeholder="{{ 'Search the web...' if lang == 'en' else 'Busca en la web...' }}" title="{{ 'Search query' if lang == 'en' else 'Query de búsqueda' }}">
                 <input type="hidden" name="category" id="cat-input" value="{{ category or 'general' }}">
                 <input type="hidden" name="pageno" id="page-input" value="{{ pageno or 1 }}">
                 <div id="suggestions-box"></div>
@@ -24,14 +24,14 @@
         </div>
         <div class="header-actions">
             <!-- Botón de preferencias integrado en el header (Results Page) -->
-            <a href="/settings" class="settings-btn-inline" title="Configurar motores y privacidad">
+            <a href="/settings" class="settings-btn-inline" title="{{ 'Configure engines and privacy' if lang == 'en' else 'Configurar motores y privacidad' }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3" />
                     <path
                         d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
-                <span>Preferencias</span>
+                <span>{{ 'Preferences' if lang == 'en' else 'Preferencias' }}</span>
             </a>
         </div>
     </div>
@@ -41,23 +41,23 @@
         <div class="main-results">
             <div class="tabs-container">
                 <a class="tab {% if not category or category == 'general' %}active{% endif %}"
-                    onclick="changeCat('general')">General</a>
+                    onclick="changeCat('general')">{{ 'General' if lang == 'en' else 'General' }}</a>
                 <a class="tab {% if category == 'it_science' %}active{% endif %}"
-                    onclick="changeCat('it_science')">TI/Ciencia</a>
-                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">Noticias</a>
+                    onclick="changeCat('it_science')">{{ 'IT/Science' if lang == 'en' else 'TI/Ciencia' }}</a>
+                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">{{ 'News' if lang == 'en' else 'Noticias' }}</a>
                 <a class="tab {% if category == 'videos' %}active{% endif %}" onclick="changeCat('videos')">Videos</a>
-                <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">Imágenes</a>
+                <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">{{ 'Images' if lang == 'en' else 'Imágenes' }}</a>
                 <a class="tab {% if category == 'social' %}active{% endif %}" onclick="changeCat('social')">Social</a>
                 <a class="tab {% if category == 'shopping' %}active{% endif %}"
                     onclick="changeCat('shopping')">Shopping</a>
-                <a class="tab {% if category == 'maps' %}active{% endif %}" onclick="changeCat('maps')">Mapas</a>
+                <a class="tab {% if category == 'maps' %}active{% endif %}" onclick="changeCat('maps')">{{ 'Maps' if lang == 'en' else 'Mapas' }}</a>
             </div>
 
             {% if not results %}
             <div class="no-results">
                 <div class="no-results-icon">🔍</div>
-                <h3>No se encontraron resultados</h3>
-                <p class="text-muted">Intenta buscar algo más general o verifica tu conexión.</p>
+                <h3>{{ 'No results found' if lang == 'en' else 'No se encontraron resultados' }}</h3>
+                <p class="text-muted">{{ 'Try a broader search or check your connection.' if lang == 'en' else 'Intenta buscar algo más general o verifica tu conexión.' }}</p>
             </div>
             {% endif %}
 
@@ -66,7 +66,7 @@
             {% set featured = results | selectattr('template', 'equalto', 'infobox.html') | first %}
             {% if featured %}
             <div class="infobox-container featured-answer">
-                <div class="featured-badge">Respuesta Destacada</div>
+                <div class="featured-badge">{{ 'Featured Answer' if lang == 'en' else 'Respuesta Destacada' }}</div>
                 <div class="infobox-header-main">
                     {% if featured.img_src %}
                     {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
@@ -82,9 +82,9 @@
                         <div class="infobox-title">{{ featured.title }}</div>
                         <input type="checkbox" id="read-more-toggle" class="read-more-checkbox">
                         <p class="infobox-content">{{ featured.content }}</p>
-                        <label for="read-more-toggle" class="read-more-label">Continuar Leyendo</label>
+                        <label for="read-more-toggle" class="read-more-label">{{ 'Read More' if lang == 'en' else 'Continuar Leyendo' }}</label>
                         {% if featured.url %}<a href="{{ featured.url }}" target="_blank" class="infobox-link"
-                            rel="noopener noreferrer nofollow">Leer más en {{
+                            rel="noopener noreferrer nofollow">{{ 'Read more on' if lang == 'en' else 'Leer más en' }} {{
                             featured.source or 'la fuente' }} →</a>{% endif %}
                     </div>
                 </div>
@@ -98,8 +98,8 @@
                 <div class="infobox-title">{{ result.title }}</div>
                 <p class="infobox-content">{{ result.content }}</p>
                 {% if result.url %}<a href="{{ result.url }}" target="_blank" class="infobox-link"
-                    rel="noopener noreferrer nofollow">Leer más en {{
-                    result.source or 'la fuente' }}</a>{% endif %}
+                    rel="noopener noreferrer nofollow">{{ 'Read more on' if lang == 'en' else 'Leer más en' }} {{
+                    result.source or ('the source' if lang == 'en' else 'la fuente') }}</a>{% endif %}
             </div>
             {% endfor %}
 
@@ -166,12 +166,12 @@
                         <div class="shopping-price">{{ result.price }}</div>
                         {% endif %}
                         <p class="shopping-content">{{ (result.content|striptags|truncate(80)) if result.content else
-                            "Producto disponible." }}</p>
+                            "{{ 'Product available.' if lang == 'en' else 'Producto disponible.' }}" }}</p>
                         <div class="shopping-meta">
                             <span class="source-tag {{ result.shopping_store or result.source }}">{{
                                 (result.shopping_store or result.source)|capitalize }}</span>
                             <a href="{{ result.url }}" target="_blank" class="shopping-link"
-                                rel="noopener noreferrer nofollow">Ver producto →</a>
+                                rel="noopener noreferrer nofollow">{{ 'View product' if lang == 'en' else 'Ver producto' }} →</a>
                         </div>
                     </div>
                 </div>
@@ -194,8 +194,8 @@
                     </div>
                     {% endif %}
                     <a href="{{ result.url }}" target="_blank" class="infobox-link"
-                        rel="noopener noreferrer nofollow">Ver en {{ result.source|capitalize if result.source else
-                        'Fuente' }} →</a>
+                        rel="noopener noreferrer nofollow">{{ 'View on' if lang == 'en' else 'Ver en' }} {{ result.source|capitalize if result.source else
+                        ('Source' if lang == 'en' else 'Fuente') }} →</a>
                 </div>
                 {% endfor %}
             </div>
@@ -237,7 +237,7 @@
                     </div>
                     {% endif %}
                 </div>
-                <span class="result-count">{{ result.sources|length }} fuentes</span>
+                <span class="result-count">{{ result.sources|length }} {{ 'sources' if lang == 'en' else 'fuentes' }}</span>
             </div>
             {% endfor %}
             {% endif %}
@@ -246,10 +246,10 @@
             {% if results %}
             <div class="pagination">
                 {% if pageno > 1 %}
-                <button class="page-btn" onclick="goPage('{{ pageno - 1 }}')">← Anterior</button>
+                <button class="page-btn" onclick="goPage('{{ pageno - 1 }}')">← {{ 'Previous' if lang == 'en' else 'Anterior' }}</button>
                 {% endif %}
-                <span class="page-indicator">Página {{ pageno }}</span>
-                <button class="page-btn" onclick="goPage('{{ pageno + 1 }}')">Siguiente →</button>
+                <span class="page-indicator">{{ 'Page' if lang == 'en' else 'Página' }} {{ pageno }}</span>
+                <button class="page-btn" onclick="goPage('{{ pageno + 1 }}')">{{ 'Next' if lang == 'en' else 'Siguiente' }} →</button>
             </div>
             {% endif %}
         </div>
@@ -275,26 +275,26 @@
                 <p class="infobox-content-sidebar">{{ info.content }}</p>
                 {% if info.url %}
                 <a href="{{ info.url }}" target="_blank" rel="noopener noreferrer nofollow"
-                    class="infobox-link-sidebar">Abrir en {{ info.source|capitalize }} →</a>
+                    class="infobox-link-sidebar">{{ 'Open in' if lang == 'en' else 'Abrir en' }} {{ info.source|capitalize }} →</a>
                 {% endif %}
             </div>
             {% endfor %}
             {% else %}
             <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">Más información</h3>
-                <p class="sidebar-empty-text">No hay datos adicionales disponibles para esta consulta.</p>
+                <h3 class="sidebar-empty-title">{{ 'More info' if lang == 'en' else 'Más información' }}</h3>
+                <p class="sidebar-empty-text">{{ 'No additional data available for this query.' if lang == 'en' else 'No hay datos adicionales disponibles para esta consulta.' }}</p>
             </div>
             {% endif %}
             {% else %}
             <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">Más información</h3>
-                <p class="sidebar-empty-text">En esta categoría solo se muestran resultados directos.</p>
+                <h3 class="sidebar-empty-title">{{ 'More info' if lang == 'en' else 'Más información' }}</h3>
+                <p class="sidebar-empty-text">{{ 'Only direct results are shown in this category.' if lang == 'en' else 'En esta categoría solo se muestran resultados directos.' }}</p>
             </div>
             {% endif %}
 
             <div class="infobox-container sidebar-tips">
-                <h3 class="sidebar-tips-title">Sugerencias Pro</h3>
-                <p class="sidebar-tips-text">Prueba usar <b>!w</b> para Wikipedia o <b>!yt</b> para videos directos.</p>
+                <h3 class="sidebar-tips-title">{{ 'Pro Tips' if lang == 'en' else 'Sugerencias Pro' }}</h3>
+                <p class="sidebar-tips-text">{{ 'Try using <b>!w</b> for Wikipedia or <b>!yt</b> for direct videos.'|safe if lang == 'en' else 'Prueba usar <b>!w</b> para Wikipedia o <b>!yt</b> para videos directos.'|safe }}</p>
             </div>
         </div>
     </div>
