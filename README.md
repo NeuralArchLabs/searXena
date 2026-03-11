@@ -76,7 +76,7 @@ searXena no es solo una interfaz para humanos; es una **infraestructura de búsq
 
 ## 🔒 Arquitectura de Privacidad Transparente
 
-searXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (Google/Meta), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
+searXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (terceros anunciantes), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
 
 ### Proxificación del DOM Absoluta
 Cuando buscas cualquier consulta general (Noticias, TI, Código), searXena enmascara tu identidad a través del motor asíncrono backend. Modificamos de forma sistemática los `User-Agent`. Toda URL de imagen devuelta por los motores comerciales pasa de manera forzada por nuestro sistema interno de `/proxify`, impidiendo que tu IP se filtre directamente.

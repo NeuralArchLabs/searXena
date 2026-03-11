@@ -76,7 +76,7 @@ searXena is not just an interface for humans; it is a **search infrastructure op
 
 ## 🔒 Transparent Privacy Architecture
 
-searXena priorities that your data **never** ends up in advertising profiles (Google/Meta), assuming a shield role beneath the graphical interface. Even so, the architecture requires certain technical consensuses, reported here transparently:
+searXena priorities that your data **never** ends up in advertising profiles (third-party advertisers), assuming a shield role beneath the graphical interface. Even so, the architecture requires certain technical consensuses, reported here transparently:
 
 ### Absolute DOM Proxification
 When you search any general query (News, IT, Code), searXena masks your identity through the asynchronous backend engine. We systematically modify the `User-Agent`s. Every image URL returned by commercial engines is forcibly passed through our internal `/proxify` system, preventing your IP from leaking directly.
