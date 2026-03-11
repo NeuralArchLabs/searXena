@@ -7,7 +7,7 @@
   <h1>searXena</h1>
 
   <p>
-    Un metabuscador ágil, local y 100% nativo para Windows enfocado en la privacidad extrema.
+    Un metabuscador ágil, local y 100% nativo para Windows. Creado como un puente de alto rendimiento entre los LLM (sistemas de IA autónomos) y la web en tiempo real, garantizando mitigación de rastreo y privacidad.
   </p>
   
   <p>
@@ -43,7 +43,8 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 ## ✨ Características Principales
 
 * 🚀 **Metabúsqueda Paralela Asíncrona:** Una sola consulta tuya dispara docenas de solicitudes asíncronas a motores globales (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.) consolidándolas en menos de 1 segundo.
-* 🛡️ **Burbuja de Privacidad Absoluta:** Actúa como un proxy intermediario entre tú y las mega-corporaciones. Ni Google ni Microsoft pueden perfilarte; todas las peticiones le llegan a ellos como originadas desde searXena.
+* 🤖 **Integración IA First:** Formato JSON y esquemas Tools pre-construidos nativos, listos para conectar tu despliegue LLM a internet sin overheads ni scraping de HTML innecesario.
+* 🛡️ **Prevención de Rastreo (Anti-Tracking):** Actúa como un proxy intermediario entre tú y las mega-corporaciones. Dificulta significativamente el perfilado de usuarios corporativo al actuar como intermediario.
 * 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador corporativo evadiendo telemetría hospedado localmente en tu sistema.
 * 📱 **UI/UX Moderna y Dinámica:** Animaciones fluidas, modo oscuro ultra refinado ("Space Violet"), interfaz responsiva y separada categóricamente en pestañas (General, TI/Ciencia, Mapas, Videos, Imágenes).
 * 🌎 **Rich Snippets Consolidados:** Lectura enriquecida consolidando datos de Wikipedia o Wikidata en recuadros laterales de rápido consumo ("Infoboxes") al estilo de los grandes motores comerciales.

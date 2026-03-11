@@ -7,7 +7,7 @@
   <h1>searXena</h1>
 
   <p>
-    An agile, local, and 100% native metasearch engine for Windows focused on extreme privacy.
+    An agile, local, and 100% native metasearch engine for Windows. Built as a high-performance bridge between LLMs (autonomous AI systems) and the real-time web, ensuring tracking mitigation and privacy.
   </p>
   
   <p>
@@ -43,7 +43,8 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 ## ✨ Main Features
 
 * 🚀 **Asynchronous Parallel Metasearch:** A single query from you triggers dozens of asynchronous requests to global engines (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.), consolidating them in less than 1 second.
-* 🛡️ **Absolute Privacy Bubble:** Acts as an intermediary proxy between you and mega-corporations. Neither Google nor Microsoft can profile you; all requests reach them as originating from searXena.
+* 🤖 **AI-First Integration:** Native JSON formatting and pre-built Tools schemas, ready to connect your LLM deployment to the internet without overheads or unnecessary HTML scraping.
+* 🛡️ **Tracking Prevention:** Acts as an intermediary proxy between you and mega-corporations. Significantly hinders corporate user profiling by acting as an intermediary.
 * 📦 **100% Native on Windows:** Zero complex dependencies. Just clone, install the libraries with `pip`, run the main `.py` file, and you have a corporate search engine evading telemetry hosted locally on your system.
 * 📱 **Modern and Dynamic UI/UX:** Fluid animations, ultra-refined dark mode ("Space Violet"), responsive interface, and categorically separated into tabs (General, IT/Science, Maps, Videos, Images).
 * 🌎 **Consolidated Rich Snippets:** Enriched reading consolidating data from Wikipedia or Wikidata in quick-consumption side boxes ("Infoboxes") in the style of major commercial engines.
