@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>searXena Pro - Privacidad Total</title>
+    <title>searXena Pro - {{ {'en': 'Private Search & AI', 'zh': '隐私搜索与 AI'}.get(lang, 'Búsqueda Privada e IA') }}
+    </title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css?v=3.6">
     <meta name="referrer" content="no-referrer">
@@ -342,7 +343,8 @@
 
 <body>
     <!-- Botón de Preferencias (Top Right) -->
-    <a href="/settings" class="settings-btn" title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
+    <a href="/settings" class="settings-btn"
+        title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path
@@ -460,15 +462,18 @@
 
         <div class="search-box">
             <form action="/search" method="get" id="search-form">
-                <input type="text" name="q" class="search-input" id="search-input" placeholder="{{ {'en': 'What are you looking for?', 'zh': '您在找什么？'}.get(lang, '¿Qué estás buscando?') }}"
-                    autocomplete="off" autofocus title="{{ {'en': 'Private search', 'zh': '隐私搜索'}.get(lang, 'Búsqueda privada') }}">
+                <input type="text" name="q" class="search-input" id="search-input"
+                    placeholder="{{ {'en': 'What are you looking for?', 'zh': '您在找什么？'}.get(lang, '¿Qué estás buscando?') }}"
+                    autocomplete="off" autofocus
+                    title="{{ {'en': 'Private search', 'zh': '隐私搜索'}.get(lang, 'Búsqueda privada') }}">
                 <input type="hidden" name="category" id="cat-input" value="general">
                 <div id="suggestions-box"></div>
             </form>
         </div>
 
         <div class="text-muted" style="margin-top: 30px; font-size: 0.85rem; opacity: 0.7;">
-            {{ {'en': 'No tracking. No ads. Just results.', 'zh': '无追踪。无广告。只有结果。'}.get(lang, 'Sin rastreo. Sin publicidad. Solo resultados.') }}
+            {{ {'en': 'No tracking. No ads. Just results.', 'zh': '无追踪。无广告。只有结果。'}.get(lang, 'Sin rastreo. Sin
+            publicidad. Solo resultados.') }}
         </div>
     </div>
 

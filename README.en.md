@@ -14,6 +14,7 @@
     <a href="#origin-and-acknowledgments">Origin</a> • 
     <a href="#tech-stack">Stack</a> • 
     <a href="#main-features">Features</a> • 
+    <a href="#artificial-intelligence-and-agents">AI Agents</a> • 
     <a href="#privacy-architecture">Privacy</a> • 
     <a href="#installation-and-usage">Installation</a> • 
     <a href="#license-and-credits">Credits</a>
@@ -64,6 +65,14 @@ Historically, open-source metasearch engines focused on privacy (like SearXNG or
 | **LLM Tool Calling** | External community adapters required | **Native JSON API** built from day one |
 
 Unless you want to rent a VPS in the cloud, searXena is the only logical, viable, and high-performance answer for the demanding Windows user who desires *in-house* data sovereignty.
+
+## 🤖 Artificial Intelligence and Agents
+
+searXena is not just an interface for humans; it is a **search infrastructure optimized for the AI era**. We have designed the engine to serve as real-time "eyes" for your Large Language Models (LLMs).
+
+*   **Internet Exploration for AI:** Provides a clean, structured data stream that allows agents to navigate and research the web without the friction of visual rendering.
+*   **Native Tool Calling:** Core-level compatibility with the OpenAI/Anthropic "Functions" standard.
+*   **Curated Ranking for RAG:** Results are prioritized to feed *Retrieval-Augmented Generation* systems, filtering out commercial noise and prioritizing substantial technical and encyclopedic information sources.
 
 ## 🔒 Transparent Privacy Architecture
 

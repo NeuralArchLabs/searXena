@@ -14,6 +14,7 @@
     <a href="#origen-y-agradecimientos">Origen</a> • 
     <a href="#stack-tecnológico">Stack</a> • 
     <a href="#características-principales">Características</a> • 
+    <a href="#inteligencia-artificial-y-agentes">Agentes IA</a> • 
     <a href="#arquitectura-de-privacidad">Privacidad</a> • 
     <a href="#instalación-y-uso">Instalación</a> • 
     <a href="#licencia-y-créditos">Créditos</a>
@@ -64,6 +65,14 @@ Históricamente, los metabuscadores open-source enfocados en privacidad (como Se
 | **Tool Calling LLM** | Adaptadores comunitarios externos requeridos | **API JSON Nativa** construida desde el día uno |
 
 A menos que quieras rentar un VPS en la nube, searXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
+
+## 🤖 Inteligencia Artificial y Agentes
+
+searXena no es solo una interfaz para humanos; es una **infraestructura de búsqueda optimizada para la era de la IA**. Hemos diseñado el motor para que sirva como el par de "ojos" en tiempo real para tus modelos de lenguaje (LLMs).
+
+*   **Exploración de Internet para IA:** Proporciona un flujo de datos limpio y estructurado que permite a los agentes navegar e investigar en la web sin la fricción del renderizado visual.
+*   **Tool Calling Nativo:** Compatible con el estándar de "Functions" de OpenAI/Anthropic desde el núcleo.
+*   **Ranking Curado para RAG:** Los resultados están priorizados para alimentar sistemas de *Retrieval-Augmented Generation*, filtrando el ruido comercial y priorizando fuentes sustanciales de información técnica y enciclopédica.
 
 ## 🔒 Arquitectura de Privacidad Transparente
 
