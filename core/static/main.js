@@ -1,5 +1,5 @@
 /**
- * main.js - Lógica compartida para searXena Pro
+ * main.js - Lógica compartida para searXena
  * Enfocado en privacidad local y rendimiento.
  */
 

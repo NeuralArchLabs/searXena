@@ -125,7 +125,7 @@ Open your browser (Brave, Edge, Firefox) and enter directly into `http://127.0.0
 
 *   **License:** This project is free software, distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 *   **Credits:** All technical base knowledge for modeling extraction module classes and heuristic derivations morally belongs to the maintainers of [Searx](https://github.com/searx/searx) and [SearXNG](https://github.com/searxng/searxng).
-*   **Information Sources:** searXena Pro acts as a signal aggregator. We recognize and respect the immense indexing work and technological value provided by the integrated search engines (Google, Bing, DuckDuckGo, etc.). This software is limited to processing and anonymizing public data for the end user.
-*   **Educational and Research Use:** searXena Pro is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service.
+*   **Information Sources:** searXena acts as a signal aggregator. We recognize and respect the immense indexing work and technological value provided by the integrated search engines (Google, Bing, DuckDuckGo, etc.). This software is limited to processing and anonymizing public data for the end user.
+*   **Educational and Research Use:** searXena is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service.
 
 **LEGAL NOTICE:** searXena is distributed "AS IS", without warranties of any kind. The user assumes all legal responsibility derived from the use of the software, including compliance with local laws and contracts with external data providers. The developer is not responsible for IP blocks, third-party legal actions, or any other damages resulting from the use of this code.

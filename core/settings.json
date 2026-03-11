@@ -1,6 +1,6 @@
 {
     "general": {
-        "instance_name": "searXena Pro",
+        "instance_name": "searXena",
         "safe_search": 0,
         "autocomplete": "google",
         "default_lang": "es",
@@ -292,6 +292,10 @@
             "name": "osm",
             "enabled": true,
             "weight": 1.2
+        },
+        {
+            "name": "scholar",
+            "enabled": true
         }
     ]
 }
