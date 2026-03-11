@@ -332,12 +332,15 @@ class EngineManager:
                     # Criterio: El infobox debe contener la esencia de la búsqueda
                     # Si la query es una palabra única y el título no es igual -> Descartar de destacados
                     is_relevant = False
-                    if q_norm == title_norm:
+                    # Caso 1: Match Exacto
+                    if q_norm == title_norm or q_norm.replace(' ','') == title_norm.replace(' ',''):
+                        is_relevant = True
+                    # Caso 2: Solapamiento significativo o contención
+                    elif q_words.issubset(t_words) or t_words.issubset(q_words):
                         is_relevant = True
                     elif len(q_words) > 1: 
                         intersection = q_words.intersection(t_words)
-                        overlap = len(intersection) / len(q_words)
-                        if overlap >= 0.7 or q_words.issubset(t_words) or t_words.issubset(q_words):
+                        if len(intersection) / len(q_words) >= 0.6:
                             is_relevant = True
 
                     if is_relevant:
@@ -413,26 +416,31 @@ class EngineManager:
             final.append(data)
             
         # Ordenación de Infoboxes por relevancia (Perfect Match primero)
-        def infobox_sort(i):
+        def infobox_sort_score(i):
             title = re.sub(r'[^\w\s]', '', i.get('title', '').lower()).strip()
             q_fix = q_norm.replace(' ', '')
             t_fix = title.replace(' ', '')
             
-            # Tie-breaker: Wikipedia > Wikidata > Otros
+            # Puntuación: 0 = Perfect, 1 = Substring, 2 = Partial
+            base = 2
+            if q_fix == t_fix: base = 0
+            elif q_fix in t_fix or t_fix in q_fix: base = 1
+            
+            # Tie-breaker decimal: Wikipedia > Wikidata > Otros
             prio = 0.5
             if i.get('source') == 'wikipedia': prio = 0.1
             elif i.get('source') == 'wikidata': prio = 0.2
             
-            if q_fix == t_fix: return 0 + prio
-            if q_fix in t_fix or t_fix in q_fix: return 1 + prio
-            return 2 + prio
+            return base + prio
         
-        infoboxes.sort(key=infobox_sort)
+        infoboxes.sort(key=infobox_sort_score)
         
-        # Opcional: Solo quedarnos con el mejor infobox si es realmente bueno
-        if infoboxes and infobox_sort(infoboxes[0]) > 1:
-            # Si el mejor infobox no es ni siquiera un match parcial fuerte, quitarlo
-            infoboxes = []
+        # Quedarnos solo con el mejor infobox si es bueno
+        final_infoboxes = []
+        if infoboxes:
+            best_score = infobox_sort_score(infoboxes[0])
+            if best_score < 2.0: # Solo mostrar si es match exacto o substring fuerte
+                final_infoboxes = [infoboxes[0]]
         
         # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
@@ -440,4 +448,4 @@ class EngineManager:
         # Limitar resultados para limpieza absoluta
         limited_results = final[:40]
         
-        return limited_results, infoboxes
+        return limited_results, final_infoboxes
