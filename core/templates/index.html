@@ -342,14 +342,14 @@
 
 <body>
     <!-- Botón de Preferencias (Top Right) -->
-    <a href="/settings" class="settings-btn" title="{{ 'Configure engines and privacy' if lang == 'en' else 'Configurar motores y privacidad' }}">
+    <a href="/settings" class="settings-btn" title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path
                 d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
             <circle cx="12" cy="12" r="3" />
         </svg>
-        {{ 'Preferences' if lang == 'en' else 'Preferencias' }}
+        {{ {'en': 'Preferences', 'zh': '偏好设置'}.get(lang, 'Preferencias') }}
     </a>
 
     <div class="home-container">
@@ -460,15 +460,15 @@
 
         <div class="search-box">
             <form action="/search" method="get" id="search-form">
-                <input type="text" name="q" class="search-input" id="search-input" placeholder="{{ 'What are you looking for?' if lang == 'en' else '¿Qué estás buscando?' }}"
-                    autocomplete="off" autofocus title="{{ 'Private search' if lang == 'en' else 'Búsqueda privada' }}">
+                <input type="text" name="q" class="search-input" id="search-input" placeholder="{{ {'en': 'What are you looking for?', 'zh': '您在找什么？'}.get(lang, '¿Qué estás buscando?') }}"
+                    autocomplete="off" autofocus title="{{ {'en': 'Private search', 'zh': '隐私搜索'}.get(lang, 'Búsqueda privada') }}">
                 <input type="hidden" name="category" id="cat-input" value="general">
                 <div id="suggestions-box"></div>
             </form>
         </div>
 
         <div class="text-muted" style="margin-top: 30px; font-size: 0.85rem; opacity: 0.7;">
-            {{ 'No tracking. No ads. Just results.' if lang == 'en' else 'Sin rastreo. Sin publicidad. Solo resultados.' }}
+            {{ {'en': 'No tracking. No ads. Just results.', 'zh': '无追踪。无广告。只有结果。'}.get(lang, 'Sin rastreo. Sin publicidad. Solo resultados.') }}
         </div>
     </div>
 

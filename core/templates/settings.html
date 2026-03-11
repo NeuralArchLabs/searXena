@@ -44,7 +44,7 @@
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            {{ 'Back to Home' if lang == 'en' else 'Volver al Inicio' }}
+            {{ {'en': 'Back to Home', 'zh': '返回主页'}.get(lang, 'Volver al Inicio') }}
         </a>
 
         <div class="settings-card">
@@ -52,11 +52,11 @@
                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <div>
                     <h1 class="logo-main"
-                        style="font-size: 2.5rem; text-align: left; margin-bottom: 5px; margin-top: 0;">{{ 'Preferences'
-                        if lang == 'en' else 'Preferencias' }}
+                        style="font-size: 2.5rem; text-align: left; margin-bottom: 5px; margin-top: 0;">{{ {'en':
+                        'Preferences', 'zh': '偏好设置'}.get(lang, 'Preferencias') }}
                     </h1>
-                    <p style="color: var(--text-secondary); margin: 0;">{{ 'Customize your private search experience' if
-                        lang == 'en' else 'Personaliza tu experiencia de búsqueda privada' }}
+                    <p style="color: var(--text-secondary); margin: 0;">{{ {'en': 'Customize your private search
+                        experience', 'zh': '自定义您的私人搜索体验'}.get(lang, 'Personaliza tu experiencia de búsqueda privada') }}
                     </p>
                 </div>
 
@@ -110,23 +110,25 @@
                 <div id="section-general" class="settings-section active">
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>{{ 'Search Language' if lang == 'en' else 'Idioma de búsqueda' }}</h3>
-                            <p>{{ 'Prioritize results in this language.' if lang == 'en' else 'Priorizar resultados en
-                                este idioma.' }}</p>
+                            <h3>{{ {'en': 'Search Language', 'zh': '搜索语言'}.get(lang, 'Idioma de búsqueda') }}</h3>
+                            <p>{{ {'en': 'Prioritize results in this language.', 'zh': '优先显示此语言的结果。'}.get(lang,
+                                'Priorizar resultados en este idioma.') }}</p>
                         </div>
                         <select name="language" class="select-custom" title="Seleccionar idioma">
                             <option value="es" {% if general.get('default_lang', 'es' )=='es' %}selected{% endif %}>
-                                {{ 'Spanish' if lang == 'en' else 'Español' }}</option>
+                                {{ {'en': 'Spanish', 'zh': '西班牙语'}.get(lang, 'Español') }}</option>
                             <option value="en" {% if general.get('default_lang')=='en' %}selected{% endif %}>English
                             </option>
+                            <option value="zh" {% if general.get('default_lang')=='zh' %}selected{% endif %}>中文
+                                (Chinese)</option>
                         </select>
                     </div>
 
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>{{ 'Safe Search' if lang == 'en' else 'Búsqueda Segura' }}</h3>
-                            <p>{{ 'Filter explicit content from results.' if lang == 'en' else 'Filtrar contenido
-                                explícito de los resultados.' }}</p>
+                            <h3>{{ {'en': 'Safe Search', 'zh': '安全搜索'}.get(lang, 'Búsqueda Segura') }}</h3>
+                            <p>{{ {'en': 'Filter explicit content from results.', 'zh': '从结果中过滤露骨内容。'}.get(lang,
+                                'Filtrar contenido explícito de los resultados.') }}</p>
                         </div>
                         <select name="safesearch" class="select-custom" title="Configurar búsqueda segura">
                             <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>{{ 'Disabled' if
@@ -142,7 +144,7 @@
 
                     <div class="setting-row">
                         <div class="setting-info">
-                            <h3>{{ 'Autocomplete' if lang == 'en' else 'Autocompletado' }}</h3>
+                            <h3>{{ {'en': 'Autocomplete', 'zh': '自动完成'}.get(lang, 'Autocompletado') }}</h3>
                             <p>{{ 'Suggestions are processed locally to protect your privacy.' if lang == 'en' else 'Las
                                 sugerencias se procesan localmente para proteger tu privacidad.' }}</p>
                         </div>
@@ -152,7 +154,7 @@
                             <option value="duckduckgo" {% if general.get('autocomplete')=='duckduckgo' %}selected{%
                                 endif %}>DuckDuckGo (Proxy)</option>
                             <option value="none" {% if general.get('autocomplete')=='none' %}selected{% endif %}>
-                                {{ 'Disabled' if lang == 'en' else 'Desactivado' }}</option>
+                                {{ {'en': 'Disabled', 'zh': '已禁用'}.get(lang, 'Desactivado') }}</option>
                         </select>
                     </div>
                 </div>
@@ -192,6 +194,20 @@
                             <li><b>Referrer Policy:</b> We implement strict <i>no-referrer</i> headers.</li>
                             <li><b>Secure Backend:</b> Integrated firewall against external tracking cookies and
                                 scripts.</li>
+                        </ul>
+                        {% elif lang == 'zh' %}
+                        <h2 style="color: var(--accent); margin-bottom: 15px;">本地隐私与主权</h2>
+                        <p style="color: var(--text-primary); font-size: 1rem; line-height: 1.6;">
+                            searXena Pro
+                            是一个设计为在本地运行的<b>私有且去中心化</b>的元搜索引擎。不同于商业搜索引擎或“云”服务，在这里您拥有绝对控制权：该实例运行在<b>您自己的硬件上</b>。
+                        </p>
+                        <ul
+                            style="margin-left: 20px; margin-top: 20px; color: var(--text-secondary); line-height: 1.8; font-size: 0.95rem;">
+                            <li><b>100% 本地执行:</b> 您的搜索不会被发送到任何外部中央服务器。</li>
+                            <li><b>资源隔离:</b> 图像和网页图标通过本地代理获取。</li>
+                            <li><b>零持久化:</b> 我们不保留日志、历史记录或用户画像。</li>
+                            <li><b>来路策略:</b> 我们执行严格的 <i>no-referrer</i> 头部协议。</li>
+                            <li><b>安全后端:</b> 集成防火墙以抵御外部跟踪cookie和脚本。</li>
                         </ul>
                         {% else %}
                         <h2 style="color: var(--accent); margin-bottom: 15px;">Privacidad Local y Soberanía</h2>
