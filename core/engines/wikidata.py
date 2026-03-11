@@ -1,35 +1,78 @@
 import httpx
+import asyncio
 from urllib.parse import urlencode
 
+NAME = "wikidata"
 CATEGORIES = ['general', 'it_science']
+WEIGHT = 1.0
 
-def request(query, params):
-    # Wikidata para Infobox
-    query_params = {
+async def request(query, params):
+    params["url"] = "internal://wikidata"
+
+async def response(resp):
+    results = []
+    query = resp.search_params.get("q")
+    lang = resp.search_params.get("language", "es")
+    headers = {"User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena)"}
+
+    # 1. Buscar la entidad más relevante
+    search_params = {
         "action": "wbsearchentities",
         "format": "json",
         "search": query,
-        "language": "es",
+        "language": lang,
         "limit": 1
     }
-    params["url"] = f"https://www.wikidata.org/w/api.php?{urlencode(query_params)}"
-
-def response(resp):
-    results = []
+    
     try:
-        data = resp.json()
-        search = data.get("search", [])
-        if search:
-            entity = search[0]
-            # Si hemos encontrado una entidad, creamos un resultado "Infobox"
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            r = await client.get(f"https://www.wikidata.org/w/api.php?{urlencode(search_params)}", headers=headers)
+            search_data = r.json()
+            search_results = search_data.get("search", [])
+            
+            if not search_results:
+                return []
+            
+            entity_id = search_results[0].get("id")
+            label = search_results[0].get("label", "")
+            description = search_results[0].get("description", "")
+
+            # 2. Obtener detalles de la entidad (especialmente imágenes P18)
+            detail_params = {
+                "action": "wbgetentities",
+                "format": "json",
+                "ids": entity_id,
+                "props": "claims|labels|descriptions",
+                "languages": lang
+            }
+            r_detail = await client.get(f"https://www.wikidata.org/w/api.php?{urlencode(detail_params)}", headers=headers)
+            detail_data = r_detail.json()
+            entity_info = detail_data.get("entities", {}).get(entity_id, {})
+            
+            claims = entity_info.get("claims", {})
+            img_src = None
+            
+            # P18 es la propiedad de imagen en Wikidata
+            if "P18" in claims:
+                img_name = claims["P18"][0].get("mainsnak", {}).get("datavalue", {}).get("value")
+                if img_name:
+                    # Formato para obtener la imagen directa de Wikimedia Commons
+                    img_src = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_name.replace(' ', '_')}?width=400"
+
+            # Mejorar descripción si es muy corta
+            final_content = description if description else "Información enciclopédica de Wikidata."
+            
             results.append({
                 "template": "infobox.html",
-                "title": entity.get("label", ""),
-                "url": f"https://www.wikidata.org/wiki/{entity.get('id')}",
-                "content": entity.get("description", "Información enciclopédica encontrada en Wikidata."),
-                "score": 5.0 # ¡Directo al top!
+                "title": label,
+                "url": f"https://www.wikidata.org/wiki/{entity_id}",
+                "content": final_content,
+                "img_src": img_src,
+                "source": "wikidata",
+                "score": 4.0
             })
-    except Exception:
-        pass
-    
+            
+    except Exception as e:
+        print(f"DEBUG Wikidata Error: {e}")
+        
     return results

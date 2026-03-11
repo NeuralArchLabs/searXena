@@ -177,7 +177,7 @@ class EngineManager:
         except Exception:
             valid_results = []
         
-        results, infoboxes = self.process_and_rank(valid_results, category)
+        results, infoboxes = self.process_and_rank(valid_results, category, clean_query)
         
         # Cache Result
         ttl = self.settings["general"].get("cache_ttl", 600)
@@ -229,7 +229,10 @@ class EngineManager:
                         self.search_params = p
                         self.url = p["url"]
                     def json(self): return {}
-                results = engine.response(FakeResponse(params))
+                if asyncio.iscoroutinefunction(engine.response):
+                    results = await engine.response(FakeResponse(params))
+                else:
+                    results = engine.response(FakeResponse(params))
             elif params.get("url"):
                 async with httpx.AsyncClient(
                     follow_redirects=True, 
@@ -257,9 +260,15 @@ class EngineManager:
                             def json(self):
                                 return json.loads(self.text)
                         
-                        results = engine.response(ResponseWrapper(resp, params))
+                        if asyncio.iscoroutinefunction(engine.response):
+                            results = await engine.response(ResponseWrapper(resp, params))
+                        else:
+                            results = engine.response(ResponseWrapper(resp, params))
                 
             clean = []
+            if results and asyncio.iscoroutine(results):
+                results = await results
+            
             if isinstance(results, list):
                 engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-1])
                 engine_weight = getattr(engine, "WEIGHT", 1.0)
@@ -299,18 +308,47 @@ class EngineManager:
             
         return True
 
-    def process_and_rank(self, results_groups, category="general"):
+    def process_and_rank(self, results_groups, category="general", query=""):
         score_map = defaultdict(lambda: {"title": "", "url": "", "content": "", "score": 0.0, "sources": set(), "engine_positions": []})
         infoboxes = [] # Resultados destacados (Wiki, Calculadora, OSM)
+        
+        # Normalizar query para validación de relevancia
+        import re
+        q_norm = re.sub(r'[^\w\s]', '', query.lower()).strip()
+        q_words = set(q_norm.split())
         
         for results in results_groups:
             for position, res in enumerate(results):
                 # 1. Extraer INFOTOOLS (Respuestas Destacadas Reales)
                 if res.get("template") == "infobox.html":
-                    # Evitar duplicar infoboxes exactos de la misma fuente
-                    if not any(i['title'] == res['title'] and i['source'] == res['source'] for i in infoboxes):
-                        infoboxes.append(res)
-                    continue
+                    # VALIDACIÓN DE RELEVANCIA PARA INFOBOXES
+                    # Evitar mostrar infoboxes de "coincidencia parcial" como destacados
+                    # Ejemplo: Query "openclaw" vs Título "Claw (videojuego)" -> No es match perfecto.
+                    res_title = res.get("title", "").lower()
+                    title_norm = re.sub(r'\(.*?\)', '', res_title) # Quitar (videojuego), etc.
+                    title_norm = re.sub(r'[^\w\s]', '', title_norm).strip()
+                    t_words = set(title_norm.split())
+
+                    # Criterio: El infobox debe contener la esencia de la búsqueda
+                    # Si la query es una palabra única y el título no es igual -> Descartar de destacados
+                    is_relevant = False
+                    if q_norm == title_norm:
+                        is_relevant = True
+                    elif len(q_words) > 1: 
+                        intersection = q_words.intersection(t_words)
+                        overlap = len(intersection) / len(q_words)
+                        if overlap >= 0.7 or q_words.issubset(t_words) or t_words.issubset(q_words):
+                            is_relevant = True
+
+                    if is_relevant:
+                        if not any(i['title'] == res['title'] and i['source'] == res['source'] for i in infoboxes):
+                            infoboxes.append(res)
+                        continue # Ya está en infoboxes, no procesar como resultado normal
+                    else:
+                        # Si no es suficientemente relevante para ser infobox, 
+                        # degradar a resultado estándar para no perder la información
+                        res["template"] = "default"
+
 
                 # 2. Normalización de URL para deduplicación robusta (SearXNG style)
                 raw_url = res.get('url', '').lower()
@@ -374,7 +412,29 @@ class EngineManager:
 
             final.append(data)
             
-        # Ordenación Final por Score
+        # Ordenación de Infoboxes por relevancia (Perfect Match primero)
+        def infobox_sort(i):
+            title = re.sub(r'[^\w\s]', '', i.get('title', '').lower()).strip()
+            q_fix = q_norm.replace(' ', '')
+            t_fix = title.replace(' ', '')
+            
+            # Tie-breaker: Wikipedia > Wikidata > Otros
+            prio = 0.5
+            if i.get('source') == 'wikipedia': prio = 0.1
+            elif i.get('source') == 'wikidata': prio = 0.2
+            
+            if q_fix == t_fix: return 0 + prio
+            if q_fix in t_fix or t_fix in q_fix: return 1 + prio
+            return 2 + prio
+        
+        infoboxes.sort(key=infobox_sort)
+        
+        # Opcional: Solo quedarnos con el mejor infobox si es realmente bueno
+        if infoboxes and infobox_sort(infoboxes[0]) > 1:
+            # Si el mejor infobox no es ni siquiera un match parcial fuerte, quitarlo
+            infoboxes = []
+        
+        # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
         
         # Limitar resultados para limpieza absoluta

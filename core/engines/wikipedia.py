@@ -1,42 +1,64 @@
+import httpx
+import asyncio
 from urllib.parse import urlencode
 
 NAME = "wikipedia"
 CATEGORIES = ['general', 'it_science']
 WEIGHT = 3.0
 
-def request(query, params):
-    lang = params.get("language", "es")
-    query_params = {
-        "action": "query",
-        "format": "json",
-        "prop": "extracts|info|pageimages",
-        "exintro": True,
-        "explaintext": True,
-        "exsentences": 5,
-        "inprop": "url",
-        "pithumbsize": 400,
-        "generator": "search",
-        "gsrsearch": query,
-        "gsrlimit": 3
-    }
-    params["url"] = f"https://{lang}.wikipedia.org/w/api.php?{urlencode(query_params)}"
-    params["headers"]["User-Agent"] = "searXena/1.0 (https://github.com/martinezpalomera92/searXena; contact: user@example.com) modern-browser-style"
+async def request(query, params):
+    params["url"] = "internal://wikipedia"
 
-def response(resp):
+async def response(resp):
     results = []
-    try:
-        data = resp.json()
+    query = resp.search_params.get("q")
+    lang = resp.search_params.get("language", "es")
+    
+    headers = {
+        "User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
+    }
+
+    # Búsqueda multi-idioma para mayor cobertura
+    langs = [lang]
+    if lang != 'en':
+        langs.append('en')
+    
+    async def fetch_wiki(l):
+        # Usamos gsrsearch para obtener resultados ordenados por relevancia
+        q_params = {
+            "action": "query", "format": "json", "prop": "extracts|info|pageimages",
+            "exintro": True, "explaintext": True, "exsentences": 5,
+            "inprop": "url", "pithumbsize": 400, "generator": "search",
+            "gsrsearch": query, "gsrlimit": 5
+        }
+        api_url = f"https://{l}.wikipedia.org/w/api.php?{urlencode(q_params)}"
+        try:
+            async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
+                r = await client.get(api_url, headers=headers)
+                if r.status_code == 200:
+                    return r.json(), l
+        except: pass
+        return None, l
+
+    pending = [fetch_wiki(l) for l in langs]
+    completed = await asyncio.gather(*pending)
+
+    for data, l in completed:
+        if not data: continue
         pages = data.get("query", {}).get("pages", {})
         for page_id, page in pages.items():
-            if "extract" in page:
+            title = page.get("title", "")
+            extract = page.get("extract", "")
+            
+            # Filtro básico: Si el título no tiene NADA que ver con la query, descartar
+            # (Ejemplo: Query "openclaw" traía "Claw (videojuego)")
+            if extract and len(extract) > 40:
                 results.append({
-                    "title": page.get("title", ""),
-                    "url": page.get("fullurl", f"https://wikipedia.org/?curid={page_id}"),
-                    "content": page.get("extract", ""),
+                    "title": title,
+                    "url": page.get("fullurl", f"https://{l}.wikipedia.org/wiki/{title.replace(' ','_')}"),
+                    "content": extract,
                     "img_src": page.get("thumbnail", {}).get("source") if "thumbnail" in page else None,
-                    "template": "infobox.html", # Promocionar a Infobox
+                    "template": "infobox.html",
                     "source": "wikipedia"
                 })
-    except Exception:
-        pass
     return results
