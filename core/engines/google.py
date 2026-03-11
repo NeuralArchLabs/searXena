@@ -69,7 +69,7 @@ def response(resp):
                             item["img_src"] = src
                     
                     # Bonus: Si es video en motor general, forzar template y miniatura HQ si es Youtube
-                    if params.get("category") == "videos" or "youtube.com" in url or "youtu.be" in url:
+                    if resp.search_params.get("category") == "videos" or "youtube.com" in url or "youtu.be" in url:
                         item["template"] = "videos.html"
                         import re
                         yt_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
