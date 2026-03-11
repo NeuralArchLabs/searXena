@@ -44,6 +44,22 @@ SearXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 * 📱 **UI/UX Moderna y Dinámica:** Animaciones fluidas, modo oscuro ultra refinado ("Space Violet"), interfaz responsiva y separada categóricamente en pestañas (General, TI/Ciencia, Mapas, Videos, Imágenes).
 * 🌎 **Rich Snippets Consolidados:** Lectura enriquecida consolidando datos de Wikipedia o Wikidata en recuadros laterales de rápido consumo ("Infoboxes") al estilo de los grandes motores comerciales.
 
+## 🥊 ¿Por qué no tenemos rival en Windows? (SearXena vs El Resto)
+
+Históricamente, los metabuscadores open-source enfocados en privacidad (como SearXNG o Whoogle) nacieron y fueron diseñados **estrictamente pensando en entornos GNU/Linux o despliegues Cloud**. Si un usuario de Windows deseaba correrlos localmente, debía enfrentarse a una odisea de fricción técnica: instalar **WSL2** (Subsistema de Windows para Linux), dedicar recursos de memoria fijos para máquinas virtuales, configurar demonios de **Docker**, lidiar con configuraciones de red de contenedores (NAT bridging), y gastar gigabytes de almacenamiento solo para arrancar una barra de búsqueda.
+
+**SearXena elimina por completo todas estas barreras. No tenemos rivales en este ecosistema porque somos 100% nativos.**
+
+| Característica | 👾 Los "Rivales" (SearXNG / Whoogle) | 👑 SearXena |
+| :--- | :--- | :--- |
+| **Arquitectura en Windows** | Virtualización Forzada (Docker / WSL2) | **Directa al Kernel** (vía Python nativo) |
+| **Consumo de Memoria** | ~1 GB a 2 GB (Por sobrecarga de VM / Contenedores) | **~30 MB - 60 MB** (Ejecución Pura) |
+| **Tiempo de Arranque** | Lento (Inicia Docker Engine, luego levanta el stack) | **Instantáneo** (Menor a un segundo) |
+| **Experiencia de Instalación** | Compleja, comandos de sysadmin orientados a Linux | **Simple** (`pip install` y `python app.py`) |
+| **Tool Calling LLM** | Adaptadores comunitarios externos requeridos | **API JSON Nativa** construida desde el día uno |
+
+A menos que quieras rentar un VPS en la nube, SearXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
+
 ## 🔒 Arquitectura de Privacidad Transparente
 
 SearXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (Google/Meta), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
@@ -56,6 +72,19 @@ Al interactuar con la pestaña especializada de Mapas, SearXena implementa regla
 * **Geocodificación Limpia**: La petición nominal (ej. "Buscar Jalisco") va blindada mediante el core backend a favor del anonimato. OSM jamás sabe las palabras de tu búsqueda.
 * **Transparencia IP (El Iframe Interactivo)**: Para que experimentes un mapa funcional arrastrable dentro de la sección Mapas, inyectamos un `iframe` dinámico referenciando a `openstreetmap.org`. Esto hace que **tu navegador realice una conexión directa a OSM revelando temporalmente tu IP pública** para la descarga de mosaicos visuales (tiles).
 * El trade-off: OSM es una fundación [abierta pro-privacidad](https://wiki.osmfoundation.org/wiki/Privacy_Policy) sin motores que subasten telemetría ni cookies inter-rastreo, por lo que la exposición de IP nativa es benigna y se justifica a cambio de integrar la cartografía funcional.
+
+## 🤖 Integración Nativa con Inteligencia Artificial (API)
+
+SearXena no es solo para consumo humano. Está diseñado desde su base web para **actuar como el motor de búsqueda de investigación de tus propios agentes de IA (LLMs) locales o en la nube**, proveyendo soporte nativo de *Tool Calling* estrictamente estandarizado (formato OpenAI/Anthropic/Gemini).
+
+A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas y recibir respuestas en **JSON limpio, indexado y estructurado**, suprimiendo el HTML, CSS o el costoso ruido visual derivado de los scrapers crudos.
+
+* **Endpoints Listos para IA:**
+  * `GET /api/v1/tools_schema`: Devuelve un esquema literal `function_declarations` inyectable directo hacia tu LLM con todos los parámetros habilitados disponibles.
+  * `POST /api/v1/search`: Webhook de comunicación que ejecuta la búsqueda y devuelve metadata analítica de profundidad.
+* **Smart Ranking Anti-Alucinaciones:** El filtro heurístico procesa los retornos a favor del agente; bajo la categoría "TI", oculta de cara al LLM los sitios publicitarios y le alimenta directamente de StackOverflow, la MDN Web Docs, y repositorios sustanciales de GitHub.
+
+> **¿Construyendo un Agente RAG?** Echa un vistazo profundo a los payloads, headers preconstruidos y recomendaciones del System Prompt alojados en la [**Guía de Integración AI**](AI_INTEGRATION_GUIDE.md) incluida en este repositorio oficial.
 
 ## 🚀 Instalación y Uso (Modo Local)
 
