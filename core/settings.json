@@ -290,7 +290,7 @@
         },
         {
             "name": "osm",
-            "enabled": false,
+            "enabled": true,
             "weight": 1.2
         }
     ]

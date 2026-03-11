@@ -146,17 +146,26 @@ body {
     display: none;
 }
 
-.featured-answer .infobox-content {
-    -webkit-line-clamp: 8;
-    line-clamp: 8;
-}
-
 .infobox-link {
     color: var(--accent);
     font-size: 0.9rem;
     margin-top: 15px;
     display: block;
     text-decoration: none;
+}
+
+.map-container {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.map-container iframe {
+    display: block;
+    filter: brightness(0.9) contrast(1.1);
 }
 
 .no-results {
@@ -1052,4 +1061,14 @@ body {
     color: white;
     border-color: var(--accent);
     background: var(--accent-glow);
+}
+
+.general-price-tag {
+    color: var(--accent);
+    font-weight: bold;
+    margin: 4px 0 6px 0;
+}
+
+.maps-item {
+    margin-bottom: 20px;
 }

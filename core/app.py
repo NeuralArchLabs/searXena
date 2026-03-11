@@ -204,8 +204,8 @@ async def search(request: Request):
     if category == "shopping":
         results = reorganized
     
-    # Solo mostrar infoboxes (respuestas destacadas) en la categoría GENERAL
-    if category == "general":
+    # Los infoboxes (como OSM) son esenciales en General y Mapas
+    if category in ["general", "maps"]:
         full_results = infoboxes + results
     else:
         full_results = results

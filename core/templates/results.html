@@ -71,10 +71,11 @@
                     {% if featured.img_src %}
                     {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
                     <img src="{{ featured.img_src if featured.img_src.startswith('http') else 'https:' ~ featured.img_src }}"
-                        alt="Info Image" class="featured-image" onerror="this.style.display='none';">
+                        alt="Info Image" class="featured-image"
+                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
                     {% else %}
                     <img src="/proxify?url={{ featured.img_src | urlencode }}" alt="Info Image" class="featured-image"
-                        onerror="this.style.display='none';">
+                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
                     {% endif %}
                     {% endif %}
                     <div class="infobox-body-main">
@@ -181,11 +182,20 @@
             <!-- Vista de Mapas -->
             <div class="maps-list">
                 {% for result in results if result.source == 'osm' or 'map' in result.title|lower %}
-                <div class="infobox-container featured-answer" style="margin-bottom: 20px;">
+                <div class="infobox-container featured-answer maps-item">
                     <div class="infobox-title">{{ result.title }}</div>
                     <p class="infobox-content">{{ result.content }}</p>
+                    {% if result.is_map %}
+                    <div class="map-container">
+                        <iframe width="100%" height="300" frameborder="0" scrolling="no" marginheight="0"
+                            marginwidth="0" src="{{ result.map_embed_url }}"
+                            title="Mapa interactivo de {{ result.source|capitalize }}">
+                        </iframe>
+                    </div>
+                    {% endif %}
                     <a href="{{ result.url }}" target="_blank" class="infobox-link"
-                        rel="noopener noreferrer nofollow">Ver en OpenStreetMap →</a>
+                        rel="noopener noreferrer nofollow">Ver en {{ result.source|capitalize if result.source else
+                        'Fuente' }} →</a>
                 </div>
                 {% endfor %}
             </div>
@@ -208,8 +218,7 @@
                         <div class="result-url" title="{{ result.url }}">{{ result.url }}</div>
 
                         {% if result.price %}
-                        <div class="general-price-tag"
-                            style="color: var(--accent); font-weight: bold; margin: 4px 0 6px 0;">
+                        <div class="general-price-tag">
                             {{ result.price }}
                         </div>
                         {% endif %}
@@ -250,7 +259,7 @@
             {% if category in ('general', 'it_science') or not category %}
             {% set infoboxes = results | selectattr('template', 'equalto', 'infobox.html') | list %}
             {% if infoboxes %}
-            {% for info in infoboxes %}
+            {% for info in infoboxes if info != featured %}
             <div class="infobox-container sidebar-box">
                 <div class="infobox-title-sidebar">{{ info.title }}</div>
                 {% if info.img_src %}

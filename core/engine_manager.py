@@ -149,12 +149,12 @@ class EngineManager:
             elif engine.ENABLED and real_category in engine.CATEGORIES:
                 category_engines.append(engine)
         
-        # Si no hay motores en la categoría, buscar en general (Fallback)
-        if not category_engines and not include_engines:
+        # Si no hay motores en la categoría, o si es la categoría maps (requiere apoyo), buscar en general (Fallback)
+        if (not category_engines and not include_engines) or category == "maps":
             for name, engine in self.engines.items():
                 if exclude_engines and name in exclude_engines:
                     continue
-                if engine.ENABLED and "general" in engine.CATEGORIES:
+                if engine.ENABLED and "general" in engine.CATEGORIES and engine not in category_engines:
                     category_engines.append(engine)
                     
         # PRIORIZACIÓN (SearXNG): 
@@ -423,7 +423,9 @@ class EngineManager:
             
             # Puntuación: 0 = Perfect, 1 = Substring, 2 = Partial
             base = 2
-            if q_fix == t_fix: base = 0
+            if i.get('source') == 'osm':
+                base = -1  # Mapas siempre pasan como respuesta destacada
+            elif q_fix == t_fix: base = 0
             elif q_fix in t_fix or t_fix in q_fix: base = 1
             
             # Tie-breaker decimal: Wikipedia > Wikidata > Otros
@@ -435,12 +437,16 @@ class EngineManager:
         
         infoboxes.sort(key=infobox_sort_score)
         
-        # Quedarnos solo con el mejor infobox si es bueno
+        # Permitir múltiples infoboxes (hasta 3 en general, 5 en mapas)
         final_infoboxes = []
         if infoboxes:
-            best_score = infobox_sort_score(infoboxes[0])
-            if best_score < 2.0: # Solo mostrar si es match exacto o substring fuerte
-                final_infoboxes = [infoboxes[0]]
+            for info in infoboxes:
+                if infobox_sort_score(info) < 2.0:
+                    final_infoboxes.append(info)
+                
+                max_infoboxes = 5 if category == 'maps' else 3
+                if len(final_infoboxes) >= max_infoboxes:
+                    break
         
         # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
