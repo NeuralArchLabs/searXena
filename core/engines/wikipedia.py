@@ -23,18 +23,16 @@ async def response(resp):
         langs.append('en')
     
     async def fetch_wiki(l):
-        # Aumentamos exsentences y quitamos exintro para intentar obtener más texto si el intro es corto
+        # Aumentamos exsentences a 10 para un snippet más rico
         q_params = {
             "action": "query", "format": "json", "prop": "extracts|info|pageimages",
-            "exsentences": 10,  # Más oraciones
-            "explaintext": True,
-            "inprop": "url", "pithumbsize": 600, # Imagen más grande
-            "generator": "search",
+            "exintro": True, "explaintext": True, "exsentences": 10,
+            "inprop": "url", "pithumbsize": 600, "generator": "search",
             "gsrsearch": query, "gsrlimit": 5
         }
         api_url = f"https://{l}.wikipedia.org/w/api.php?{urlencode(q_params)}"
         try:
-            async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=6.0, follow_redirects=True) as client:
                 r = await client.get(api_url, headers=headers)
                 if r.status_code == 200:
                     return r.json(), l
@@ -51,14 +49,16 @@ async def response(resp):
             title = page.get("title", "")
             extract = page.get("extract", "")
             
+            # Priorizamos la imagen de la API de Wikipedia (pageimage)
+            img_src = page.get("thumbnail", {}).get("source")
+            
             if extract and len(extract) > 40:
                 results.append({
                     "title": title,
                     "url": page.get("fullurl", f"https://{l}.wikipedia.org/wiki/{title.replace(' ','_')}"),
                     "content": extract,
-                    "img_src": page.get("thumbnail", {}).get("source") if "thumbnail" in page else None,
+                    "img_src": img_src,
                     "template": "infobox.html",
-                    "source": "wikipedia",
-                    "lang": l
+                    "source": "wikipedia"
                 })
     return results

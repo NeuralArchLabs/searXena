@@ -1,6 +1,5 @@
 import httpx
 import asyncio
-import hashlib
 from urllib.parse import urlencode
 
 NAME = "wikidata"
@@ -10,22 +9,13 @@ WEIGHT = 1.0
 async def request(query, params):
     params["url"] = "internal://wikidata"
 
-def get_commons_url(filename):
-    """Genera una URL directa de thumbnail para un archivo de Wikimedia Commons"""
-    if not filename: return None
-    name = filename.replace(' ', '_')
-    m = hashlib.md5()
-    m.update(name.encode('utf-8'))
-    h = m.hexdigest()
-    # Estructura de Commons: /a/ab/Filename
-    return f"https://upload.wikimedia.org/wikipedia/commons/thumb/{h[0]}/{h[0:2]}/{name}/400px-{name}"
-
 async def response(resp):
     results = []
     query = resp.search_params.get("query")
     lang = resp.search_params.get("language", "es")
     headers = {"User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena)"}
 
+    # 1. Buscar la entidad más relevante
     search_params = {
         "action": "wbsearchentities",
         "format": "json",
@@ -47,6 +37,7 @@ async def response(resp):
             label = search_results[0].get("label", "")
             description = search_results[0].get("description", "")
 
+            # 2. Obtener detalles de la entidad (especialmente imágenes P18)
             detail_params = {
                 "action": "wbgetentities",
                 "format": "json",
@@ -61,20 +52,23 @@ async def response(resp):
             claims = entity_info.get("claims", {})
             img_src = None
             
-            # Intentar obtener imagen de P18
+            # P18 es la propiedad de imagen en Wikidata
             if "P18" in claims:
                 img_name = claims["P18"][0].get("mainsnak", {}).get("datavalue", {}).get("value")
                 if img_name:
-                    img_src = get_commons_url(img_name)
+                    # Formato para obtener la imagen directa de Wikimedia Commons
+                    img_src = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_name.replace(' ', '_')}?width=400"
 
+            # Mejorar descripción si es muy corta
+            final_content = description if description else "Información enciclopédica de Wikidata."
+            
             results.append({
                 "template": "infobox.html",
                 "title": label,
                 "url": f"https://www.wikidata.org/wiki/{entity_id}",
-                "content": description if description else "Información de Wikidata.",
+                "content": final_content,
                 "img_src": img_src,
                 "source": "wikidata",
-                "lang": lang,
                 "score": 4.0
             })
             

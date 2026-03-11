@@ -325,9 +325,7 @@ class EngineManager:
                     # Evitar mostrar infoboxes de "coincidencia parcial" como destacados
                     # Ejemplo: Query "openclaw" vs Título "Claw (videojuego)" -> No es match perfecto.
                     res_title = res.get("title", "").lower()
-                    # Limpieza profunda de sufijos (Wikipedia, Wikidata, etc.)
-                    title_norm = re.sub(r' - wikipedia$| - wikidata$| - wikcionario$| - sitio oficial$', '', res_title)
-                    title_norm = re.sub(r'\(.*?\)', '', title_norm) # Quitar (videojuego), (consola), etc.
+                    title_norm = re.sub(r'\(.*?\)', '', res_title) # Quitar (videojuego), etc.
                     title_norm = re.sub(r'[^\w\s]', '', title_norm).strip()
                     t_words = set(title_norm.split())
 
@@ -428,36 +426,21 @@ class EngineManager:
             if q_fix == t_fix: base = 0
             elif q_fix in t_fix or t_fix in q_fix: base = 1
             
-            # Tie-breaker decimal: Prioridad Idioma (Decisiva) > Wikipedia > Wikidata
-            lang_pref = 0.01 if i.get('lang') == 'es' else 0.5 
-            prio = 0.05
-            if i.get('source') == 'wikipedia': prio = 0.01
-            elif i.get('source') == 'wikidata': prio = 0.02
+            # Tie-breaker decimal: Wikipedia > Wikidata > Otros
+            prio = 0.5
+            if i.get('source') == 'wikipedia': prio = 0.1
+            elif i.get('source') == 'wikidata': prio = 0.2
             
-            return base + lang_pref + prio
+            return base + prio
         
         infoboxes.sort(key=infobox_sort_score)
         
-        # Quedarnos solo con el mejor infobox si es bueno, pero enriquecerlo con los demás
+        # Quedarnos solo con el mejor infobox si es bueno
         final_infoboxes = []
         if infoboxes:
             best_score = infobox_sort_score(infoboxes[0])
             if best_score < 2.0: # Solo mostrar si es match exacto o substring fuerte
-                best_info = infoboxes[0].copy() # Usar copia para no mutar el original
-                # Enriquecer SOLO con datos del mismo tema exacto
-                best_t_fix = re.sub(r'[^\w\s]', '', best_info.get('title', '').lower()).strip().replace(' ', '')
-                for other in infoboxes[1:]:
-                    other_t_fix = re.sub(r'[^\w\s]', '', other.get('title', '').lower()).strip().replace(' ', '')
-                    if other_t_fix == best_t_fix: # SOLO fusión si los nombres son idénticos
-                        if not best_info.get('img_src') and other.get('img_src'):
-                            best_info['img_src'] = other['img_src']
-                        # Si encontramos una versión en español de algo que estaba en inglés, preferirla
-                        if other.get('lang') == 'es' and best_info.get('lang') != 'es':
-                            best_info['content'] = other['content']
-                            best_info['lang'] = 'es'
-                            best_info['url'] = other['url']
-                            best_info['source'] = other['source']
-                final_infoboxes = [best_info]
+                final_infoboxes = [infoboxes[0]]
         
         # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
