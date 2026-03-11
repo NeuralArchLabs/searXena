@@ -1,4 +1,8 @@
 <div align="center">
+  <p>
+    <a href="README.en.md">English</a> | 🌎 <b>Versión en Español</b>
+  </p>
+
   <img src="https://img.shields.io/badge/Sear-Xena-6a00ff?style=for-the-badge&logo=search&logoColor=white" alt="searXena Logo"/>
   <h1>searXena</h1>
 
