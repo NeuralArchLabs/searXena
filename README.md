@@ -1,6 +1,6 @@
 <div align="center">
   <p>
-    <a href="README.en.md">English</a> | 🌎 <b>Versión en Español</b>
+    <a href="README.en.md">English</a> | 🌎 <b>Versión en Español</b> | <a href="README.zh.md">中文</a>
   </p>
 
   <img src="https://img.shields.io/badge/Sear-Xena-6a00ff?style=for-the-badge&logo=search&logoColor=white" alt="searXena Logo"/>
@@ -59,7 +59,7 @@ Históricamente, los metabuscadores open-source enfocados en privacidad (como Se
 | **Arquitectura en Windows** | Virtualización Forzada (Docker / WSL2) | **Directa al Kernel** (vía Python nativo) |
 | **Consumo de Memoria** | ~1 GB a 2 GB (Por sobrecarga de VM / Contenedores) | **~30 MB - 60 MB** (Ejecución Pura) |
 | **Tiempo de Arranque** | Lento (Inicia Docker Engine, luego levanta el stack) | **Instantáneo** (Menor a un segundo) |
-| **Experiencia de Instalación** | Compleja, comandos de sysadmin orientados a Linux | **Simple** (`pip install` y `python app.py`) |
+| **Experiencia de Instalación** | Compleja, comandos de sysadmin orientados a Linux | **Simple** (Scripts `.ps1` auto-configurables) |
 | **Tool Calling LLM** | Adaptadores comunitarios externos requeridos | **API JSON Nativa** construida desde el día uno |
 
 A menos que quieras rentar un VPS en la nube, searXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
@@ -92,24 +92,22 @@ A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas 
 
 ## 🚀 Instalación y Uso (Modo Local)
 
-1. **Requisito Prevío:** Al menos Python 3.9 instalado en tu sistema.
-2. Clona el repositorio a un directorio local:
+1. Clona el repositorio a un directorio local:
    ```bash
    git clone https://github.com/martinezpalomera92/searXena.git
    cd searXena
    ```
-3. (Opcional) Te recomendamos crear un entorno virtual para encapsular los paquetes:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate
+2. (Opcional) Si tu sistema bloquea los scripts, dales permisos:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
-4. Instala todas las dependencias necesarias:
-   ```bash
-   pip install -r requirements.txt
+3. Ejecuta el instalador automático en la terminal base:
+   ```powershell
+   .\win_setup.ps1
    ```
-5. Inicia el motor searXena:
-   ```bash
-   python app.py
+4. Inicia el motor searXena:
+   ```powershell
+   .\run.ps1
    ```
 Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0.1:8000`. searXena ya está listo para enmascararte.
 
