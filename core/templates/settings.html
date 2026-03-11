@@ -97,13 +97,13 @@
             </div>
 
             <div class="settings-tabs" role="tablist">
-                <div class="settings-tab active" onclick="showSection('general')" role="tab">{{ 'General' if lang ==
-                    'en' else 'General' }}</div>
-                <div class="settings-tab" onclick="showSection('engines')" role="tab">{{ 'Engines' if lang == 'en' else
-                    'Motores' }} ({{ engines|length }})
+                <div class="settings-tab active" onclick="showSection('general')" role="tab">{{ {'en': 'General', 'zh':
+                    '综合'}.get(lang, 'General') }}</div>
+                <div class="settings-tab" onclick="showSection('engines')" role="tab">{{ {'en': 'Engines', 'zh':
+                    '搜索引擎'}.get(lang, 'Motores') }} ({{ engines|length }})
                 </div>
-                <div class="settings-tab" onclick="showSection('about')" role="tab">{{ 'Privacy & Security' if lang ==
-                    'en' else 'Privacidad y Seguridad' }}</div>
+                <div class="settings-tab" onclick="showSection('about')" role="tab">{{ {'en': 'Privacy & Security',
+                    'zh': '隐私与安全'}.get(lang, 'Privacidad y Seguridad') }}</div>
             </div>
 
             <form action="/save_settings" method="post">
@@ -131,13 +131,14 @@
                                 'Filtrar contenido explícito de los resultados.') }}</p>
                         </div>
                         <select name="safesearch" class="select-custom" title="Configurar búsqueda segura">
-                            <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>{{ 'Disabled' if
-                                lang == 'en' else 'Desactivado' }}
+                            <option value="0" {% if general.get('safe_search')==0 %}selected{% endif %}>{{ {'en':
+                                'Disabled', 'zh': '已禁用'}.get(lang, 'Desactivado') }}
                             </option>
-                            <option value="1" {% if general.get('safe_search', 1)==1 %}selected{% endif %}>Moderado
+                            <option value="1" {% if general.get('safe_search', 1)==1 %}selected{% endif %}>{{ {'en':
+                                'Moderate', 'zh': '中等'}.get(lang, 'Moderado') }}
                             </option>
-                            <option value="2" {% if general.get('safe_search')==2 %}selected{% endif %}>{{ 'Strict' if
-                                lang == 'en' else 'Estricto' }}
+                            <option value="2" {% if general.get('safe_search')==2 %}selected{% endif %}>{{ {'en':
+                                'Strict', 'zh': '严格'}.get(lang, 'Estricto') }}
                             </option>
                         </select>
                     </div>
@@ -145,8 +146,9 @@
                     <div class="setting-row">
                         <div class="setting-info">
                             <h3>{{ {'en': 'Autocomplete', 'zh': '自动完成'}.get(lang, 'Autocompletado') }}</h3>
-                            <p>{{ 'Suggestions are processed locally to protect your privacy.' if lang == 'en' else 'Las
-                                sugerencias se procesan localmente para proteger tu privacidad.' }}</p>
+                            <p>{{ {'en': 'Suggestions are processed locally to protect your privacy.', 'zh':
+                                '建议在本地处理以保护您的隐私。'}.get(lang, 'Las sugerencias se procesan localmente para proteger tu
+                                privacidad.') }}</p>
                         </div>
                         <select name="autocomplete" class="select-custom" title="Motor de sugerencias">
                             <option value="google" {% if general.get('autocomplete', 'google' )=='google' %}selected{%
@@ -161,8 +163,9 @@
 
                 <div id="section-engines" class="settings-section">
                     <div style="margin-bottom: 20px; color: var(--text-secondary); font-size: 0.9rem;">
-                        {{ 'Select the search engines searXena will query simultaneously.' if lang == 'en' else
-                        'Selecciona los motores de búsqueda que searXena consultará simultáneamente.' }}
+                        {{ {'en': 'Select the search engines searXena will query simultaneously.', 'zh':
+                        '选择searXena将同时查询的搜索引擎。'}.get(lang, 'Selecciona los motores de búsqueda que searXena consultará
+                        simultáneamente.') }}
                     </div>
                     <div class="engine-grid">
                         {% for engine in engines %}
@@ -238,8 +241,8 @@
                     </div>
                 </div>
 
-                <button type="submit" class="save-bar">{{ 'Save Preferences' if lang == 'en' else 'Guardar Preferencias'
-                    }} y Proteger sesión</button>
+                <button type="submit" class="save-bar">{{ {'en': 'Save Preferences and Protect Session', 'zh':
+                    '保存偏好设置并保护会话'}.get(lang, 'Guardar Preferencias y Proteger sesión') }}</button>
             </form>
         </div>
     </div>
