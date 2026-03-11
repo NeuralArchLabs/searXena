@@ -325,7 +325,9 @@ class EngineManager:
                     # Evitar mostrar infoboxes de "coincidencia parcial" como destacados
                     # Ejemplo: Query "openclaw" vs Título "Claw (videojuego)" -> No es match perfecto.
                     res_title = res.get("title", "").lower()
-                    title_norm = re.sub(r'\(.*?\)', '', res_title) # Quitar (videojuego), etc.
+                    # Limpieza agresiva de sufijos de motores/sitios
+                    title_norm = re.sub(r' - wikipedia$| - wikidata$| - wikcionario$', '', res_title)
+                    title_norm = re.sub(r'\(.*?\)', '', title_norm) # Quitar (videojuego), etc.
                     title_norm = re.sub(r'[^\w\s]', '', title_norm).strip()
                     t_words = set(title_norm.split())
 
@@ -426,11 +428,11 @@ class EngineManager:
             if q_fix == t_fix: base = 0
             elif q_fix in t_fix or t_fix in q_fix: base = 1
             
-            # Tie-breaker decimal: Prioridad Idioma > Wikipedia > Wikidata
-            lang_pref = 0.05 if i.get('lang') == 'es' else 0.1 # Prioridad a español si el sistema lo pide
-            prio = 0.5
-            if i.get('source') == 'wikipedia': prio = 0.1
-            elif i.get('source') == 'wikidata': prio = 0.2
+            # Tie-breaker decimal: Prioridad Idioma (Mucho más fuerte) > Wikipedia > Wikidata
+            lang_pref = 0.01 if i.get('lang') == 'es' else 0.4 
+            prio = 0.05
+            if i.get('source') == 'wikipedia': prio = 0.01
+            elif i.get('source') == 'wikidata': prio = 0.02
             
             return base + lang_pref + prio
         
