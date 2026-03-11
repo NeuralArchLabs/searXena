@@ -18,17 +18,18 @@ async def response(resp):
         "User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
     }
 
-    # Búsqueda multi-idioma para mayor cobertura
     langs = [lang]
     if lang != 'en':
         langs.append('en')
     
     async def fetch_wiki(l):
-        # Usamos gsrsearch para obtener resultados ordenados por relevancia
+        # Aumentamos exsentences y quitamos exintro para intentar obtener más texto si el intro es corto
         q_params = {
             "action": "query", "format": "json", "prop": "extracts|info|pageimages",
-            "exintro": True, "explaintext": True, "exsentences": 5,
-            "inprop": "url", "pithumbsize": 400, "generator": "search",
+            "exsentences": 10,  # Más oraciones
+            "explaintext": True,
+            "inprop": "url", "pithumbsize": 600, # Imagen más grande
+            "generator": "search",
             "gsrsearch": query, "gsrlimit": 5
         }
         api_url = f"https://{l}.wikipedia.org/w/api.php?{urlencode(q_params)}"
@@ -50,8 +51,6 @@ async def response(resp):
             title = page.get("title", "")
             extract = page.get("extract", "")
             
-            # Filtro básico: Si el título no tiene NADA que ver con la query, descartar
-            # (Ejemplo: Query "openclaw" traía "Claw (videojuego)")
             if extract and len(extract) > 40:
                 results.append({
                     "title": title,
