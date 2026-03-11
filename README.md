@@ -115,4 +115,4 @@ Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0
 * Todo el conocimiento de base técnica para modelar las clases de los módulos de extracción y derivaciones heurísticas, pertenecen de forma moral a los mantenedores pasados y presentes del formidable código de [Searx](https://github.com/searx/searx) (Iniciado por Taica) y [SearXNG](https://github.com/searxng/searxng).
 * Herramientas de extracción comunitaria posibilitadas gracias a los estatus permisivos de entidades abiertas (como la familia Wikimedia Foundations).
 
-*SearXena y todos sus recursos se emiten bajo fines de experimentación, soberanía digital individual y propósitos estrictamente educativos.*
+*SearXena se distribuye tal cual, bajo la filosofía de "úselo bajo su propio riesgo". No almacenamos logs, no controlamos lo que buscas y definitivamente no somos responsables si tu historial de búsqueda asusta a tu proveedor de internet o si una corporación se enoja porque evades sus rastreadores. Úsalo con sabiduría y mantén vivo el internet libre.*
