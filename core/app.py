@@ -151,9 +151,6 @@ async def search(request: Request):
         q = q or form.get("q")
         category = category or form.get("category", "general")
         pageno = int(form.get("pageno", 1))
-    if category == "it_science":
-        category = "it"
-        
     if not q:
         return RedirectResponse(url="/")
 
@@ -170,6 +167,7 @@ async def search(request: Request):
                 category = target
 
     results, infoboxes = [], []
+    related_searches = await suggestions.get_suggestions(q)
     
     if category == "shopping":
         # Modificar la query internamente para forzar a los motores generales a arrojar resultados comerciales
@@ -229,6 +227,7 @@ async def search(request: Request):
         "request": request, 
         "query": q, 
         "results": full_results,
+        "related_searches": related_searches,
         "category": category,
         "pageno": pageno,
         "lang": manager.settings.get("general", {}).get("default_lang", "es")
@@ -244,7 +243,7 @@ async def search(request: Request):
 
 class ToolSearchRequest(BaseModel):
     query: str = Field(..., description="Término de búsqueda.")
-    category: Optional[str] = Field("general", description="Categoría: general, it, shopping, news, images, videos.")
+    category: Optional[str] = Field("general", description="Categoría: general, images, videos, news, maps, shopping, it, social.")
     pageno: Optional[int] = Field(1, description="Número de página.")
     language: Optional[str] = Field(None, description="Código ISO (es, en, etc.).")
     include_engines: Optional[List[str]] = Field(None, description="Motores específicos a incluir.")
@@ -308,7 +307,7 @@ async def api_tools_schema():
             },
             "category": {
               "type": "string",
-              "enum": ["general", "it", "shopping", "news", "images", "videos"],
+              "enum": ["general", "images", "videos", "news", "maps", "shopping", "it", "social"],
               "description": "Opcional. Default: general."
             },
             "language": {

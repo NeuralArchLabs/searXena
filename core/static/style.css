@@ -206,6 +206,7 @@ body {
     flex-direction: column;
     overflow: hidden;
     height: 100%;
+    cursor: pointer;
 }
 
 .shopping-card:hover {
@@ -375,6 +376,7 @@ body {
     padding: 15px;
     margin-bottom: 20px;
     transition: all 0.3s;
+    cursor: pointer;
 }
 
 .video-thumb {
@@ -412,6 +414,7 @@ body {
     backdrop-filter: blur(5px);
     overflow: hidden;
     position: relative;
+    cursor: pointer;
     /* Anchor for .result-count absolute positioning */
 }
 
@@ -546,19 +549,24 @@ body {
     border-color: #00a1f133;
 }
 
-/* Results Page Layout */
+/* Results Page Layout Configuration */
 .results-page-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 40px;
-    max-width: 1300px;
-    margin: 40px 5%;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 5%;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1250px) {
     .results-page-layout {
-        grid-template-columns: 1fr 380px;
-        margin: 40px auto;
+        /* Wider column to accommodate all 8 tabs without wrapping (approx ~850px) */
+        grid-template-columns: 850px minmax(380px, 1fr);
+        margin-left: calc(5% + 169px); /* Fine-tuned to 169px */
+        width: calc(100% - (5% + 169px));
+        padding: 0;
+        gap: 60px;
     }
 
     .sidebar {
@@ -566,17 +574,51 @@ body {
     }
 }
 
+/* Sidebar behavior for mobile/tablet */
+@media (max-width: 1249px) {
+    .sidebar {
+        display: none;
+    }
+    
+    /* Reveal sidebar as an overlay when a preview is active on mobile */
+    .sidebar.active-preview {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--bg-dark);
+        z-index: 2000;
+        max-height: 85vh;
+        padding: 30px 5%;
+        border-top: 2px solid var(--accent);
+        box-shadow: 0 -20px 60px rgba(0,0,0,0.9);
+        overflow-y: auto;
+        border-radius: 30px 30px 0 0;
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Hide global infoboxes in mobile preview mode to avoid clutter */
+    .sidebar.active-preview .infobox-container:not(.suggestions-box):not(.preview-container) {
+        display: none !important;
+    }
+    
+    .sidebar.active-preview .sidebar-tips {
+        display: none !important;
+    }
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+}
+
 .main-results {
     min-width: 0;
 }
 
-.sidebar {
-    display: none;
-}
-
-/* Sidebar Elements */
+/* Sidebar Elements & Containers */
 .sidebar-box {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .infobox-title-sidebar {
@@ -607,26 +649,6 @@ body {
     font-weight: 600;
 }
 
-.sidebar-empty {
-    background: var(--glass);
-    opacity: 0.6;
-}
-
-.sidebar-empty-title {
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-.sidebar-empty-text {
-    font-size: 0.85rem;
-    margin-top: 10px;
-}
-
-.sidebar-tips {
-    background: var(--glass);
-    margin-top: 20px;
-}
-
 .sidebar-tips-title {
     color: var(--accent);
     font-size: 0.9rem;
@@ -638,6 +660,177 @@ body {
     font-size: 0.85rem;
     margin-top: 10px;
     color: var(--text-secondary);
+}
+
+/* Hide alignment on smaller screens */
+@media (max-width: 1100px) {
+    .results-page-layout {
+        padding-left: 0;
+        margin: 20px 5%;
+    }
+}
+
+/* Tabs: No scrollbar */
+.tabs-container {
+    display: flex;
+    gap: 12px;
+    margin: 10px 0 50px 0; /* Increased margin to push away the glow from featured result */
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    position: relative;
+    z-index: 10;
+    padding: 5px 0;
+    background: transparent; /* Restored clean background */
+}
+
+.tabs-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* Sidebar & Preview */
+@media (min-width: 1250px) {
+    .sticky-sidebar-block {
+        position: sticky;
+        top: 130px; /* More space from header */
+        z-index: 50;
+    }
+}
+
+.preview-container {
+    display: none;
+    background: linear-gradient(135deg, #1e1b4b, var(--bg-card));
+    border: 1px solid var(--accent);
+    box-shadow: 0 10px 40px var(--accent-glow);
+    padding: 25px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+    animation: fadeIn 0.3s ease;
+}
+
+.preview-close-btn {
+    display: none;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 10;
+}
+
+@media (max-width: 1249px) {
+    .preview-close-btn {
+        display: flex;
+    }
+    
+    .sidebar.active-preview .preview-container {
+        display: block; /* Force visible in mobile overlay */
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        position: relative;
+        top: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.preview-favicon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: white;
+    padding: 4px;
+}
+
+.preview-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.preview-url {
+    color: #4ade80;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    word-break: break-all;
+}
+
+.preview-content-text {
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 25px;
+    font-size: 1.05rem;
+}
+
+.preview-btn-main {
+    display: block;
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.preview-btn-main:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.selected-preview {
+    border-color: var(--accent) !important;
+    background: var(--accent-glow) !important;
+    transform: translateX(10px);
+}
+
+/* Suggestions / Related */
+.suggestions-box {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+}
+
+.related-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.related-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 8px 16px;
+    border-radius: 15px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.related-item:hover {
+    border-color: var(--accent);
+    background: var(--accent-glow);
 }
 
 /* Pagination */
@@ -754,7 +947,7 @@ body {
     width: 100%;
     background: transparent;
     border: none;
-    padding: 15px 30px;
+    padding: 15px 60px 15px 30px; /* Space on right for clear button */
     color: white;
     font-size: 1.2rem;
     outline: none;
@@ -829,6 +1022,39 @@ body {
 .suggestion-item:hover {
     background: var(--accent-glow);
     color: var(--accent);
+}
+
+/* Clear Search Button */
+.clear-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background: none; /* No more circle */
+    border: none;
+    color: var(--text-secondary);
+    opacity: 0.3; /* Translucent by default */
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 32px; /* Bigger X */
+    line-height: 1;
+    transition: all 0.2s ease-in-out;
+    z-index: 101;
+}
+
+.clear-btn:hover {
+    opacity: 1; /* Fully visible on hover */
+    color: white;
+    transform: translateY(-50%) scale(1.15);
+}
+
+.search-box-header .clear-btn {
+    right: 15px;
+    font-size: 26px; /* Slightly smaller in header */
 }
 
 /* Footer & Credits */

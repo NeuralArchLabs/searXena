@@ -10,7 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let timeout = null;
 
     if (input && sbox) {
+        // Create Clear Button (X)
+        const clearBtn = document.createElement('div');
+        clearBtn.id = 'clear-search';
+        clearBtn.className = 'clear-btn';
+        clearBtn.innerHTML = '&times;';
+        clearBtn.style.display = input.value ? 'flex' : 'none';
+        input.parentNode.appendChild(clearBtn);
+
         input.addEventListener('input', () => {
+            clearBtn.style.display = input.value.length > 0 ? 'flex' : 'none';
             clearTimeout(timeout);
             const q = input.value.trim();
 
@@ -21,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             timeout = setTimeout(async () => {
                 try {
-                    // La petición de sugerencias también pasa por nuestro backend
                     const r = await fetch(`/autoc?q=${encodeURIComponent(q)}`);
                     const data = await r.json();
 
@@ -31,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         ).join('');
                         sbox.style.display = 'block';
 
-                        // Delegación de eventos para las sugerencias
                         sbox.querySelectorAll('.suggestion-item').forEach(item => {
                             item.onclick = () => {
                                 input.value = item.getAttribute('data-val');
@@ -46,6 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }, 250);
         });
+
+        clearBtn.onclick = () => {
+            input.value = '';
+            input.focus();
+            clearBtn.style.display = 'none';
+            sbox.style.display = 'none';
+        };
     }
 
     // Cerrar sugerencias al hacer clic fuera
@@ -172,5 +186,50 @@ function goPage(p) {
     if (pageInput) {
         pageInput.value = p;
         performSearch(getSearchUrl(), true, false);
+    }
+}
+/**
+ * Muestra una vista previa del resultado en el sidebar
+ */
+function setPreview(el) {
+    const pane = document.getElementById('preview-pane');
+    if (!pane) return;
+
+    // Extraer datos
+    const title = el.getAttribute('data-title');
+    const content = el.getAttribute('data-content');
+    const url = el.getAttribute('data-url');
+    const icon = el.getAttribute('data-icon');
+
+    // Actualizar elementos del pane
+    document.getElementById('preview-title').innerText = title;
+    document.getElementById('preview-content').innerText = content;
+    document.getElementById('preview-url').innerText = url;
+    document.getElementById('preview-icon').src = icon;
+    document.getElementById('preview-link').href = url;
+
+    // Mostrar el pane
+    pane.style.display = 'block';
+    pane.closest('.sidebar').classList.add('active-preview');
+
+    // Highlight visual
+    document.querySelectorAll('.result-card, .video-card, .shopping-card').forEach(c => c.classList.remove('selected-preview'));
+    el.classList.add('selected-preview');
+
+    // Scroll suave al top si es necesario o simplemente asegurar visibilidad
+    if (window.innerWidth < 1250) {
+        pane.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+/**
+ * Cierra la vista previa y el overlay de móvil
+ */
+function closePreview() {
+    const pane = document.getElementById('preview-pane');
+    if (pane) {
+        pane.style.display = 'none';
+        pane.closest('.sidebar').classList.remove('active-preview');
+        document.querySelectorAll('.selected-preview').forEach(c => c.classList.remove('selected-preview'));
     }
 }

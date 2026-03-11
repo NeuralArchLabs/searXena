@@ -45,18 +45,18 @@
             <div class="tabs-container">
                 <a class="tab {% if not category or category == 'general' %}active{% endif %}"
                     onclick="changeCat('general')">{{ {'en': 'General', 'zh': '综合'}.get(lang, 'General') }}</a>
-                <a class="tab {% if category == 'it_science' %}active{% endif %}" onclick="changeCat('it_science')">{{
-                    {'en': 'IT/Science', 'zh': 'IT/科学'}.get(lang, 'TI/Ciencia') }}</a>
-                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">{{ {'en':
-                    'News', 'zh': '新闻'}.get(lang, 'Noticias') }}</a>
-                <a class="tab {% if category == 'videos' %}active{% endif %}" onclick="changeCat('videos')">Videos</a>
                 <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">{{ {'en':
                     'Images', 'zh': '图片'}.get(lang, 'Imágenes') }}</a>
-                <a class="tab {% if category == 'social' %}active{% endif %}" onclick="changeCat('social')">Social</a>
-                <a class="tab {% if category == 'shopping' %}active{% endif %}"
-                    onclick="changeCat('shopping')">Shopping</a>
+                <a class="tab {% if category == 'videos' %}active{% endif %}" onclick="changeCat('videos')">Videos</a>
+                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">{{ {'en':
+                    'News', 'zh': '新闻'}.get(lang, 'Noticias') }}</a>
                 <a class="tab {% if category == 'maps' %}active{% endif %}" onclick="changeCat('maps')">{{ {'en':
                     'Maps', 'zh': '地图'}.get(lang, 'Mapas') }}</a>
+                <a class="tab {% if category == 'shopping' %}active{% endif %}"
+                    onclick="changeCat('shopping')">Shopping</a>
+                <a class="tab {% if category == 'it' %}active{% endif %}" onclick="changeCat('it')">{{
+                    {'en': 'IT/Science', 'zh': 'IT/科学'}.get(lang, 'TI/Ciencia') }}</a>
+                <a class="tab {% if category == 'social' %}active{% endif %}" onclick="changeCat('social')">Social</a>
             </div>
 
             {% if not results %}
@@ -69,7 +69,7 @@
             {% endif %}
 
             <!-- Resultado Destacado Principal (Featured Answer) -->
-            {% if category in ('general', 'it_science') or not category %}
+            {% if category in ('general', 'it') or not category %}
             {% set featured = results | selectattr('template', 'equalto', 'infobox.html') | first %}
             {% if featured %}
             <div class="infobox-container featured-answer">
@@ -134,7 +134,11 @@
             <div class="videos-list">
                 {% for result in results if result.template == 'videos.html' or (result.url and ('youtube' in result.url
                 or 'vimeo' in result.url)) %}
-                <div class="video-card">
+                <div class="video-card" onclick="setPreview(this)" 
+                    data-title="{{ result.title|striptags|e }}" 
+                    data-content="{{ result.content|striptags|e }}" 
+                    data-url="{{ result.url|e }}"
+                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
                     {% if result.img_src or result.thumbnail_src %}
                     <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer nofollow">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
@@ -158,7 +162,11 @@
             <!-- Vista de Shopping -->
             <div class="shopping-grid">
                 {% for result in results if result.template == 'shopping.html' or category == 'shopping' %}
-                <div class="shopping-card">
+                <div class="shopping-card" onclick="setPreview(this)"
+                    data-title="{{ result.title|striptags|e }}" 
+                    data-content="{{ result.content|striptags|e }}" 
+                    data-url="{{ result.url|e }}"
+                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
                     {% if result.img_src or result.thumbnail_src %}
                     <div class="shopping-image-container">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
@@ -217,7 +225,13 @@
             <!-- Vista General / Listado -->
             {% for result in results if result.template != 'infobox.html' and result.template != 'images.html' and
             result.template != 'videos.html' %}
-            <div class="result-card">
+            <div class="result-card" 
+                onclick="setPreview(this)" 
+                data-title="{{ result.title|striptags|e }}" 
+                data-content="{{ result.content|striptags|e }}" 
+                data-url="{{ result.url|e }}"
+                data-source="{{ result.sources|join(', ')|e }}"
+                data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
                 <div class="result-card-inner">
                     <div class="result-body">
                         <div class="result-header">
@@ -273,52 +287,63 @@
 
         <!-- Sidebar -->
         <div class="sidebar">
-            {% if category in ('general', 'it_science') or not category %}
+            <!-- Pre-existing Infoboxes (Non-sticky, top) -->
+            {% if category in ('general', 'it') or not category %}
             {% set infoboxes = results | selectattr('template', 'equalto', 'infobox.html') | list %}
             {% if infoboxes %}
             {% for info in infoboxes if info != featured %}
             <div class="infobox-container sidebar-box">
-                <div class="infobox-title-sidebar">{{ info.title }}</div>
+                <div class="infobox-title-sidebar">{{ info.title|e }}</div>
                 {% if info.img_src %}
                 {% if info.source == 'wikipedia' or 'wikimedia' in info.img_src %}
-                <img src="{{ info.img_src if info.img_src.startswith('http') else 'https:' ~ info.img_src }}"
-                    alt="Info Image" class="infobox-image"
-                    onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                <img src="{{ info.img_src if info.img_src.startswith('http') else 'https:' ~ info.img_src }}" alt=""
+                    class="infobox-image" onerror="this.style.display='none';">
                 {% else %}
-                <img src="/proxify?url={{ info.img_src | urlencode }}" alt="Info Image" class="infobox-image"
-                    onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                <img src="/proxify?url={{ info.img_src | urlencode }}" alt="" class="infobox-image"
+                    onerror="this.style.display='none';">
                 {% endif %}
                 {% endif %}
-                <p class="infobox-content-sidebar">{{ info.content }}</p>
+                <p class="infobox-content-sidebar">{{ info.content|striptags }}</p>
                 {% if info.url %}
-                <a href="{{ info.url }}" target="_blank" rel="noopener noreferrer nofollow"
-                    class="infobox-link-sidebar">{{ {'en': 'Open in', 'zh': '打开于'}.get(lang, 'Abrir en') }} {{
-                    info.source|capitalize }} →</a>
+                <a href="{{ info.url }}" target="_blank" class="infobox-link-sidebar">{{ info.source|capitalize }} →</a>
                 {% endif %}
             </div>
             {% endfor %}
-            {% else %}
-            <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}
-                </h3>
-                <p class="sidebar-empty-text">{{ {'en': 'No additional data available for this query.', 'zh':
-                    '此查询没有可用的附加数据。'}.get(lang, 'No hay datos adicionales disponibles para esta consulta.') }}</p>
-            </div>
             {% endif %}
-            {% else %}
-            <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}
-                </h3>
-                <p class="sidebar-empty-text">{{ {'en': 'Only direct results are shown in this category.', 'zh':
-                    '此类别仅显示直接结果。'}.get(lang, 'En esta categoría solo se muestran resultados directos.') }}</p>
-            </div>
             {% endif %}
 
             <div class="infobox-container sidebar-tips">
                 <h3 class="sidebar-tips-title">{{ {'en': 'Pro Tips', 'zh': '专业提示'}.get(lang, 'Sugerencias Pro') }}</h3>
-                <p class="sidebar-tips-text">{{ {'en': 'Try using <b>!w</b> for Wikipedia or <b>!yt</b> for direct
-                    videos.', 'zh': '尝试使用<b>!w</b>搜索维基百科或<b>!yt</b>搜索直接视频。'}.get(lang, 'Prueba usar <b>!w</b> para
-                    Wikipedia o <b>!yt</b> para videos directos.')|safe }}</p>
+                <p class="sidebar-tips-text">{{ {'en': 'Try using <b>!w</b> for Wikipedia.', 'zh': '尝试使用<b>!w</b>。'}.get(lang, 'Prueba usar <b>!w</b> para Wikipedia.')|safe }}</p>
+            </div>
+
+            <!-- Sticky Block (Preview + Suggestions) -->
+            <div class="sticky-sidebar-block">
+                <!-- Preview Pane (Penúltimo) -->
+                <div id="preview-pane" class="preview-container sidebar-box">
+                    <div class="preview-close-btn" onclick="closePreview()">×</div>
+                    <div class="preview-header">
+                        <img id="preview-icon" src="" alt="" class="preview-favicon">
+                        <h3 id="preview-title" class="preview-title"></h3>
+                    </div>
+                    <div id="preview-url" class="preview-url"></div>
+                    <p id="preview-content" class="preview-content-text"></p>
+                    <div class="preview-actions">
+                        <a id="preview-link" href="#" target="_blank" class="preview-btn-main">{{ {'en': 'Visit Website', 'zh': '访问网站'}.get(lang, 'Visitar Sitio Web') }}</a>
+                    </div>
+                </div>
+
+                <!-- Suggestions / Related Searches (Último) -->
+                {% if related_searches %}
+                <div class="infobox-container sidebar-box suggestions-box">
+                    <h3 class="sidebar-tips-title">{{ {'en': 'Related Searches', 'zh': '相关搜索'}.get(lang, 'Búsquedas Relacionadas') }}</h3>
+                    <div class="related-list">
+                        {% for s in related_searches %}
+                        <a href="/search?q={{ s|urlencode }}" class="related-item">{{ s }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

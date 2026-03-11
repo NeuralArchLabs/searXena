@@ -87,6 +87,11 @@ Al interactuar con la pestaña especializada de Mapas, searXena implementa regla
 * **Transparencia IP (El Iframe Interactivo)**: Para que experimentes un mapa funcional arrastrable dentro de la sección Mapas, inyectamos un `iframe` dinámico referenciando a `openstreetmap.org`. Esto hace que **tu navegador realice una conexión directa a OSM revelando temporalmente tu IP pública** para la descarga de mosaicos visuales (tiles).
 * El trade-off: OSM es una fundación [abierta pro-privacidad](https://wiki.osmfoundation.org/wiki/Privacy_Policy) sin motores que subasten telemetría ni cookies inter-rastreo, por lo que la exposición de IP nativa es benigna y se justifica a cambio de integrar la cartografía funcional.
 
+### Aceleración de Activos de Confianza (Wikipedia/Wikimedia)
+Siguiendo nuestra arquitectura de "Direct Media Delivery" para optimizar el rendimiento sin sacrificar la privacidad:
+* **Nodos de Alta Confianza**: searXena identifica a los servidores de Wikipedia y Wikimedia como fuentes de infraestructura pública educativa de alta confianza. 
+* **Optimización de Carga**: Al ser plataformas libres de rastreadores publicitarios y cookies de terceros, permitimos la carga directa de sus recursos multimedia. Esto garantiza una experiencia de usuario fluida y de alta resolución, aprovechando que estas instituciones operan bajo protocolos de confidencialidad estrictos compatibles con la filosofía de searXena.
+
 ## 🤖 Integración Nativa con Inteligencia Artificial (API)
 
 searXena no es solo para consumo humano. Está diseñado desde su base web para **actuar como el motor de búsqueda de investigación de tus propios agentes de IA (LLMs) locales o en la nube**, proveyendo soporte nativo de *Tool Calling* estrictamente estandarizado (formato OpenAI/Anthropic/Gemini).

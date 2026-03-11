@@ -6,7 +6,7 @@ from typing import List
 # Cache simple en memoria
 suggestion_cache = {}
 # Timeout ultra corto para sugerencias (SearXNG style)
-client = httpx.AsyncClient(http2=True, timeout=0.6)
+client = httpx.AsyncClient(http2=True, timeout=1.5)
 
 async def get_suggestions(query: str) -> List[str]:
     if not query or len(query) < 2:
