@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/Sear-Xena-6a00ff?style=for-the-badge&logo=search&logoColor=white" alt="SearXena Logo"/>
-  <h1>SearXena</h1>
+  <img src="https://img.shields.io/badge/Sear-Xena-6a00ff?style=for-the-badge&logo=search&logoColor=white" alt="searXena Logo"/>
+  <h1>searXena</h1>
 
   <p>
     Un metabuscador ágil, local y 100% nativo para Windows enfocado en la privacidad extrema.
@@ -20,15 +20,15 @@
 
 ## 📖 Origen y Agradecimientos
 
-SearXena nació originalmente como una iniciativa de investigación para realizar un *port* experimental de [SearXNG](https://github.com/searxng/searxng) destinado a ejecutarse de forma nativa en sistemas operativos Windows sin el peso de contenedores Docker o subsistemas WSL involucrados. 
+searXena nació originalmente como una iniciativa de investigación para realizar un *port* experimental de [SearXNG](https://github.com/searxng/searxng) destinado a ejecutarse de forma nativa en sistemas operativos Windows sin el peso de contenedores Docker o subsistemas WSL involucrados. 
 
-A medida que el desarrollo avanzó y la necesidad de integraciones interactivas más profundas surgió, **SearXena evolucionó para convertirse en un software iterativamente independiente**. Nuestro código base fue reescrito y estructurado bajo una arquitectura de micro-gestores propia (FastAPI), conservando el espíritu de soberanía del usuario establecido por el movimiento open-source.
+A medida que el desarrollo avanzó y la necesidad de integraciones interactivas más profundas surgió, **searXena evolucionó para convertirse en un software iterativamente independiente**. Nuestro código base fue reescrito y estructurado bajo una arquitectura de micro-gestores propia (FastAPI), conservando el espíritu de soberanía del usuario establecido por el movimiento open-source.
 
 Reconocemos y honramos formalmente al proyecto original SearXNG y a sus desarrolladores comunitarios por sentar los estándares universales y la base teórica (parsers, evasión, headers proxy) acerca de cómo debe operar un metabuscador resistente a la censura.
 
 ## 🛠️ Stack Tecnológico
 
-SearXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecución hiperfluida inclusive en hardware de uso local secundario:
+searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecución hiperfluida inclusive en hardware de uso local secundario:
 
 - **Backend:** [Python 3.x](https://www.python.org/) y [FastAPI](https://fastapi.tiangolo.com/) (Alto rendimiento asíncrono).
 - **Servidor Web:** [Uvicorn](https://www.uvicorn.org/) (Soporte nativo ASGI).
@@ -39,18 +39,18 @@ SearXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 ## ✨ Características Principales
 
 * 🚀 **Metabúsqueda Paralela Asíncrona:** Una sola consulta tuya dispara docenas de solicitudes asíncronas a motores globales (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.) consolidándolas en menos de 1 segundo.
-* 🛡️ **Burbuja de Privacidad Absoluta:** Actúa como un proxy intermediario entre tú y las mega-corporaciones. Ni Google ni Microsoft pueden perfilarte; todas las peticiones le llegan a ellos como originadas desde SearXena.
+* 🛡️ **Burbuja de Privacidad Absoluta:** Actúa como un proxy intermediario entre tú y las mega-corporaciones. Ni Google ni Microsoft pueden perfilarte; todas las peticiones le llegan a ellos como originadas desde searXena.
 * 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador corporativo evadiendo telemetría hospedado localmente en tu sistema.
 * 📱 **UI/UX Moderna y Dinámica:** Animaciones fluidas, modo oscuro ultra refinado ("Space Violet"), interfaz responsiva y separada categóricamente en pestañas (General, TI/Ciencia, Mapas, Videos, Imágenes).
 * 🌎 **Rich Snippets Consolidados:** Lectura enriquecida consolidando datos de Wikipedia o Wikidata en recuadros laterales de rápido consumo ("Infoboxes") al estilo de los grandes motores comerciales.
 
-## 🥊 ¿Por qué no tenemos rival en Windows? (SearXena vs El Resto)
+## 🥊 ¿Por qué no tenemos rival en Windows? (searXena vs El Resto)
 
 Históricamente, los metabuscadores open-source enfocados en privacidad (como SearXNG o Whoogle) nacieron y fueron diseñados **estrictamente pensando en entornos GNU/Linux o despliegues Cloud**. Si un usuario de Windows deseaba correrlos localmente, debía enfrentarse a una odisea de fricción técnica: instalar **WSL2** (Subsistema de Windows para Linux), dedicar recursos de memoria fijos para máquinas virtuales, configurar demonios de **Docker**, lidiar con configuraciones de red de contenedores (NAT bridging), y gastar gigabytes de almacenamiento solo para arrancar una barra de búsqueda.
 
-**SearXena elimina por completo todas estas barreras. No tenemos rivales en este ecosistema porque somos 100% nativos.**
+**searXena elimina por completo todas estas barreras. No tenemos rivales en este ecosistema porque somos 100% nativos.**
 
-| Característica | 👾 Los "Rivales" (SearXNG / Whoogle) | 👑 SearXena |
+| Característica | 👾 Los "Rivales" (SearXNG / Whoogle) | 👑 searXena |
 | :--- | :--- | :--- |
 | **Arquitectura en Windows** | Virtualización Forzada (Docker / WSL2) | **Directa al Kernel** (vía Python nativo) |
 | **Consumo de Memoria** | ~1 GB a 2 GB (Por sobrecarga de VM / Contenedores) | **~30 MB - 60 MB** (Ejecución Pura) |
@@ -58,24 +58,24 @@ Históricamente, los metabuscadores open-source enfocados en privacidad (como Se
 | **Experiencia de Instalación** | Compleja, comandos de sysadmin orientados a Linux | **Simple** (`pip install` y `python app.py`) |
 | **Tool Calling LLM** | Adaptadores comunitarios externos requeridos | **API JSON Nativa** construida desde el día uno |
 
-A menos que quieras rentar un VPS en la nube, SearXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
+A menos que quieras rentar un VPS en la nube, searXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
 
 ## 🔒 Arquitectura de Privacidad Transparente
 
-SearXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (Google/Meta), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
+searXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (Google/Meta), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
 
 ### Proxificación del DOM Absoluta
-Cuando buscas cualquier consulta general (Noticias, TI, Código), SearXena enmascara tu identidad a través del motor asíncrono backend. Modificamos de forma sistemática los `User-Agent`. Toda URL de imagen devuelta por los motores comerciales pasa de manera forzada por nuestro sistema interno de `/proxify`, impidiendo que tu IP se filtre directamente.
+Cuando buscas cualquier consulta general (Noticias, TI, Código), searXena enmascara tu identidad a través del motor asíncrono backend. Modificamos de forma sistemática los `User-Agent`. Toda URL de imagen devuelta por los motores comerciales pasa de manera forzada por nuestro sistema interno de `/proxify`, impidiendo que tu IP se filtre directamente.
 
 ### Módulo de Mapas: OSM (OpenStreetMap)
-Al interactuar con la pestaña especializada de Mapas, SearXena implementa reglas un poco más permeables para lograr darte interactividad útil (arrastrar, hacer zoom), conservando el anonimato comercial:
+Al interactuar con la pestaña especializada de Mapas, searXena implementa reglas un poco más permeables para lograr darte interactividad útil (arrastrar, hacer zoom), conservando el anonimato comercial:
 * **Geocodificación Limpia**: La petición nominal (ej. "Buscar Jalisco") va blindada mediante el core backend a favor del anonimato. OSM jamás sabe las palabras de tu búsqueda.
 * **Transparencia IP (El Iframe Interactivo)**: Para que experimentes un mapa funcional arrastrable dentro de la sección Mapas, inyectamos un `iframe` dinámico referenciando a `openstreetmap.org`. Esto hace que **tu navegador realice una conexión directa a OSM revelando temporalmente tu IP pública** para la descarga de mosaicos visuales (tiles).
 * El trade-off: OSM es una fundación [abierta pro-privacidad](https://wiki.osmfoundation.org/wiki/Privacy_Policy) sin motores que subasten telemetría ni cookies inter-rastreo, por lo que la exposición de IP nativa es benigna y se justifica a cambio de integrar la cartografía funcional.
 
 ## 🤖 Integración Nativa con Inteligencia Artificial (API)
 
-SearXena no es solo para consumo humano. Está diseñado desde su base web para **actuar como el motor de búsqueda de investigación de tus propios agentes de IA (LLMs) locales o en la nube**, proveyendo soporte nativo de *Tool Calling* estrictamente estandarizado (formato OpenAI/Anthropic/Gemini).
+searXena no es solo para consumo humano. Está diseñado desde su base web para **actuar como el motor de búsqueda de investigación de tus propios agentes de IA (LLMs) locales o en la nube**, proveyendo soporte nativo de *Tool Calling* estrictamente estandarizado (formato OpenAI/Anthropic/Gemini).
 
 A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas y recibir respuestas en **JSON limpio, indexado y estructurado**, suprimiendo el HTML, CSS o el costoso ruido visual derivado de los scrapers crudos.
 
@@ -103,11 +103,11 @@ A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas 
    ```bash
    pip install -r requirements.txt
    ```
-5. Inicia el motor SearXena:
+5. Inicia el motor searXena:
    ```bash
    python app.py
    ```
-Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0.1:8000`. SearXena ya está listo para enmascararte.
+Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0.1:8000`. searXena ya está listo para enmascararte.
 
 ## ⚖️ Licencia y Créditos Restringidos
 
@@ -115,4 +115,4 @@ Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0
 * Todo el conocimiento de base técnica para modelar las clases de los módulos de extracción y derivaciones heurísticas, pertenecen de forma moral a los mantenedores pasados y presentes del formidable código de [Searx](https://github.com/searx/searx) (Iniciado por Taica) y [SearXNG](https://github.com/searxng/searxng).
 * Herramientas de extracción comunitaria posibilitadas gracias a los estatus permisivos de entidades abiertas (como la familia Wikimedia Foundations).
 
-*SearXena se distribuye tal cual, bajo la filosofía de "úselo bajo su propio riesgo". No almacenamos logs, no controlamos lo que buscas y definitivamente no somos responsables si tu historial de búsqueda asusta a tu proveedor de internet o si una corporación se enoja porque evades sus rastreadores. Úsalo con sabiduría y mantén vivo el internet libre.*
+*searXena se distribuye tal cual, bajo la filosofía de "úselo bajo su propio riesgo". No almacenamos logs, no controlamos lo que buscas y definitivamente no somos responsables si tu historial de búsqueda asusta a tu proveedor de internet o si una corporación se enoja porque evades sus rastreadores. Úsalo con sabiduría y mantén vivo el internet libre.*
