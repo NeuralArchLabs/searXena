@@ -14,9 +14,9 @@ coverage/
 cache/
 build/
 dist/
+# Configuración de usuario
+core/settings.json
 local/
-gh-pages/
-*.egg-info/
 
 /package-lock.json
 /node_modules/
