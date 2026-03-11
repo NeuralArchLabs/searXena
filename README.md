@@ -121,10 +121,10 @@ A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas 
    ```
 Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0.1:8000`. searXena ya está listo para enmascararte.
 
-## ⚖️ Licencia y Créditos Restringidos
+## ⚖️ Licencia y Renuncia de Responsabilidad
 
-* Desarrollado independientemente por **Armando Martínez Palomera**.
-* Todo el conocimiento de base técnica para modelar las clases de los módulos de extracción y derivaciones heurísticas, pertenecen de forma moral a los mantenedores pasados y presentes del formidable código de [Searx](https://github.com/searx/searx) (Iniciado por Taica) y [SearXNG](https://github.com/searxng/searxng).
-* Herramientas de extracción comunitaria posibilitadas gracias a los estatus permisivos de entidades abiertas (como la familia Wikimedia Foundations).
+*   **Licencia:** Este proyecto es software libre, distribuido bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+*   **Créditos:** Todo el conocimiento de base técnica para modelar las clases de los módulos de extracción y derivaciones heurísticas pertenece de forma moral a los mantenedores de [Searx](https://github.com/searx/searx) y [SearXNG](https://github.com/searxng/searxng).
+*   **Uso Educativo y de Investigación:** searXena Pro se proporciona únicamente con fines de investigación y uso personal. El desarrollador no promueve ni se responsabiliza por el uso de esta herramienta para violar los Términos de Servicio de terceros.
 
-*searXena se distribuye tal cual, bajo la filosofía de "úselo bajo su propio riesgo". No almacenamos logs, no controlamos lo que buscas y definitivamente no somos responsables si tu historial de búsqueda asusta a tu proveedor de internet o si una corporación se enoja porque evades sus rastreadores. Úsalo con sabiduría y mantén vivo el internet libre.*
+**AVISO LEGAL:** searXena se distribuye "TAL CUAL", sin garantías de ningún tipo. El usuario asume toda la responsabilidad legal derivada del uso del software, incluyendo el cumplimiento de las leyes locales y los contratos con proveedores de datos externos. El desarrollador no se hace responsable de bloqueos de IP, acciones legales de terceros o cualquier otro perjuicio derivado del uso de este código.

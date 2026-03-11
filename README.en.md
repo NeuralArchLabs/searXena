@@ -121,10 +121,10 @@ Through the `/api/v1/search` route, your assistant can automate queries and rece
    ```
 Open your browser (Brave, Edge, Firefox) and enter directly into `http://127.0.0.1:8000`. searXena is now ready to mask you.
 
-## ⚖️ Restricted License and Credits
+## ⚖️ License and Legal Disclaimer
 
-* Independently developed by **Armando Martínez Palomera**.
-* All technical base knowledge for modeling extraction module classes and heuristic derivations morally belongs to the past and present maintainers of the formidable codebase of [Searx](https://github.com/searx/searx) (Started by Taica) and [SearXNG](https://github.com/searxng/searxng).
-* Community extraction tools made possible thanks to the permissive status of open entities (like the Wikimedia Foundation family).
+*   **License:** This project is free software, distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+*   **Credits:** All technical base knowledge for modeling extraction module classes and heuristic derivations morally belongs to the maintainers of [Searx](https://github.com/searx/searx) and [SearXNG](https://github.com/searxng/searxng).
+*   **Educational and Research Use:** searXena Pro is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service.
 
-*searXena is distributed "as is" under the philosophy of "use at your own risk". We don't store logs, we don't control what you search, and we are definitely not responsible if your search history scares your ISP or if a corporation gets angry because you evade their trackers. Use it wisely and keep the internet free.*
+**LEGAL NOTICE:** searXena is distributed "AS IS", without warranties of any kind. The user assumes all legal responsibility derived from the use of the software, including compliance with local laws and contracts with external data providers. The developer is not responsible for IP blocks, third-party legal actions, or any other damages resulting from the use of this code.
