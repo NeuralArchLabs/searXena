@@ -16,7 +16,9 @@
         <div class="search-box-header">
             <form action="/search" method="get" id="search-form">
                 <input type="text" name="q" class="search-input" id="search-input" value="{{ query }}"
-                    autocomplete="off" placeholder="{{ {'en': 'Search the web...', 'zh': '在网络上搜索...'}.get(lang, 'Busca en la web...') }}" title="{{ {'en': 'Search query', 'zh': '搜索查询'}.get(lang, 'Query de búsqueda') }}">
+                    autocomplete="off"
+                    placeholder="{{ {'en': 'Search the web...', 'zh': '在网络上搜索...'}.get(lang, 'Busca en la web...') }}"
+                    title="{{ {'en': 'Search query', 'zh': '搜索查询'}.get(lang, 'Query de búsqueda') }}">
                 <input type="hidden" name="category" id="cat-input" value="{{ category or 'general' }}">
                 <input type="hidden" name="pageno" id="page-input" value="{{ pageno or 1 }}">
                 <div id="suggestions-box"></div>
@@ -24,7 +26,8 @@
         </div>
         <div class="header-actions">
             <!-- Botón de preferencias integrado en el header (Results Page) -->
-            <a href="/settings" class="settings-btn-inline" title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
+            <a href="/settings" class="settings-btn-inline"
+                title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="3" />
@@ -42,22 +45,26 @@
             <div class="tabs-container">
                 <a class="tab {% if not category or category == 'general' %}active{% endif %}"
                     onclick="changeCat('general')">{{ {'en': 'General', 'zh': '综合'}.get(lang, 'General') }}</a>
-                <a class="tab {% if category == 'it_science' %}active{% endif %}"
-                    onclick="changeCat('it_science')">{{ {'en': 'IT/Science', 'zh': 'IT/科学'}.get(lang, 'TI/Ciencia') }}</a>
-                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">{{ {'en': 'News', 'zh': '新闻'}.get(lang, 'Noticias') }}</a>
+                <a class="tab {% if category == 'it_science' %}active{% endif %}" onclick="changeCat('it_science')">{{
+                    {'en': 'IT/Science', 'zh': 'IT/科学'}.get(lang, 'TI/Ciencia') }}</a>
+                <a class="tab {% if category == 'news' %}active{% endif %}" onclick="changeCat('news')">{{ {'en':
+                    'News', 'zh': '新闻'}.get(lang, 'Noticias') }}</a>
                 <a class="tab {% if category == 'videos' %}active{% endif %}" onclick="changeCat('videos')">Videos</a>
-                <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">{{ {'en': 'Images', 'zh': '图片'}.get(lang, 'Imágenes') }}</a>
+                <a class="tab {% if category == 'images' %}active{% endif %}" onclick="changeCat('images')">{{ {'en':
+                    'Images', 'zh': '图片'}.get(lang, 'Imágenes') }}</a>
                 <a class="tab {% if category == 'social' %}active{% endif %}" onclick="changeCat('social')">Social</a>
                 <a class="tab {% if category == 'shopping' %}active{% endif %}"
                     onclick="changeCat('shopping')">Shopping</a>
-                <a class="tab {% if category == 'maps' %}active{% endif %}" onclick="changeCat('maps')">{{ {'en': 'Maps', 'zh': '地图'}.get(lang, 'Mapas') }}</a>
+                <a class="tab {% if category == 'maps' %}active{% endif %}" onclick="changeCat('maps')">{{ {'en':
+                    'Maps', 'zh': '地图'}.get(lang, 'Mapas') }}</a>
             </div>
 
             {% if not results %}
             <div class="no-results">
                 <div class="no-results-icon">🔍</div>
                 <h3>{{ {'en': 'No results found', 'zh': '未找到结果'}.get(lang, 'No se encontraron resultados') }}</h3>
-                <p class="text-muted">{{ {'en': 'Try a broader search or check your connection.', 'zh': '尝试更宽泛的搜索或检查您的连接。'}.get(lang, 'Intenta buscar algo más general o verifica tu conexión.') }}</p>
+                <p class="text-muted">{{ {'en': 'Try a broader search or check your connection.', 'zh':
+                    '尝试更宽泛的搜索或检查您的连接。'}.get(lang, 'Intenta buscar algo más general o verifica tu conexión.') }}</p>
             </div>
             {% endif %}
 
@@ -66,7 +73,8 @@
             {% set featured = results | selectattr('template', 'equalto', 'infobox.html') | first %}
             {% if featured %}
             <div class="infobox-container featured-answer">
-                <div class="featured-badge">{{ {'en': 'Featured Answer', 'zh': '精选回答'}.get(lang, 'Respuesta Destacada') }}</div>
+                <div class="featured-badge">{{ {'en': 'Featured Answer', 'zh': '精选回答'}.get(lang, 'Respuesta Destacada')
+                    }}</div>
                 <div class="infobox-header-main">
                     {% if featured.img_src %}
                     {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
@@ -82,9 +90,11 @@
                         <div class="infobox-title">{{ featured.title }}</div>
                         <input type="checkbox" id="read-more-toggle" class="read-more-checkbox">
                         <p class="infobox-content">{{ featured.content }}</p>
-                        <label for="read-more-toggle" class="read-more-label">{{ {'en': 'Read More', 'zh': '继续阅读'}.get(lang, 'Continuar Leyendo') }}</label>
+                        <label for="read-more-toggle" class="read-more-label">{{ {'en': 'Read More', 'zh':
+                            '继续阅读'}.get(lang, 'Continuar Leyendo') }}</label>
                         {% if featured.url %}<a href="{{ featured.url }}" target="_blank" class="infobox-link"
-                            rel="noopener noreferrer nofollow">{{ {'en': 'Read more on', 'zh': '阅读更多来自'}.get(lang, 'Leer más en') }} {{
+                            rel="noopener noreferrer nofollow">{{ {'en': 'Read more on', 'zh': '阅读更多来自'}.get(lang, 'Leer
+                            más en') }} {{
                             featured.source or 'la fuente' }} →</a>{% endif %}
                     </div>
                 </div>
@@ -98,7 +108,8 @@
                 <div class="infobox-title">{{ result.title }}</div>
                 <p class="infobox-content">{{ result.content }}</p>
                 {% if result.url %}<a href="{{ result.url }}" target="_blank" class="infobox-link"
-                    rel="noopener noreferrer nofollow">{{ {'en': 'Read more on', 'zh': '阅读更多来自'}.get(lang, 'Leer más en') }} {{
+                    rel="noopener noreferrer nofollow">{{ {'en': 'Read more on', 'zh': '阅读更多来自'}.get(lang, 'Leer más
+                    en') }} {{
                     result.source or ({'en': 'the source', 'zh': '来源'}.get(lang, 'la fuente')) }}</a>{% endif %}
             </div>
             {% endfor %}
@@ -171,7 +182,8 @@
                             <span class="source-tag {{ result.shopping_store or result.source }}">{{
                                 (result.shopping_store or result.source)|capitalize }}</span>
                             <a href="{{ result.url }}" target="_blank" class="shopping-link"
-                                rel="noopener noreferrer nofollow">{{ {'en': 'View product', 'zh': '查看产品'}.get(lang, 'Ver producto') }} →</a>
+                                rel="noopener noreferrer nofollow">{{ {'en': 'View product', 'zh': '查看产品'}.get(lang,
+                                'Ver producto') }} →</a>
                         </div>
                     </div>
                 </div>
@@ -194,7 +206,8 @@
                     </div>
                     {% endif %}
                     <a href="{{ result.url }}" target="_blank" class="infobox-link"
-                        rel="noopener noreferrer nofollow">{{ {'en': 'View on', 'zh': '在...查看'}.get(lang, 'Ver en') }} {{ result.source|capitalize if result.source else
+                        rel="noopener noreferrer nofollow">{{ {'en': 'View on', 'zh': '在...查看'}.get(lang, 'Ver en') }}
+                        {{ result.source|capitalize if result.source else
                         ({'en': 'Source', 'zh': '来源'}.get(lang, 'Fuente')) }} →</a>
                 </div>
                 {% endfor %}
@@ -237,7 +250,8 @@
                     </div>
                     {% endif %}
                 </div>
-                <span class="result-count">{{ result.sources|length }} {{ {'en': 'sources', 'zh': '个来源'}.get(lang, 'fuentes') }}</span>
+                <span class="result-count">{{ result.sources|length }} {{ {'en': 'sources', 'zh': '个来源'}.get(lang,
+                    'fuentes') }}</span>
             </div>
             {% endfor %}
             {% endif %}
@@ -246,10 +260,13 @@
             {% if results %}
             <div class="pagination">
                 {% if pageno > 1 %}
-                <button class="page-btn" onclick="goPage('{{ pageno - 1 }}')">← {{ {'en': 'Previous', 'zh': '上一页'}.get(lang, 'Anterior') }}</button>
+                <button class="page-btn" onclick="goPage('{{ pageno - 1 }}')">← {{ {'en': 'Previous', 'zh':
+                    '上一页'}.get(lang, 'Anterior') }}</button>
                 {% endif %}
-                <span class="page-indicator">{{ {'en': 'Page', 'zh': '第'}.get(lang, 'Página') }} {{ pageno }}{{ ' 页' if lang == 'zh' else '' }}</span>
-                <button class="page-btn" onclick="goPage('{{ pageno + 1 }}')">{{ {'en': 'Next', 'zh': '下一页'}.get(lang, 'Siguiente') }} →</button>
+                <span class="page-indicator">{{ {'en': 'Page', 'zh': '第'}.get(lang, 'Página') }} {{ pageno }}{{ ' 页' if
+                    lang == 'zh' else '' }}</span>
+                <button class="page-btn" onclick="goPage('{{ pageno + 1 }}')">{{ {'en': 'Next', 'zh': '下一页'}.get(lang,
+                    'Siguiente') }} →</button>
             </div>
             {% endif %}
         </div>
@@ -275,33 +292,40 @@
                 <p class="infobox-content-sidebar">{{ info.content }}</p>
                 {% if info.url %}
                 <a href="{{ info.url }}" target="_blank" rel="noopener noreferrer nofollow"
-                    class="infobox-link-sidebar">{{ {'en': 'Open in', 'zh': '打开于'}.get(lang, 'Abrir en') }} {{ info.source|capitalize }} →</a>
+                    class="infobox-link-sidebar">{{ {'en': 'Open in', 'zh': '打开于'}.get(lang, 'Abrir en') }} {{
+                    info.source|capitalize }} →</a>
                 {% endif %}
             </div>
             {% endfor %}
             {% else %}
             <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}</h3>
-                <p class="sidebar-empty-text">{{ {'en': 'No additional data available for this query.', 'zh': '此查询没有可用的附加数据。'}.get(lang, 'No hay datos adicionales disponibles para esta consulta.') }}</p>
+                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}
+                </h3>
+                <p class="sidebar-empty-text">{{ {'en': 'No additional data available for this query.', 'zh':
+                    '此查询没有可用的附加数据。'}.get(lang, 'No hay datos adicionales disponibles para esta consulta.') }}</p>
             </div>
             {% endif %}
             {% else %}
             <div class="infobox-container sidebar-empty">
-                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}</h3>
-                <p class="sidebar-empty-text">{{ {'en': 'Only direct results are shown in this category.', 'zh': '此类别仅显示直接结果。'}.get(lang, 'En esta categoría solo se muestran resultados directos.') }}</p>
+                <h3 class="sidebar-empty-title">{{ {'en': 'More info', 'zh': '更多信息'}.get(lang, 'Más información') }}
+                </h3>
+                <p class="sidebar-empty-text">{{ {'en': 'Only direct results are shown in this category.', 'zh':
+                    '此类别仅显示直接结果。'}.get(lang, 'En esta categoría solo se muestran resultados directos.') }}</p>
             </div>
             {% endif %}
 
             <div class="infobox-container sidebar-tips">
                 <h3 class="sidebar-tips-title">{{ {'en': 'Pro Tips', 'zh': '专业提示'}.get(lang, 'Sugerencias Pro') }}</h3>
-                <p class="sidebar-tips-text">{{ {'en': 'Try using <b>!w</b> for Wikipedia or <b>!yt</b> for direct videos.', 'zh': '尝试使用<b>!w</b>搜索维基百科或<b>!yt</b>搜索直接视频。'}.get(lang, 'Prueba usar <b>!w</b> para Wikipedia o <b>!yt</b> para videos directos.')|safe }}</p>
+                <p class="sidebar-tips-text">{{ {'en': 'Try using <b>!w</b> for Wikipedia or <b>!yt</b> for direct
+                    videos.', 'zh': '尝试使用<b>!w</b>搜索维基百科或<b>!yt</b>搜索直接视频。'}.get(lang, 'Prueba usar <b>!w</b> para
+                    Wikipedia o <b>!yt</b> para videos directos.')|safe }}</p>
             </div>
         </div>
     </div>
 
     <footer class="footer">
-        <p>Copyright © 2026 searXena — Developed by <a href="https://github.com/martinezpalomera92"
-                class="credit-link" target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
+        <p>searXena — AGPLv3 Open Source — Built by <a href="https://github.com/martinezpalomera92" class="credit-link"
+                target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
     </footer>
 
     <script src="/static/main.js?v=3.6"></script>
