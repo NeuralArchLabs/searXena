@@ -71,11 +71,10 @@
                     {% if featured.img_src %}
                     {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
                     <img src="{{ featured.img_src if featured.img_src.startswith('http') else 'https:' ~ featured.img_src }}"
-                        alt="Info Image" class="featured-image"
-                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                        alt="Info Image" class="featured-image" onerror="this.style.display='none';">
                     {% else %}
                     <img src="/proxify?url={{ featured.img_src | urlencode }}" alt="Info Image" class="featured-image"
-                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                        onerror="this.style.display='none';">
                     {% endif %}
                     {% endif %}
                     <div class="infobox-body-main">

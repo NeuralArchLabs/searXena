@@ -15,7 +15,7 @@ async def response(resp):
     lang = resp.search_params.get("language", "es")
     
     headers = {
-        "User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
+        "User-Agent": "searXena/1.2 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
     }
 
     langs = [lang]
@@ -23,12 +23,13 @@ async def response(resp):
         langs.append('en')
     
     async def fetch_wiki(l):
-        # Aumentamos exsentences a 10 para un snippet más rico
         q_params = {
-            "action": "query", "format": "json", "prop": "extracts|info|pageimages",
-            "exintro": True, "explaintext": True, "exsentences": 10,
-            "inprop": "url", "pithumbsize": 600, "generator": "search",
-            "gsrsearch": query, "gsrlimit": 5
+            "action": "query", "format": "json", 
+            "prop": "extracts|info|pageimages|images|pageprops",
+            "explaintext": True, 
+            "exchars": 1200, 
+            "inprop": "url", "pithumbsize": 800, 
+            "generator": "search", "gsrsearch": query, "gsrlimit": 5
         }
         api_url = f"https://{l}.wikipedia.org/w/api.php?{urlencode(q_params)}"
         try:
@@ -49,9 +50,42 @@ async def response(resp):
             title = page.get("title", "")
             extract = page.get("extract", "")
             
-            # Priorizamos la imagen de la API de Wikipedia (pageimage)
+            # 1. Intentar imagen principal de la API
             img_src = page.get("thumbnail", {}).get("source")
             
+            # 2. Intentar page_image de pageprops
+            if not img_src:
+                pp = page.get("pageprops", {})
+                img_name = pp.get("page_image_free") or pp.get("page_image")
+                if img_name:
+                     img_src = f"https://commons.wikimedia.org/wiki/Special:FilePath/{img_name.replace(' ', '_')}?width=800"
+
+            # 3. Fallback agresivo a la lista de imágenes
+            if not img_src and "images" in page:
+                for img in page["images"]:
+                    img_title = img.get("title", "")
+                    img_lower = img_title.lower()
+                    
+                    if not any(ext in img_lower for ext in ['.jpg', '.jpeg', '.png', '.webp', '.svg']):
+                        continue
+                        
+                    forbidden = [
+                        "symbol", "question", "edit-clear", "ambox", "magnifying", "folder", "padlock",
+                        "speaker", "decrease", "increase", "sound", "placeholder",
+                        "stub", "generic", "map", "flag", "translation", "language", "p_ext"
+                    ]
+                    if any(f in img_lower for f in forbidden):
+                        continue
+                    
+                    clean_name = img_title.replace("Archivo:", "").replace("File:", "").replace(" ", "_").strip()
+                    img_src = f"https://commons.wikimedia.org/wiki/Special:FilePath/{clean_name}?width=800"
+                    
+                    # Si el nombre de la imagen tiene el título o la palabra logo, es casi seguro la correcta
+                    clean_query = query.lower().replace(" ", "")
+                    it_clean = img_lower.replace("_","").replace("-","")
+                    if clean_query in it_clean or "logo" in it_clean or "brand" in it_clean:
+                        break
+
             if extract and len(extract) > 40:
                 results.append({
                     "title": title,

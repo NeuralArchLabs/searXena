@@ -146,6 +146,11 @@ body {
     display: none;
 }
 
+.featured-answer .infobox-content {
+    -webkit-line-clamp: 8;
+    line-clamp: 8;
+}
+
 .infobox-link {
     color: var(--accent);
     font-size: 0.9rem;
