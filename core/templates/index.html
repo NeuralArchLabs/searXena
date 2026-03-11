@@ -460,8 +460,8 @@
 
         <div class="search-box">
             <form action="/search" method="get" id="search-form">
-                <input type="text" name="q" class="search-input" id="search-input" placeholder="¿Qué estás buscando?"
-                    autocomplete="off" autofocus title="Búsqueda privada">
+                <input type="text" name="q" class="search-input" id="search-input" placeholder="{{ 'What are you looking for?' if lang == 'en' else '¿Qué estás buscando?' }}"
+                    autocomplete="off" autofocus title="{{ 'Private search' if lang == 'en' else 'Búsqueda privada' }}">
                 <input type="hidden" name="category" id="cat-input" value="general">
                 <div id="suggestions-box"></div>
             </form>
