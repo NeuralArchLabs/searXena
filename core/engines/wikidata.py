@@ -11,7 +11,7 @@ async def request(query, params):
 
 async def response(resp):
     results = []
-    query = resp.search_params.get("q")
+    query = resp.search_params.get("query")
     lang = resp.search_params.get("language", "es")
     headers = {"User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena)"}
 
