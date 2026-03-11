@@ -104,7 +104,7 @@ Through the `/api/v1/search` route, your assistant can automate queries and rece
 
 1. Clone the repository to a local directory:
    ```bash
-   git clone https://github.com/martinezpalomera92/searXena.git
+   git clone https://github.com/NeuralArchLabs/searXena.git
    cd searXena
    ```
 2. (Optional) If your system blocks scripts, allow them:
