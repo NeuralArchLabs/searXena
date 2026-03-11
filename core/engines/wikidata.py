@@ -13,8 +13,10 @@ async def response(resp):
     results = []
     query = resp.search_params.get("query")
     lang = resp.search_params.get("language", "es")
-    headers = {"User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena)"}
-
+    headers = {
+        "User-Agent": "searXena/1.1 (https://github.com/NeuralArchLabs/searXena) Bot/1.0"
+    }
+    
     # 1. Buscar la entidad más relevante
     search_params = {
         "action": "wbsearchentities",

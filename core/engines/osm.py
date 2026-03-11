@@ -24,7 +24,7 @@ async def response(resp):
         return []
 
     headers = {
-        "User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
+        "User-Agent": "searXena/1.0 (https://github.com/NeuralArchLabs/searXena) Bot/1.0"
     }
 
     # Parámetros para Nominatim

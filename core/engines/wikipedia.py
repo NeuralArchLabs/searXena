@@ -15,7 +15,7 @@ async def response(resp):
     lang = resp.search_params.get("language", "es")
     
     headers = {
-        "User-Agent": "searXena/1.1 (https://github.com/martinezpalomera92/searXena) Bot/1.0"
+        "User-Agent": "searXena/1.1 (https://github.com/NeuralArchLabs/searXena) Bot/1.0"
     }
 
     # Búsqueda multi-idioma para mayor cobertura
