@@ -31,6 +31,14 @@ async def index(request: Request):
     lang = manager.settings.get("general", {}).get("default_lang", "es")
     return templates.TemplateResponse("index.html", {"request": request, "lang": lang})
 
+@app.get("/robots.txt")
+async def robots():
+    return Response(content=open(os.path.join(BASE_DIR, "static", "robots.txt")).read(), media_type="text/plain")
+
+@app.get("/ai.txt")
+async def ai_txt():
+    return Response(content=open(os.path.join(BASE_DIR, "static", "ai.txt")).read(), media_type="text/plain")
+
 @app.get("/autoc")
 async def autocomplete(q: str = ""):
     results = await suggestions.get_suggestions(q)
@@ -235,12 +243,13 @@ async def search(request: Request):
 # --- API endpoints para IA / LLMs ---
 
 class ToolSearchRequest(BaseModel):
-    query: str = Field(..., description="Query string for search")
-    category: str = Field("general", description="Category of search: general, images, videos, news, it, shopping")
-    pageno: int = Field(1, description="Page number/offset for the search results")
-    include_engines: Optional[List[str]] = Field(None, description="List of specific engine names to use (e.g. ['google', 'github']). Ignored if empty.")
-    exclude_engines: Optional[List[str]] = Field(None, description="List of specific engine names to exclude. Ignored if empty.")
-    limit: int = Field(10, description="Cantidad máxima de resultados a retornar (default 10 para ahorrar contexto).")
+    query: str = Field(..., description="Término de búsqueda.")
+    category: Optional[str] = Field("general", description="Categoría: general, it, shopping, news, images, videos.")
+    pageno: Optional[int] = Field(1, description="Número de página.")
+    language: Optional[str] = Field(None, description="Código ISO (es, en, etc.).")
+    include_engines: Optional[List[str]] = Field(None, description="Motores específicos a incluir.")
+    exclude_engines: Optional[List[str]] = Field(None, description="Motores a ignorar.")
+    limit: Optional[int] = Field(10, description="Límite de resultados para optimizar contexto.")
 
 @app.post("/api/v1/search")
 async def api_search(request_data: ToolSearchRequest):
@@ -251,17 +260,20 @@ async def api_search(request_data: ToolSearchRequest):
         request_data.query,
         category=request_data.category,
         pageno=request_data.pageno,
+        lang=request_data.language,
         include_engines=request_data.include_engines,
         exclude_engines=request_data.exclude_engines
     )
     
-    # Limpiamos resultados para IA
-    keys_to_remove = ["template", "engine_positions", "score", "sources"]
+    keys_to_remove = [
+        "template", "engine_positions", "score", "sources", 
+        "engine_weight", "thumbnail_src", "prio", "is_shop",
+        "shopping_store", "category"
+    ]
     
     clean_results = []
-    # Convertimos los results de dicts, omitiendo las llaves para front end
     for r in infoboxes + results:
-        clean_r = {k: v for k, v in r.items() if k not in keys_to_remove}
+        clean_r = {k: v for k, v in r.items() if k not in keys_to_remove and v is not None}
         clean_results.append(clean_r)
         
     total = len(clean_results)
@@ -270,54 +282,43 @@ async def api_search(request_data: ToolSearchRequest):
     return {
         "results": limited,
         "meta": {
-            "total_found": total,
-            "limit_applied": request_data.limit,
+            "total": total,
             "has_more": total > request_data.limit,
-            "suggestion": f"Hay {total} resultados en total guardados en cache. Estas viendo solo los primeros {request_data.limit}. Para ver el resto, repite esta misma llamada a la herramienta pero cambia el parametro 'limit' a {total} o superior." if total > request_data.limit else None
+            "info": f"Mostrando {len(limited)} de {total}. Aumenta 'limit' si necesitas más." if total > request_data.limit else None
         }
     }
 
 @app.get("/api/v1/tools_schema")
 async def api_tools_schema():
     """
-    Devuelve el esquema nativo listando la herramienta general del buscador 
-    para ser mapeada directamente en APIs de LLMs modernos (OpenAI, Anthropic, Gemini, etc.)
+    Devuelve el esquema nativo de la herramienta para Agentes de IA.
     """
     engines_list = [name for name, _ in manager.engines.items()]
     return {
       "type": "function",
       "function": {
         "name": "searxena_search",
-        "description": "Realiza una meta-búsqueda en la web. Útil para obtener información general, código, noticias, o buscar bibliotecas de IT y productos.",
+        "description": "Busca en la web. Solo requiere 'query'. Usa otros parámetros solo si es estrictamente necesario para ahorrar tokens.",
         "parameters": {
           "type": "object",
           "properties": {
             "query": {
               "type": "string",
-              "description": "El término de búsqueda"
+              "description": "Término a buscar (ej: 'clima en Madrid')."
             },
             "category": {
               "type": "string",
               "enum": ["general", "it", "shopping", "news", "images", "videos"],
-              "description": "El canal de búsqueda a utilizar según la intención. General es el default."
+              "description": "Opcional. Default: general."
             },
-            "pageno": {
-              "type": "integer",
-              "description": "Número de página de resultados (1 por defecto)."
-            },
-            "include_engines": {
-              "type": "array",
-              "items": {"type": "string", "enum": engines_list},
-              "description": "Opcional. Exige el uso exclusivo de este arreglo de motores."
-            },
-            "exclude_engines": {
-              "type": "array",
-              "items": {"type": "string", "enum": engines_list},
-              "description": "Opcional. Motores específicos a excluir de los resultados."
+            "language": {
+              "type": "string",
+              "enum": ["es", "en", "it", "fr", "de", "zh", "pt", "ja"],
+              "description": "Opcional. Idioma de búsqueda."
             },
             "limit": {
               "type": "integer",
-              "description": "Cantidad máxima de resultados para ahorrar contexto (default 10)."
+              "description": "Opcional. Máximo de resultados (Default: 10)."
             }
           },
           "required": ["query"]

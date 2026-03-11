@@ -28,6 +28,7 @@ Este es el endpoint donde el LLM enviará su "Tool Call". Devuelve un objeto con
 | `query`           | `string`   | **Sí**    | La consulta o pregunta a buscar. |
 | `category`        | `string`   | No        | `general` (default), `it`, `news`, `shopping`, `images`, `videos`. |
 | `pageno`          | `integer`  | No        | Número de página. Default `1`. |
+| `language`        | `string`   | No        | ISO code: `es`, `en`, `it`, `fr`, `de`, `zh`, `pt`, `ja`. |
 | `include_engines` | `string[]` | No        | Lista blanca de motores (ej. `["google", "duckduckgo"]`). |
 | `exclude_engines` | `string[]` | No        | Lista negra de motores. |
 | `limit`           | `integer`  | No        | Máximo de resultados. Default `10`. |
@@ -67,12 +68,12 @@ Para optimizar el uso de searXena, instruye a tu modelo con lo siguiente:
 ```python
 import httpx
 
-def search_ai(query: str, category: str = "general", limit: int = 10):
+def search_ai(query: str, category: str = "general", limit: int = 10, language: str = None):
     url = "http://localhost:8000/api/v1/search"
-    payload = {"query": query, "category": category, "limit": limit}
+    payload = {"query": query, "category": category, "limit": limit, "language": language}
     return httpx.post(url, json=payload).json()
 
-# Ejemplo: Búsqueda técnica curada
-results = search_ai("FastAPI async patterns", category="it")
+# Ejemplo: Búsqueda técnica curada en inglés
+results = search_ai("FastAPI async patterns", category="it", language="en")
 print(f"Top Result: {results['results'][0]['title']}")
 ```

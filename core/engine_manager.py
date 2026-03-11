@@ -151,7 +151,9 @@ class EngineManager:
                 break
 
         # 2. Check Cache
-        cache_key = f"{clean_query}:{category}:{pageno}:{target_engine}"
+        # Incluimos idioma y filtros en la llave para evitar colisiones, pero NO el limit,
+        # ya que el limit se aplica en la capa de la API sobre el set completo cacheado.
+        cache_key = f"{clean_query}:{category}:{pageno}:{target_engine}:{lang}:{include_engines}:{exclude_engines}"
         now = time.time()
         if cache_key in self._cache:
             results, expiry = self._cache[cache_key]
