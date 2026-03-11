@@ -435,12 +435,23 @@ class EngineManager:
         
         infoboxes.sort(key=infobox_sort_score)
         
-        # Quedarnos solo con el mejor infobox si es bueno
+        # Quedarnos solo con el mejor infobox si es bueno, pero enriquecerlo con los demás
         final_infoboxes = []
         if infoboxes:
             best_score = infobox_sort_score(infoboxes[0])
             if best_score < 2.0: # Solo mostrar si es match exacto o substring fuerte
-                final_infoboxes = [infoboxes[0]]
+                best_info = infoboxes[0]
+                # Enriquecer con datos de otros infoboxes parecidos (ej. traer imagen de Wikidata a Wikipedia)
+                best_t_fix = re.sub(r'[^\w\s]', '', best_info.get('title', '').lower()).strip().replace(' ', '')
+                for other in infoboxes[1:]:
+                    other_t_fix = re.sub(r'[^\w\s]', '', other.get('title', '').lower()).strip().replace(' ', '')
+                    if other_t_fix == best_t_fix or best_t_fix in other_t_fix or other_t_fix in best_t_fix:
+                        if not best_info.get('img_src') and other.get('img_src'):
+                            best_info['img_src'] = other['img_src']
+                        if len(other.get('content', '')) > len(best_info.get('content', '')) + 20:
+                             # Solo actualizar si es significativamente más largo/mejor
+                             best_info['content'] = other['content']
+                final_infoboxes = [best_info]
         
         # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
