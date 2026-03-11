@@ -33,10 +33,10 @@ async def response(resp):
         }
         api_url = f"https://{l}.wikipedia.org/w/api.php?{urlencode(q_params)}"
         try:
-            async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
-                r = await client.get(api_url, headers=headers)
-                if r.status_code == 200:
-                    return r.json(), l
+            client = resp.client
+            r = await client.get(api_url, headers=headers)
+            if r.status_code == 200:
+                return r.json(), l
         except: pass
         return None, l
 

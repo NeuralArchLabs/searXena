@@ -6,8 +6,8 @@ CATEGORIES = ["news"]
 WEIGHT = 1.0
 
 async def request(query, params):
-    async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
-        vqd = await fetch_vqd(query, client)
+    client = params['client']
+    vqd = await fetch_vqd(query, client)
         
     if not vqd: return
 

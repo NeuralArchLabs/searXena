@@ -6,9 +6,9 @@ CATEGORIES = ["images"]
 WEIGHT = 2.0
 
 async def request(query, params):
-    # Usar un cliente temporal para obtener el VQD (Validation Query Digest)
-    async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as client:
-        vqd = await fetch_vqd(query, client)
+    # Usar el cliente compartido para obtener el VQD
+    client = params['client']
+    vqd = await fetch_vqd(query, client)
         
     if not vqd:
         # Fallback si falla el VQD (usando versión Lite pre-renderizada)

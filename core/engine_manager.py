@@ -18,6 +18,7 @@ class EngineManager:
         self.settings = self.load_settings()
         self.engines = {}
         self._cache = {} 
+        self._client = None
         self.load_engines()
 
         # Bangs map (SearXNG style)
@@ -74,6 +75,36 @@ class EngineManager:
             self.settings = new_settings
         except Exception:
             pass
+
+    async def get_client(self):
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(
+                follow_redirects=True, 
+                timeout=self.settings["general"].get("timeout", 4.0),
+                limits=httpx.Limits(max_keepalive_connections=100, max_connections=500),
+                http2=True,
+                verify=False # Mantener compatibilidad pero en un pool único
+            )
+        return self._client
+
+    async def close(self):
+        if self._client:
+            await self._client.aclose()
+            self._client = None
+
+    def _prune_cache(self):
+        """Limpia el cache de entradas expiradas para evitar fugas de memoria."""
+        if len(self._cache) < 500: return
+        now = time.time()
+        expired = [k for k, v in self._cache.items() if now >= v[1]]
+        for k in expired:
+            del self._cache[k]
+        
+        # Si aún es muy grande, limpiar por LRU (simulado con borrado de las más viejas)
+        if len(self._cache) > 1000:
+            keys = list(self._cache.keys())
+            for k in keys[:200]:
+                del self._cache[k]
 
     def load_engines(self):
         if self.base_dir not in sys.path:
@@ -177,6 +208,10 @@ class EngineManager:
         except Exception:
             valid_results = []
         
+        # 4. Prune Cache periodically
+        if int(now) % 10 == 0:
+            self._prune_cache()
+
         results, infoboxes = self.process_and_rank(valid_results, category, clean_query)
         
         # Cache Result
@@ -205,7 +240,8 @@ class EngineManager:
                 "data": {},
                 "cookies": {},
                 "timeout": timeout_limit,
-                "engine_data": {}
+                "engine_data": {},
+                "client": await self.get_client()
             }
             
             # Ejecutar lógica del motor
@@ -228,42 +264,38 @@ class EngineManager:
                         self.status_code = 200
                         self.search_params = p
                         self.url = p["url"]
+                        self.client = p["client"]
                     def json(self): return {}
                 if asyncio.iscoroutinefunction(engine.response):
                     results = await engine.response(FakeResponse(params))
                 else:
                     results = engine.response(FakeResponse(params))
             elif params.get("url"):
-                async with httpx.AsyncClient(
-                    follow_redirects=True, 
-                    timeout=params["timeout"],
-                    limits=httpx.Limits(max_keepalive_connections=50, max_connections=200),
-                    http2=True,
-                    verify=False # Evitar errores SSL en entornos restringidos
-                ) as client:
-                    if params["method"] == "POST":
-                        resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"])
+                client = await self.get_client()
+                if params["method"] == "POST":
+                    resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
+                else:
+                    resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
+                
+                engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-2] if '.' in engine.__name__ else engine.__name__)
+                if engine_name in ["google", "bing", "duckduckgo"]:
+                        print(f"DEBUG: {engine_name} status: {resp.status_code}")
+                
+                if resp.status_code in [200, 202]:
+                    class ResponseWrapper:
+                        def __init__(self, r, p):
+                            self.text = r.text
+                            self.status_code = r.status_code
+                            self.search_params = p
+                            self.url = str(r.url)
+                            self.client = p["client"]
+                        def json(self):
+                            return json.loads(self.text)
+                    
+                    if asyncio.iscoroutinefunction(engine.response):
+                        results = await engine.response(ResponseWrapper(resp, params))
                     else:
-                        resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"])
-                    
-                    engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-2] if '.' in engine.__name__ else engine.__name__)
-                    if engine_name in ["google", "bing", "duckduckgo"]:
-                         print(f"DEBUG: {engine_name} status: {resp.status_code}")
-                    
-                    if resp.status_code in [200, 202]:
-                        class ResponseWrapper:
-                            def __init__(self, r, p):
-                                self.text = r.text
-                                self.status_code = r.status_code
-                                self.search_params = p
-                                self.url = str(r.url)
-                            def json(self):
-                                return json.loads(self.text)
-                        
-                        if asyncio.iscoroutinefunction(engine.response):
-                            results = await engine.response(ResponseWrapper(resp, params))
-                        else:
-                            results = engine.response(ResponseWrapper(resp, params))
+                        results = engine.response(ResponseWrapper(resp, params))
                 
             clean = []
             if results and asyncio.iscoroutine(results):

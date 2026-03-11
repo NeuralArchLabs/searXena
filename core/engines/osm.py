@@ -40,10 +40,10 @@ async def response(resp):
 
     try:
         # Nominatim requiere un User-Agent claro para no bloquear
-        async with httpx.AsyncClient(timeout=4.0, follow_redirects=True) as client:
-            r = await client.get(api_url, headers=headers)
-            
-            if r.status_code == 200:
+        client = resp.client
+        r = await client.get(api_url, headers=headers)
+        
+        if r.status_code == 200:
                 data = r.json()
                 if data and isinstance(data, list):
                     for item in data:

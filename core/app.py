@@ -110,17 +110,20 @@ async def proxify(url: str):
         url = "https:" + url
 
     async def stream_resource():
-        async with httpx.AsyncClient(verify=False, timeout=15.0, follow_redirects=True) as client:
-            try:
-                async with client.stream("GET", url) as resp:
-                    if resp.status_code == 200:
-                        async for chunk in resp.aiter_bytes():
-                            yield chunk
-                    else:
-                        # Fallback simple
-                        pass
-            except Exception:
-                pass
+        client = await manager.get_client()
+        try:
+            # Limitar tamaño de descarga a 10MB para evitar OOM y abusos
+            max_size = 10 * 1024 * 1024
+            downloaded = 0
+            async with client.stream("GET", url, timeout=10.0) as resp:
+                if resp.status_code == 200:
+                    async for chunk in resp.aiter_bytes():
+                        downloaded += len(chunk)
+                        if downloaded > max_size:
+                            break
+                        yield chunk
+        except Exception:
+            pass
 
     headers = {
         "Cache-Control": "public, max-age=604800" # Cachear localmente por una semana
