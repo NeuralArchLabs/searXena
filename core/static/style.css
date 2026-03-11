@@ -907,16 +907,14 @@ body {
     backdrop-filter: blur(20px);
     display: flex;
     flex-direction: column;
-    height: 75vh;
-    /* Altura relativa al viewport */
-    min-height: 500px;
+    height: auto;
+    min-height: 70vh;
 }
 
 .settings-card form {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    overflow: hidden;
 }
 
 .settings-tabs {
@@ -944,10 +942,26 @@ body {
 .settings-section {
     display: none;
     flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 10px;
-    /* Margen para el scrollbar */
-    margin-bottom: 20px;
+    overflow-y: visible;
+    margin-bottom: 30px;
+}
+
+/* Scrollbar premium para secciones que lo requieran (como Motores) */
+.settings-section::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-section::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-section::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 10px;
+}
+
+.settings-section::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 
 .settings-section.active {
@@ -1019,8 +1033,8 @@ body {
 }
 
 .save-bar {
-    margin-top: auto;
-    /* Ancla al fondo */
+    margin-top: 20px;
+    /* Espacio respecto al contenido anterior */
     background: var(--accent);
     color: white;
     padding: 15px 30px;

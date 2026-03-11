@@ -29,7 +29,7 @@ searXena nació originalmente como una iniciativa de investigación para realiza
 
 A medida que el desarrollo avanzó y la necesidad de integraciones interactivas más profundas surgió, **searXena evolucionó para convertirse en un software iterativamente independiente**. Nuestro código base fue reescrito y estructurado bajo una arquitectura de micro-gestores propia (FastAPI), conservando el espíritu de soberanía del usuario establecido por el movimiento open-source.
 
-Reconocemos y honramos formalmente al proyecto original SearXNG y a sus desarrolladores comunitarios por sentar los estándares universales y la base teórica (parsers, evasión, headers proxy) acerca de cómo debe operar un metabuscador resistente a la censura.
+Reconocemos y honramos formalmente al proyecto original SearXNG y a sus desarrolladores comunitarios por sentar los estándares universales y la base teórica (parsers, gestión de peticiones, headers proxy) acerca de cómo debe operar un metabuscador transparente y privado.
 
 ## 🛠️ Stack Tecnológico
 
@@ -45,8 +45,8 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 
 * 🚀 **Metabúsqueda Paralela Asíncrona:** Una sola consulta tuya dispara docenas de solicitudes asíncronas a motores globales (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.) consolidándolas en menos de 1 segundo.
 * 🤖 **Integración IA First:** Formato JSON y esquemas Tools pre-construidos nativos, listos para conectar tu despliegue LLM a internet sin overheads ni scraping de HTML innecesario.
-* 🛡️ **Prevención de Rastreo (Anti-Tracking):** Actúa como un proxy intermediario entre tú y las mega-corporaciones. Dificulta significativamente el perfilado de usuarios corporativo al actuar como intermediario.
-* 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador corporativo evadiendo telemetría hospedado localmente en tu sistema.
+* 🛡️ **Protección de Privacidad:** Actúa como una interfaz neutral entre el usuario y la web global. Promueve el anonimato al centralizar las peticiones de forma transparente a través de su propio motor de red.
+* 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador privado minimizando la telemetría externa hospedado localmente en tu sistema.
 * 📱 **UI/UX Moderna y Dinámica:** Animaciones fluidas, modo oscuro ultra refinado ("Space Violet"), interfaz responsiva y separada categóricamente en pestañas (General, TI/Ciencia, Mapas, Videos, Imágenes).
 * 🌎 **Rich Snippets Consolidados:** Lectura enriquecida consolidando datos de Wikipedia o Wikidata en recuadros laterales de rápido consumo ("Infoboxes") al estilo de los grandes motores comerciales.
 
@@ -76,10 +76,10 @@ searXena no es solo una interfaz para humanos; es una **infraestructura de búsq
 
 ## 🔒 Arquitectura de Privacidad Transparente
 
-searXena prioriza que tus datos **jamás** terminen en perfiles publicitarios (terceros anunciantes), asumiendo un rol de escudo por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
+searXena prioriza que tus datos **jamás** se utilicen para el perfilado publicitario por parte de terceros, asumiendo un rol de protección técnica por debajo de la interfaz gráfica. Aún así, la arquitectura requiere ciertos consensos técnicos, reportados aquí transparentemente:
 
 ### Proxificación del DOM Absoluta
-Cuando buscas cualquier consulta general (Noticias, TI, Código), searXena enmascara tu identidad a través del motor asíncrono backend. Modificamos de forma sistemática los `User-Agent`. Toda URL de imagen devuelta por los motores comerciales pasa de manera forzada por nuestro sistema interno de `/proxify`, impidiendo que tu IP se filtre directamente.
+Cuando buscas cualquier consulta general (Noticias, TI, Código), searXena protege tu identidad a través del motor asíncrono backend. Modificamos de forma sistemática los `User-Agent`. Toda URL de imagen devuelta por los motores comerciales pasa de manera coordinada por nuestro sistema interno de `/proxify`, asegurando que tu IP no se exponga directamente a servidores de terceros.
 
 ### Módulo de Mapas: OSM (OpenStreetMap)
 Al interactuar con la pestaña especializada de Mapas, searXena implementa reglas un poco más permeables para lograr darte interactividad útil (arrastrar, hacer zoom), conservando el anonimato comercial:
@@ -125,7 +125,7 @@ Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0
 
 *   **Licencia:** Este proyecto es software libre, distribuido bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 *   **Créditos:** Todo el conocimiento de base técnica para modelar las clases de los módulos de extracción y derivaciones heurísticas pertenece de forma moral a los mantenedores de [Searx](https://github.com/searx/searx) y [SearXNG](https://github.com/searxng/searxng).
-*   **Fuentes de Información:** searXena actúa como un agregador de señales. Reconocemos y respetamos la inmensa labor de indexación y el valor tecnológico proporcionado por los motores de búsqueda integrados (Google, Bing, DuckDuckGo, etc.). Este software se limita a procesar y anonimizar datos públicos para el usuario final.
+*   **Fuentes de Información:** searXena actúa como un agregador de señales públicas. Reconocemos y respetamos la inmensa labor de indexación y el valor tecnológico proporcionado por los motores de búsqueda integrados (Google, Bing, DuckDuckGo, etc.). Este software funciona como una herramienta de visualización y anonimización de datos públicos para el usuario final.
 *   **Uso Educativo y de Investigación:** searXena se proporciona únicamente con fines de investigación y uso personal. El desarrollador no promueve ni se responsabiliza por el uso de esta herramienta para violar los Términos de Servicio de terceros.
 
 **AVISO LEGAL:** searXena se distribuye "TAL CUAL", sin garantías de ningún tipo. El usuario asume toda la responsabilidad legal derivada del uso del software, incluyendo el cumplimiento de las leyes locales y los contratos con proveedores de datos externos. El desarrollador no se hace responsable de bloqueos de IP, acciones legales de terceros o cualquier otro perjuicio derivado del uso de este código.

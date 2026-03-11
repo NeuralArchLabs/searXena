@@ -29,7 +29,7 @@ searXena was originally born as a research initiative to create an experimental 
 
 As development progressed and the need for deeper interactive integrations arose, **searXena evolved to become an iteratively independent software**. Our codebase was rewritten and structured under its own micro-manager architecture (FastAPI), while retaining the spirit of user sovereignty established by the open-source movement.
 
-We formally recognize and honor the original SearXNG project and its community developers for setting the universal standards and theoretical foundation (parsers, evasion, proxy headers) on how a censorship-resistant metasearch engine should operate.
+We formally recognize and honor the original SearXNG project and its community developers for setting the universal standards and theoretical foundation (parsers, request management, proxy headers) on how a transparent and private metasearch engine should operate.
 
 ## 🛠️ Tech Stack
 
@@ -45,8 +45,8 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 
 * 🚀 **Asynchronous Parallel Metasearch:** A single query from you triggers dozens of asynchronous requests to global engines (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.), consolidating them in less than 1 second.
 * 🤖 **AI-First Integration:** Native JSON formatting and pre-built Tools schemas, ready to connect your LLM deployment to the internet without overheads or unnecessary HTML scraping.
-* 🛡️ **Tracking Prevention:** Acts as an intermediary proxy between you and mega-corporations. Significantly hinders corporate user profiling by acting as an intermediary.
-* 📦 **100% Native on Windows:** Zero complex dependencies. Just clone, install the libraries with `pip`, run the main `.py` file, and you have a corporate search engine evading telemetry hosted locally on your system.
+* 🛡️ **Privacy Protection:** Acts as a neutral interface between the user and the global web. Promotes anonymity by transparently centralizing requests through its own network engine.
+* 📦 **100% Native on Windows:** Zero complex dependencies. Just clone, install the libraries with `pip`, run the main `.py` file, and you have a private search engine minimizing external telemetry hosted locally on your system.
 * 📱 **Modern and Dynamic UI/UX:** Fluid animations, ultra-refined dark mode ("Space Violet"), responsive interface, and categorically separated into tabs (General, IT/Science, Maps, Videos, Images).
 * 🌎 **Consolidated Rich Snippets:** Enriched reading consolidating data from Wikipedia or Wikidata in quick-consumption side boxes ("Infoboxes") in the style of major commercial engines.
 
@@ -76,10 +76,10 @@ searXena is not just an interface for humans; it is a **search infrastructure op
 
 ## 🔒 Transparent Privacy Architecture
 
-searXena priorities that your data **never** ends up in advertising profiles (third-party advertisers), assuming a shield role beneath the graphical interface. Even so, the architecture requires certain technical consensuses, reported here transparently:
+searXena priorities that your data is **never** used for third-party advertising profiling, assuming a technical protection role beneath the graphical interface. Even so, the architecture requires certain technical consensuses, reported here transparently:
 
 ### Absolute DOM Proxification
-When you search any general query (News, IT, Code), searXena masks your identity through the asynchronous backend engine. We systematically modify the `User-Agent`s. Every image URL returned by commercial engines is forcibly passed through our internal `/proxify` system, preventing your IP from leaking directly.
+When you search any general query (News, IT, Code), searXena protects your identity through the asynchronous backend engine. We systematically modify the `User-Agent`s. Every image URL returned by commercial engines is coordinated through our internal `/proxify` system, ensuring your IP is not directly exposed to third-party servers.
 
 ### Maps Module: OSM (OpenStreetMap)
 When interacting with the specialized Maps tab, searXena implements slightly more permeable rules to achieve useful interactivity (drag, zoom), preserving commercial anonymity:
@@ -125,7 +125,7 @@ Open your browser (Brave, Edge, Firefox) and enter directly into `http://127.0.0
 
 *   **License:** This project is free software, distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 *   **Credits:** All technical base knowledge for modeling extraction module classes and heuristic derivations morally belongs to the maintainers of [Searx](https://github.com/searx/searx) and [SearXNG](https://github.com/searxng/searxng).
-*   **Information Sources:** searXena acts as a signal aggregator. We recognize and respect the immense indexing work and technological value provided by the integrated search engines (Google, Bing, DuckDuckGo, etc.). This software is limited to processing and anonymizing public data for the end user.
+*   **Information Sources:** searXena acts as a public signal aggregator. We recognize and respect the immense indexing work and technological value provided by the integrated search engines (Google, Bing, DuckDuckGo, etc.). This software functions as a tool for visualizing and anonymizing public data for the end user.
 *   **Educational and Research Use:** searXena is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service.
 
 **LEGAL NOTICE:** searXena is distributed "AS IS", without warranties of any kind. The user assumes all legal responsibility derived from the use of the software, including compliance with local laws and contracts with external data providers. The developer is not responsible for IP blocks, third-party legal actions, or any other damages resulting from the use of this code.
