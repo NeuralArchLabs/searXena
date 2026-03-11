@@ -1,15 +1,20 @@
 STATUS = "experimental"
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, urlparse, parse_qs, unquote
+from utils import LANGUAGE_MAP
 import base64
 
 CATEGORIES = ["general"]
 WEIGHT = 3.0
 
 def request(query, params):
-    # Cookies to force English market and avoid redirects
-    params["cookies"]["_EDGE_CD"] = "m=en-us&u=en-us"
-    params["cookies"]["_EDGE_S"] = "mkt=en-us&ui=en-us"
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("bing", {}).get(lang, "en-US")
+    country = lang_code.split('-')[1].lower() if '-' in lang_code else "us"
+    
+    # Cookies to force market and avoid redirects
+    params["cookies"]["_EDGE_CD"] = f"m={lang_code}&u={lang_code}"
+    params["cookies"]["_EDGE_S"] = f"mkt={lang_code}&ui={lang_code}"
     params["cookies"]["MUID"] = ""
     params["cookies"]["SRCHD"] = "AF=NOFORM"
     params["cookies"]["SRCHUSR"] = "DOB=20200101"
@@ -18,8 +23,8 @@ def request(query, params):
         "q": query,
         "pq": query,
         "FORM": "QBRE",
-        "cc": "us",
-        "setlang": "en",
+        "cc": country,
+        "setlang": lang_code,
     }
     
     if params.get("pageno", 1) > 1:
@@ -27,7 +32,7 @@ def request(query, params):
         query_params["FORM"] = f"PERE{(params['pageno']-2) if params['pageno'] > 2 else ''}"
 
     params["url"] = f"https://www.bing.com/search?{urlencode(query_params)}"
-    params["headers"]["Accept-Language"] = "en-US,en;q=0.9"
+    params["headers"]["Accept-Language"] = f"{lang_code},{lang};q=0.9,en;q=0.8"
 
 def response(resp):
     results = []

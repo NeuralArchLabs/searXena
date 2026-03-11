@@ -136,7 +136,7 @@ class EngineManager:
                 except Exception:
                     pass
 
-    async def search(self, query: str, category: str = "general", pageno: int = 1, include_engines: list = None, exclude_engines: list = None):
+    async def search(self, query: str, category: str = "general", pageno: int = 1, lang: str = None, include_engines: list = None, exclude_engines: list = None):
         # 1. Handle Bangs
         target_engine = None
         clean_query = query
@@ -196,10 +196,10 @@ class EngineManager:
         selection = category_engines[:15]
         
         if target_engine and target_engine in self.engines:
-             tasks = [self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit)]
+             tasks = [self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit, lang=lang)]
         else:
             for engine in selection:
-                tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit))
+                tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit, lang=lang))
 
         # Parallel Wait (Buscamos que sean ultra-veloces)
         try:
@@ -220,20 +220,20 @@ class EngineManager:
         
         return results, infoboxes
 
-    async def call_engine(self, engine, query, category, pageno, timeout_limit):
+    async def call_engine(self, engine, query, category, pageno, timeout_limit, lang=None):
         try:
             params = {
                 "query": query,
                 "pageno": pageno,
                 "category": category,
                 "safesearch": self.settings.get("general", {}).get("safe_search", 1),
-                "language": self.settings.get("general", {}).get("default_lang", "es"),
+                "language": lang or self.settings.get("general", {}).get("default_lang", "es"),
                 "time_range": None,
                 "url": None,
                 "method": "GET",
                 "headers": {
                     "User-Agent": gen_useragent(),
-                    "Accept-Language": f"{self.settings.get('general', {}).get('default_lang', 'es')},es;q=0.9,en;q=0.8",
+                    "Accept-Language": f"{lang or self.settings.get('general', {}).get('default_lang', 'es')},en;q=0.8",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                     "Connection": "keep-alive"
                 },
@@ -386,8 +386,22 @@ class EngineManager:
 
 
                 # 2. Normalización de URL para deduplicación robusta (SearXNG style)
-                raw_url = res.get('url', '').lower()
-                clean_url = raw_url.replace('https://', '').replace('http://', '').replace('www.', '').split('#')[0].rstrip('/')
+                raw_url = res.get('url', '')
+                if not raw_url: continue
+                
+                # Normalización agresiva: quitar fragmentos, protocolos y parámetros de rastreo/idioma comunes
+                # para que 'example.com/?hl=es' y 'example.com/?hl=en' colapsen en el mismo resultado
+                u = raw_url.lower().replace('https://', '').replace('http://', '').replace('www.', '').split('#')[0]
+                
+                # Quitar parámetros de URL comunes que duplican el mismo contenido
+                if '?' in u:
+                    base, query = u.split('?', 1)
+                    params = query.split('&')
+                    # Filtramos parámetros de idioma y tracking
+                    valid_params = [p for p in params if not any(p.startswith(x) for x in ['hl=', 'gl=', 'lr=', 'lang=', 'language=', 'utm_', 'fbclid='])]
+                    u = base + ('?' + '&'.join(valid_params) if valid_params else '')
+                
+                clean_url = u.rstrip('/')
                 if not clean_url: continue
                 
                 item = score_map[clean_url]

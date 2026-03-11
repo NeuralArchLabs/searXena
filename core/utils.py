@@ -37,3 +37,25 @@ async def fetch_vqd(query: str, client) -> Optional[str]:
         return vqd
     except Exception:
         return None
+
+# Mapeo de idiomas para motores específicos
+LANGUAGE_MAP = {
+    "google": {
+        "es": "es", "en": "en", "it": "it", "fr": "fr", "de": "de", "zh": "zh-CN", "pt": "pt", "ja": "ja"
+    },
+    "bing": {
+        "es": "es-ES", "en": "en-US", "it": "it-IT", "fr": "fr-FR", "de": "de-DE", "zh": "zh-CN", "pt": "pt-PT", "ja": "ja-JP"
+    },
+    "duckduckgo": {
+        "es": "es-es", "en": "us-en", "it": "it-it", "fr": "fr-fr", "de": "de-de", "zh": "cn-zh", "pt": "pt-pt", "ja": "jp-jp"
+    },
+    "startpage": {
+        "es": "espanol", "en": "english", "it": "italiano", "fr": "francais", "de": "deutsch", "zh": "chinese_s", "pt": "portugues", "ja": "japanese"
+    },
+    "yahoo": {
+        "es": "es-ES", "en": "en-US", "it": "it-IT", "fr": "fr-FR", "de": "de-DE", "zh": "zh-CN", "pt": "pt-PT", "ja": "ja-JP"
+    },
+    "mojeek": {
+        "es": "es", "en": "en", "it": "it", "fr": "fr", "de": "de", "zh": "zh", "pt": "pt", "ja": "ja"
+    }
+}

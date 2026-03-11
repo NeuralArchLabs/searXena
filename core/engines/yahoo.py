@@ -1,15 +1,22 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["general"]
 WEIGHT = 1.0
 
 def request(query, params):
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("yahoo", {}).get(lang, "en-US")
+    
     query_params = {
         "p": query,
-        "b": (params.get("pageno", 1) - 1) * 10 + 1
+        "ei": "UTF-8",
+        "b": (params.get("pageno", 1) - 1) * 10 + 1,
+        "setlang": lang_code
     }
     params["url"] = f"https://search.yahoo.com/search?{urlencode(query_params)}"
+    params["headers"]["Accept-Language"] = f"{lang_code},{lang};q=0.9,en;q=0.8"
 
 def response(resp):
     results = []

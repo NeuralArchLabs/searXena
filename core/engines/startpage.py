@@ -1,16 +1,20 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["general"]
 WEIGHT = 3.0
 
 def request(query, params):
     # Startpage requires POST for search recently to prevent basic scraping
+    lang = params.get("language", "es")
+    sp_lang = LANGUAGE_MAP.get("startpage", {}).get(lang, "english")
+    
     query_params = {
         "query": query,
         "cat": "web",
         "cmd": "process_search",
-        "language": "english",
+        "language": sp_lang,
         "engine0": "v1all",
         "t": "device",
         "abp": "-1"

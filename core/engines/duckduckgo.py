@@ -1,20 +1,24 @@
-STATUS = "experimental"
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["general"]
 WEIGHT = 1.8
 
 def request(query, params):
     # DDG Lite version - GET request, very stable and minimal
+    lang = params.get("language", "es")
+    kl = LANGUAGE_MAP.get("duckduckgo", {}).get(lang, "wt-wt")
+    
     query_params = {
         "q": query,
-        "kl": "wt-wt",
+        "kl": kl,
         "df": ""
     }
     params["url"] = f"https://duckduckgo.com/lite/?{urlencode(query_params)}"
     params["method"] = "GET"
     params["headers"]["Referer"] = "https://duckduckgo.com/"
+    params["headers"]["Accept-Language"] = f"{lang},en;q=0.8"
 
 def response(resp):
     results = []

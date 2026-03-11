@@ -1,5 +1,5 @@
 import httpx
-from utils import fetch_vqd
+from utils import fetch_vqd, LANGUAGE_MAP
 from urllib.parse import urlencode
 
 CATEGORIES = ["videos"]
@@ -11,8 +11,11 @@ async def request(query, params):
         
     if not vqd: return
 
+    lang = params.get("language", "es")
+    kl = LANGUAGE_MAP.get("duckduckgo", {}).get(lang, "wt-wt")
+
     query_params = {
-        "l": "wt-wt",
+        "l": kl,
         "o": "json",
         "q": query,
         "vqd": vqd,
@@ -20,6 +23,7 @@ async def request(query, params):
         "p": 1
     }
     params["url"] = f"https://duckduckgo.com/v.js?{urlencode(query_params)}"
+    params["headers"]["Accept-Language"] = f"{lang},en;q=0.8"
 
 def response(resp):
     results = []

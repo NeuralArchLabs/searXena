@@ -1,6 +1,7 @@
 STATUS = "experimental"
 import random
 from urllib.parse import urlencode, unquote
+from utils import LANGUAGE_MAP
 from selectolax.parser import HTMLParser
 
 CATEGORIES = ["general", "news", "videos", "images"]
@@ -10,9 +11,11 @@ def request(query, params):
     # Google with udm=14 (clean Web view, less bot detection)
     offset = (params.get("pageno", 1) - 1) * 10
     
+    lang_code = LANGUAGE_MAP.get("google", {}).get(params.get("language"), "es")
+    
     query_params = {
         "q": query,
-        "hl": params.get("language", "es"),
+        "hl": lang_code,
         "start": offset,
         "udm": 14, # New Web search view
     }
@@ -34,22 +37,23 @@ def request(query, params):
     import random
     cb_val = random.randint(20230000, 20249999)
     # Consent cookies to bypass 'Before you continue'
-    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.en+FX+414"
+    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.{params.get('language', 'es')}+FX+414"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
     
-    # Common selectors for Google Web (udm=14 and standard)
-    for node in tree.css('div.g, .MjjYud, .g, div.ZIN69b, .WwS1ce'):
-        title_node = node.css_first('h3')
+    # 1. Main Search Results (Desktop/Modern)
+    # Improved selectors: .g, .MjjYud, .Gx5S9b (mobile)
+    for node in tree.css('div.g, .MjjYud, .Gx5S9b, div.WwS1ce, .ZIN69b, .MjjYud'):
+        title_node = node.css_first('h3, .vv14be, .BNeawe')
         url_node = node.css_first('a[href]')
-        # Snippet can be in several places
-        snippet_node = node.css_first('div.VwiC3b, .VwiC3b, .BNeawe, .s3v9rd, span.st')
         
-        # Buscar miniatura y precio usando solo selectores DOM seguros
+        # Snippets: .VwiC3b (modern), .s31JSe (mobile), .st (old)
+        snippet_node = node.css_first('div.VwiC3b, .BNeawe, .s3v9rd, span.st, .yXK7lf')
+        
+        # Miniatures
         img_node = node.css_first('img')
-        price_node = node.css_first('.a8Pemb, .HRLxBb')
         
         if title_node and url_node:
             url = _clean_url(url_node.attributes.get('href', ''))
@@ -59,37 +63,28 @@ def response(resp):
                     item = {
                         "title": title,
                         "url": url,
-                        "content": snippet_node.text().strip() if snippet_node else "Información de Google.",
+                        "content": snippet_node.text().strip() if snippet_node else "Google result.",
                         "source": "google"
                     }
                     if img_node:
-                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src') or img_node.attributes.get('data-iurl')
+                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
                         if src and 'http' in src:
                             item["thumbnail_src"] = src
                             item["img_src"] = src
-                    
-                    # Bonus: Si es video en motor general, forzar template y miniatura HQ si es Youtube
-                    if resp.search_params.get("category") == "videos" or "youtube.com" in url or "youtu.be" in url:
-                        item["template"] = "videos.html"
-                        import re
-                        yt_match = re.search(r"(?:v=|\/)([0-9A-Za-z_-]{11}).*", url)
-                        if yt_match and ("youtube.com" in url or "youtu.be" in url):
-                            item["img_src"] = f"https://i.ytimg.com/vi/{yt_match.group(1)}/mqdefault.jpg"
-                            item["thumbnail_src"] = item["img_src"]
-                        
-                    if price_node:
-                        item["price"] = price_node.text().strip()
-                        
                     results.append(item)
     
-    # Fallback to any h3 link
+    # 2. Ultra-Fallback: Any <h3> inside an <a> or similar
     if not results:
+        # Search for any h3 link
         for node in tree.css('h3'):
             link = node.parent
-            while link and link.tag != 'a':
+            # Try to find the closest wrapping link
+            limit = 5
+            while link and link.tag != 'a' and limit > 0:
                 link = link.parent
+                limit -= 1
             
-            if link:
+            if link and link.tag == 'a':
                 url = _clean_url(link.attributes.get('href', ''))
                 if _valid_url(url):
                     results.append({

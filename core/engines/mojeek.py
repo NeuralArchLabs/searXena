@@ -1,15 +1,22 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["general"]
 WEIGHT = 1.2
 
 def request(query, params):
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("mojeek", {}).get(lang, "en")
+    
     query_params = {
         "q": query,
-        "s": (params.get("pageno", 1) - 1) * 10
+        "s": (params.get("pageno", 1) - 1) * 10,
+        "lb": lang_code,
+        "hl": lang_code
     }
     params["url"] = f"https://www.mojeek.com/search?{urlencode(query_params)}"
+    params["headers"]["Accept-Language"] = f"{lang},en;q=0.8"
 
 def response(resp):
     results = []

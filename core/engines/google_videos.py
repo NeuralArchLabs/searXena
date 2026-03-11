@@ -1,19 +1,28 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["videos"]
 WEIGHT = 2.0
 
 def request(query, params):
     start = (params.get("pageno", 1) - 1) * 10
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("google", {}).get(lang, "es")
+    country = lang_code.upper() if len(lang_code) == 2 else "US"
+    
     query_params = {
         "q": query,
         "tbm": "vid",
         "start": start,
-        "hl": "es",
-        "gl": "ES"
+        "hl": lang_code,
+        "gl": country
     }
     params["url"] = f"https://www.google.com/search?{urlencode(query_params)}"
+    
+    import random
+    cb_val = random.randint(20230000, 20249999)
+    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.{lang}+FX+414"
 
 def response(resp):
     results = []

@@ -1,20 +1,28 @@
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
+from utils import LANGUAGE_MAP
 
 CATEGORIES = ["news"]
 
 def request(query, params):
     # Google News modo móvil (siempre devuelve HTML simple y rico)
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("google", {}).get(lang, "es")
+    country = lang_code.upper() if len(lang_code) == 2 else "US"
+    
     query_params = {
         "q": query,
         "tbm": "nws",
-        "hl": "es",
-        "gl": "ES",
+        "hl": lang_code,
+        "gl": country,
         "start": (params.get("pageno", 1) - 1) * 10
     }
     params["url"] = f"https://www.google.com/search?{urlencode(query_params)}"
     params["headers"]["User-Agent"] = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
-    params["cookies"]["CONSENT"] = "YES+ES.es+V9+BX"
+    
+    import random
+    cb_val = random.randint(20230000, 20249999)
+    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.{lang}+FX+414"
 
 def response(resp):
     results = []

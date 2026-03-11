@@ -149,6 +149,8 @@ async def search(request: Request):
     if not q:
         return RedirectResponse(url="/")
 
+    lang = manager.settings.get("general", {}).get("default_lang", "es")
+
     # Sistema de Bangs (SearXNG style)
     if q.startswith("!"):
         parts = q.split(" ", 1)
@@ -166,9 +168,9 @@ async def search(request: Request):
         search_q = q if any(w in q.lower() for w in ["comprar", "precio", "oferta", "tienda"]) else f"{q} comprar"
         
         # Petición única y normal, sin paginaciones dobles raras.
-        results, infoboxes = await manager.search(search_q, category=category, pageno=pageno)
+        results, infoboxes = await manager.search(search_q, category=category, pageno=pageno, lang=lang)
     else:
-        results, infoboxes = await manager.search(q, category=category, pageno=pageno)
+        results, infoboxes = await manager.search(q, category=category, pageno=pageno, lang=lang)
     
     # Filtrado y reorganización inteligente para compras
     reorganized = []

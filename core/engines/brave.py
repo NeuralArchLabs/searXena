@@ -6,7 +6,8 @@ WEIGHT = 2.2
 def request(query, params):
     # Brave Search
     offset = (params.get("pageno", 1) - 1) * 20
-    params["url"] = f"https://search.brave.com/search?q={query}&offset={offset}"
+    lang = params.get("language", "es")
+    params["url"] = f"https://search.brave.com/search?q={query}&offset={offset}&source=web&hl={lang}"
     params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 
 def response(resp):

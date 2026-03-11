@@ -11,8 +11,11 @@ SEARCH_URL = 'https://www.youtube.com/results?search_query={query}&page={page}'
 NEXT_PAGE_URL = 'https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
 
 def request(query, params):
-    params['cookies']['CONSENT'] = "YES+"
-    params['url'] = SEARCH_URL.format(query=quote_plus(query), page=params['pageno'])
+    lang = params.get("language", "es")
+    gl = lang.upper() if len(lang) == 2 else "US"
+    
+    params['cookies']['CONSENT'] = f"YES+cb.20240101-04-p0.{lang}+FX+414"
+    params['url'] = SEARCH_URL.format(query=quote_plus(query), page=params['pageno']) + f"&hl={lang}&gl={gl}"
     
     # Soporte para rango de tiempo si es necesario
     time_map = {'day': 'Ag', 'week': 'Aw', 'month': 'BA', 'year': 'BQ'}

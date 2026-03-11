@@ -5,9 +5,10 @@ CATEGORIES = ['it_science']
 WEIGHT = 1.0
 
 def request(query, params):
+    lang = params.get("language", "es")
     query_params = {
         "q": query,
-        "hl": "es"
+        "hl": lang
     }
     params["url"] = f"https://scholar.google.com/scholar?{urlencode(query_params)}"
 
