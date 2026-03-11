@@ -426,12 +426,13 @@ class EngineManager:
             if q_fix == t_fix: base = 0
             elif q_fix in t_fix or t_fix in q_fix: base = 1
             
-            # Tie-breaker decimal: Wikipedia > Wikidata > Otros
+            # Tie-breaker decimal: Prioridad Idioma > Wikipedia > Wikidata
+            lang_pref = 0.05 if i.get('lang') == 'es' else 0.1 # Prioridad a español si el sistema lo pide
             prio = 0.5
             if i.get('source') == 'wikipedia': prio = 0.1
             elif i.get('source') == 'wikidata': prio = 0.2
             
-            return base + prio
+            return base + lang_pref + prio
         
         infoboxes.sort(key=infobox_sort_score)
         
@@ -440,17 +441,20 @@ class EngineManager:
         if infoboxes:
             best_score = infobox_sort_score(infoboxes[0])
             if best_score < 2.0: # Solo mostrar si es match exacto o substring fuerte
-                best_info = infoboxes[0]
-                # Enriquecer con datos de otros infoboxes parecidos (ej. traer imagen de Wikidata a Wikipedia)
+                best_info = infoboxes[0].copy() # Usar copia para no mutar el original
+                # Enriquecer SOLO con datos del mismo tema exacto
                 best_t_fix = re.sub(r'[^\w\s]', '', best_info.get('title', '').lower()).strip().replace(' ', '')
                 for other in infoboxes[1:]:
                     other_t_fix = re.sub(r'[^\w\s]', '', other.get('title', '').lower()).strip().replace(' ', '')
-                    if other_t_fix == best_t_fix or best_t_fix in other_t_fix or other_t_fix in best_t_fix:
+                    if other_t_fix == best_t_fix: # SOLO fusión si los nombres son idénticos
                         if not best_info.get('img_src') and other.get('img_src'):
                             best_info['img_src'] = other['img_src']
-                        if len(other.get('content', '')) > len(best_info.get('content', '')) + 20:
-                             # Solo actualizar si es significativamente más largo/mejor
-                             best_info['content'] = other['content']
+                        # Si encontramos una versión en español de algo que estaba en inglés, preferirla
+                        if other.get('lang') == 'es' and best_info.get('lang') != 'es':
+                            best_info['content'] = other['content']
+                            best_info['lang'] = 'es'
+                            best_info['url'] = other['url']
+                            best_info['source'] = other['source']
                 final_infoboxes = [best_info]
         
         # Ordenación Final de resultados por Score

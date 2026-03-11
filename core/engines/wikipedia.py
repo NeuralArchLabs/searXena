@@ -58,6 +58,7 @@ async def response(resp):
                     "content": extract,
                     "img_src": page.get("thumbnail", {}).get("source") if "thumbnail" in page else None,
                     "template": "infobox.html",
-                    "source": "wikipedia"
+                    "source": "wikipedia",
+                    "lang": l
                 })
     return results

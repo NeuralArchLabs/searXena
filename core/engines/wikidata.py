@@ -74,6 +74,7 @@ async def response(resp):
                 "content": description if description else "Información de Wikidata.",
                 "img_src": img_src,
                 "source": "wikidata",
+                "lang": lang,
                 "score": 4.0
             })
             
