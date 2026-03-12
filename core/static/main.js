@@ -175,6 +175,9 @@ async function performSearch(url, pushState = true, isNewQuery = false) {
         if (layout) {
             layout.innerHTML = htmlContent;
             layout.style.opacity = '1';
+            
+            // Remove focus from search input
+            document.getElementById('search-input')?.blur();
         }
 
         if (pushState) {
