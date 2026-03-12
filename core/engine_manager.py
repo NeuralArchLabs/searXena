@@ -91,6 +91,11 @@ class EngineManager:
         if self._client:
             await self._client.aclose()
             self._client = None
+        # También cerrar el cliente de sugerencias si fue importado
+        if "engines.suggestions" in sys.modules:
+            sugg = sys.modules["engines.suggestions"]
+            if hasattr(sugg, "client") and hasattr(sugg.client, "aclose"):
+                await sugg.client.aclose()
 
     def _prune_cache(self):
         """Limpia el cache de entradas expiradas para evitar fugas de memoria."""
@@ -205,8 +210,18 @@ class EngineManager:
 
         # Parallel Wait (Buscamos que sean ultra-veloces)
         try:
-            results_list = await asyncio.gather(*tasks, return_exceptions=True)
+            # Añadimos un pequeño margen sobre el timeout_limit para que wait_for no mate antes de tiempo el httpx interno
+            results_list = await asyncio.wait_for(
+                asyncio.gather(*tasks, return_exceptions=True),
+                timeout=timeout_limit + 1.0
+            )
             valid_results = [r for r in results_list if isinstance(r, list)]
+        except asyncio.TimeoutError:
+            # Si el gather masivo falla, cancelamos todo para evitar h6uerfanos
+            for t in tasks:
+                if not t.done():
+                    t.cancel()
+            valid_results = []
         except Exception:
             valid_results = []
         

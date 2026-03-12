@@ -42,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         sbox.querySelectorAll('.suggestion-item').forEach(item => {
                             item.onclick = () => {
                                 input.value = item.getAttribute('data-val');
-                                form.submit();
+                                sbox.style.display = 'none'; // Hide immediately
+                                form.requestSubmit(); // Triggers the SPA logic
                             };
                         });
                     } else {
@@ -135,6 +136,10 @@ async function performSearch(url, pushState = true, isNewQuery = false) {
     }
 
     if (layout) layout.style.opacity = '0.4';
+    
+    // Hide suggestions box on search
+    const sbox = document.getElementById('suggestions-box');
+    if (sbox) sbox.style.display = 'none';
 
     try {
         let htmlContent = null;

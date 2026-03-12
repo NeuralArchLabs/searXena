@@ -13,18 +13,28 @@ import engines.suggestions as suggestions
 from urllib.parse import quote_plus, urlparse
 import re
 
-app = FastAPI(title="searXena")
+from contextlib import asynccontextmanager
 
 # Configuración de base
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Inicializar EngineManager con persistencia
+manager = EngineManager(BASE_DIR)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: El manager ya se inicializa arriba, pero podríamos moverlo aquí si quisiéramos
+    yield
+    # Shutdown: Cerrar conexiones abiertas y limpiar tareas
+    await manager.close()
+
+app = FastAPI(title="searXena", lifespan=lifespan)
+
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # Register filters
 templates.env.filters["urlencode"] = lambda s: quote_plus(str(s)) if s else ""
-
-# Inicializar EngineManager con persistencia
-manager = EngineManager(BASE_DIR)
 
 @app.get("/")
 async def index(request: Request):

@@ -14,6 +14,9 @@ y este proyecto se adhiere a la [Semántica de Versiones](https://semver.org/spe
 - **Botón de Scroll-to-Top**: Añadido botón flotante dinámico para regresar al inicio de la página de forma fluida.
 - **Sugerencias Pro Dinámicas**: Nuevo sistema de tips aleatorios y multilingües en el sidebar con enlaces directos a NeuralArchLabs.
 - **Botón "X" de Limpieza**: Integrado botón translúcido para limpiar rápidamente el campo de búsqueda.
+- **Mitigación de Procesos Huérfanos**: Implementación de sistema `lifespan` en FastAPI para cierre garantizado de conexiones y protecciones con `asyncio.wait_for` para evitar tareas colgadas en búsquedas paralelas.
+- **Navegación Fluida en Preferencias**: El botón "Volver" ahora utiliza el historial del navegador para regresar a los resultados previos.
+- **Corrección de Sugerencias Persistentes**: Las sugerencias de búsqueda ahora se ocultan automáticamente al iniciar una nueva consulta en modo SPA.
 
 ## [1.3.0] - 2026-03-11
 
