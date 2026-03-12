@@ -573,6 +573,7 @@ body {
 
     .sidebar {
         display: block;
+        margin-top: 10px; /* Align with .tabs-container top margin */
     }
 }
 
@@ -676,7 +677,7 @@ body {
 .tabs-container {
     display: flex;
     gap: 12px;
-    margin: 10px 0 50px 0; /* Increased margin to push away the glow from featured result */
+    margin: 10px 0 50px; /* Increased margin to push away the glow from featured result */
     overflow-x: auto;
     scrollbar-width: none; /* Firefox */
     position: relative;
@@ -894,7 +895,7 @@ body {
 .tabs-container {
     display: flex;
     gap: 15px;
-    margin: 20px 0;
+    margin: 10px 0 20px 0; /* Standardized with upper definition */
     overflow-x: auto;
     padding-bottom: 5px;
 }
