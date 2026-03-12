@@ -5,6 +5,16 @@ Todos los cambios notables en este proyecto serán documentados en este archivo.
 El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 y este proyecto se adhiere a la [Semántica de Versiones](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-03-11
+
+### Añadido
+- **UI/UX Premium para Imágenes**: Implementación de previsualización lateral de imágenes y un sistema de **Lightbox (Vista Expandida)** cinemático con desenfoque de fondo.
+- **Diseño Centrado Global**: Reestructuración del layout para centrar la cabecera y los resultados en pantallas anchas, mejorando el equilibrio visual.
+- **Trusted Asset Acceleration (DMD)**: Wikipedia y Wikimedia marcadas como fuentes de confianza para entrega directa de medios (Direct Media Delivery), optimizando la velocidad sin trackers comerciales.
+- **Botón de Scroll-to-Top**: Añadido botón flotante dinámico para regresar al inicio de la página de forma fluida.
+- **Sugerencias Pro Dinámicas**: Nuevo sistema de tips aleatorios y multilingües en el sidebar con enlaces directos a NeuralArchLabs.
+- **Botón "X" de Limpieza**: Integrado botón translúcido para limpiar rápidamente el campo de búsqueda.
+
 ## [1.3.0] - 2026-03-11
 
 ### Añadido

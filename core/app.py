@@ -101,6 +101,7 @@ async def save_settings(request: Request):
     return RedirectResponse(url="/settings", status_code=303)
 
 import httpx
+import random
 from fastapi.responses import StreamingResponse
 
 @app.get("/proxify")
@@ -223,6 +224,19 @@ async def search(request: Request):
     else:
         full_results = results
 
+    # Sistema de Sugerencias Pro dinámicas
+    tips_pool = [
+        {'en': 'Try using <b>!w</b> for Wikipedia.', 'es': 'Prueba usar <b>!w</b> para buscar en Wikipedia.', 'zh': '尝试使用<b>!w</b>搜维基百科。'},
+        {'en': 'Use <b>!gh</b> to search projects on GitHub directly.', 'es': 'Usa <b>!gh</b> para buscar proyectos en GitHub directamente.', 'zh': '使用<b>!gh</b>直接搜GitHub。'},
+        {'en': 'Looking for code? <b>!mdn</b> or <b>!npm</b> are your friends.', 'es': '¿Buscas código? <b>!mdn</b> o <b>!npm</b> son tus mejores amigos.', 'zh': '找代码？<b>!mdn</b> 或 <b>!npm</b> 是你的好帮手。'},
+        {'en': 'Press <b>"Settings"</b> to enable more search engines.', 'es': 'Pulsa en <b>"Preferencias"</b> para habilitar más motores de búsqueda.', 'zh': '点击<b>“偏好设置”</b>开启更多引擎。'},
+        {'en': 'Follow <a href="https://github.com/NeuralArchLabs" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:bold;">NeuralArchLabs</a> on GitHub for more insane AI projects!', 'es': '¡Sigue a <a href="https://github.com/NeuralArchLabs" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:bold;">NeuralArchLabs</a> en GitHub para más proyectos de IA increíbles!', 'zh': '在 GitHub 上关注 <a href="https://github.com/NeuralArchLabs" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:bold;">NeuralArchLabs</a> 获取更多顶级 AI 项目！'},
+        {'en': 'searXena 1.4.0 is now faster thanks to DMD architecture.', 'es': 'searXena 1.4.0 ahora es más rápido gracias a la arquitectura DMD.', 'zh': '得益于DMD架构，searXena 1.4.0 现在的速度更快了。'},
+        {'en': 'Try <b>!yt</b> to search for videos on YouTube.', 'es': 'Prueba <b>!yt</b> para buscar videos en YouTube.', 'zh': '尝试使用<b>!yt</b>在YouTube搜视频。'},
+        {'en': 'Privacy first: we never store your search history.', 'es': 'Privacidad primero: nunca guardamos tu historial de búsqueda.', 'zh': '隐私第一：我们从不存储您的搜索记录。'}
+    ]
+    random_tip = random.choice(tips_pool).get(lang, tips_pool[0]['en'])
+
     response = templates.TemplateResponse("results.html", {
         "request": request, 
         "query": q, 
@@ -230,7 +244,8 @@ async def search(request: Request):
         "related_searches": related_searches,
         "category": category,
         "pageno": pageno,
-        "lang": manager.settings.get("general", {}).get("default_lang", "es")
+        "lang": lang,
+        "pro_tip": random_tip
     })
     
     # Cabeceras de Privacidad Estrictas

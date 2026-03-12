@@ -12,30 +12,32 @@
 
 <body>
     <div class="header">
-        <h2 onclick="location.href='/'" class="brand-clickable">searXena</h2>
-        <div class="search-box-header">
-            <form action="/search" method="get" id="search-form">
-                <input type="text" name="q" class="search-input" id="search-input" value="{{ query }}"
-                    autocomplete="off"
-                    placeholder="{{ {'en': 'Search the web...', 'zh': '在网络上搜索...'}.get(lang, 'Busca en la web...') }}"
-                    title="{{ {'en': 'Search query', 'zh': '搜索查询'}.get(lang, 'Query de búsqueda') }}">
-                <input type="hidden" name="category" id="cat-input" value="{{ category or 'general' }}">
-                <input type="hidden" name="pageno" id="page-input" value="{{ pageno or 1 }}">
-                <div id="suggestions-box"></div>
-            </form>
-        </div>
-        <div class="header-actions">
-            <!-- Botón de preferencias integrado en el header (Results Page) -->
-            <a href="/settings" class="settings-btn-inline"
-                title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3" />
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                </svg>
-                <span>{{ {'en': 'Preferences', 'zh': '偏好设置'}.get(lang, 'Preferencias') }}</span>
-            </a>
+        <div class="header-inner">
+            <h2 onclick="location.href='/'" class="brand-clickable">searXena</h2>
+            <div class="search-box-header">
+                <form action="/search" method="get" id="search-form">
+                    <input type="text" name="q" class="search-input" id="search-input" value="{{ query }}"
+                        autocomplete="off"
+                        placeholder="{{ {'en': 'Search the web...', 'zh': '在网络上搜索...'}.get(lang, 'Busca en la web...') }}"
+                        title="{{ {'en': 'Search query', 'zh': '搜索查询'}.get(lang, 'Query de búsqueda') }}">
+                    <input type="hidden" name="category" id="cat-input" value="{{ category or 'general' }}">
+                    <input type="hidden" name="pageno" id="page-input" value="{{ pageno or 1 }}">
+                    <div id="suggestions-box"></div>
+                </form>
+            </div>
+            <div class="header-actions">
+                <!-- Botón de preferencias integrado en el header (Results Page) -->
+                <a href="/settings" class="settings-btn-inline"
+                    title="{{ {'en': 'Configure engines and privacy', 'zh': '配置引擎和隐私'}.get(lang, 'Configurar motores y privacidad') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                    <span>{{ {'en': 'Preferences', 'zh': '偏好设置'}.get(lang, 'Preferencias') }}</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -118,14 +120,19 @@
             <!-- Vista de Imágenes -->
             <div class="images-grid">
                 {% for result in results if result.template == 'images.html' or result.img_src %}
-                <a href="{{ result.url }}" target="_blank" class="image-card" rel="noopener noreferrer nofollow">
+                <div class="image-card" onclick="setPreview(this)" 
+                    data-title="{{ result.title|e }}" 
+                    data-content="{{ result.source|default('') }}" 
+                    data-url="{{ result.url|e }}"
+                    data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
+                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
                     <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
                         alt="{{ result.title }}" loading="lazy" onerror="this.src='/static/placeholder.png';">
                     <div class="image-info">
                         <div class="image-source">{{ result.sources|join(', ') }}</div>
                         <div class="image-title-text">{{ result.title }}</div>
                     </div>
-                </a>
+                </div>
                 {% endfor %}
             </div>
 
@@ -314,7 +321,7 @@
 
             <div class="infobox-container sidebar-tips">
                 <h3 class="sidebar-tips-title">{{ {'en': 'Pro Tips', 'zh': '专业提示'}.get(lang, 'Sugerencias Pro') }}</h3>
-                <p class="sidebar-tips-text">{{ {'en': 'Try using <b>!w</b> for Wikipedia.', 'zh': '尝试使用<b>!w</b>。'}.get(lang, 'Prueba usar <b>!w</b> para Wikipedia.')|safe }}</p>
+                <p class="sidebar-tips-text">{{ pro_tip|safe }}</p>
             </div>
 
             <!-- Sticky Block (Preview + Suggestions) -->
@@ -327,6 +334,12 @@
                         <h3 id="preview-title" class="preview-title"></h3>
                     </div>
                     <div id="preview-url" class="preview-url"></div>
+                    
+                    <!-- Area para preview de imagen grande -->
+                    <div id="preview-image-container" class="preview-image-container" onclick="openLightbox()">
+                        <img id="preview-image-main" src="" alt="Full Preview" class="preview-image-main">
+                    </div>
+
                     <p id="preview-content" class="preview-content-text"></p>
                     <div class="preview-actions">
                         <a id="preview-link" href="#" target="_blank" class="preview-btn-main">{{ {'en': 'Visit Website', 'zh': '访问网站'}.get(lang, 'Visitar Sitio Web') }}</a>
@@ -352,6 +365,19 @@
         <p>searXena 2026 — AGPLv3 Open Source — Built by <a href="https://github.com/NeuralArchLabs" class="credit-link"
                 target="_blank" rel="noopener noreferrer">Neural Arch Labs</a></p>
     </footer>
+
+    <!-- Botón Volver Arriba -->
+    <button id="back-to-top" class="back-to-top" title="Volver arriba">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <!-- Lightbox para imágenes a pantalla completa -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" class="lightbox-content" src="" alt="Full size preview">
+    </div>
 
     <script src="/static/main.js?v=3.6"></script>
 </body>

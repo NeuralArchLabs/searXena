@@ -68,6 +68,25 @@ document.addEventListener('DOMContentLoaded', () => {
             sbox.style.display = 'none';
         }
     });
+
+    // Botón Volver Arriba
+    const backToTop = document.getElementById('back-to-top');
+    if (backToTop) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 400) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 });
 
 /**
@@ -208,6 +227,18 @@ function setPreview(el) {
     document.getElementById('preview-icon').src = icon;
     document.getElementById('preview-link').href = url;
 
+    // Manejar preview de imagen grande
+    const fullImg = el.getAttribute('data-full-img');
+    const imgContainer = document.getElementById('preview-image-container');
+    const imgMain = document.getElementById('preview-image-main');
+
+    if (fullImg && imgContainer && imgMain) {
+        imgMain.src = fullImg;
+        imgContainer.style.display = 'block';
+    } else if (imgContainer) {
+        imgContainer.style.display = 'none';
+    }
+
     // Mostrar el pane
     pane.style.display = 'block';
     pane.closest('.sidebar').classList.add('active-preview');
@@ -231,5 +262,31 @@ function closePreview() {
         pane.style.display = 'none';
         pane.closest('.sidebar').classList.remove('active-preview');
         document.querySelectorAll('.selected-preview').forEach(c => c.classList.remove('selected-preview'));
+    }
+}
+
+/**
+ * Abre la imagen del sidebar en pantalla completa (Lightbox)
+ */
+function openLightbox() {
+    const mainImg = document.getElementById('preview-image-main');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    if (mainImg && lightbox && lightboxImg && mainImg.src) {
+        lightboxImg.src = mainImg.src;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+    }
+}
+
+/**
+ * Cierra el Lightbox
+ */
+function closeLightbox() {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) {
+        lightbox.classList.remove('active');
+        document.body.style.overflow = ''; // Restaura scroll
     }
 }
