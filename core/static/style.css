@@ -827,7 +827,8 @@ body {
 .selected-preview {
     border-color: var(--accent) !important;
     background: var(--accent-glow) !important;
-    transform: translateX(10px);
+    box-shadow: 0 0 30px var(--accent-glow) !important;
+    /* No transform to avoid 'movement' as requested */
 }
 
 /* Suggestions / Related */
@@ -1414,12 +1415,15 @@ body {
 }
 
 .lightbox-content {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 95%;
+    max-height: 95%;
+    width: auto;
+    height: auto;
     border-radius: 12px;
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-    transform: scale(0.9);
+    transform: scale(0.95);
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(0,0,0,0.2);
 }
 
 .lightbox.active .lightbox-content {

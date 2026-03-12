@@ -244,7 +244,7 @@ function setPreview(el) {
     pane.closest('.sidebar').classList.add('active-preview');
 
     // Highlight visual
-    document.querySelectorAll('.result-card, .video-card, .shopping-card').forEach(c => c.classList.remove('selected-preview'));
+    document.querySelectorAll('.result-card, .video-card, .shopping-card, .image-card').forEach(c => c.classList.remove('selected-preview'));
     el.classList.add('selected-preview');
 
     // Scroll suave al top si es necesario o simplemente asegurar visibilidad
@@ -274,9 +274,9 @@ function openLightbox() {
     const lightboxImg = document.getElementById('lightbox-img');
 
     if (mainImg && lightbox && lightboxImg && mainImg.src) {
-        lightboxImg.src = mainImg.src;
+        lightboxImg.src = mainImg.src; // Ya es una URL proxificada
         lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+        document.body.style.overflow = 'hidden';
     }
 }
 
