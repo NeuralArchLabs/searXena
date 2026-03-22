@@ -3,7 +3,7 @@
     🌎 <b>English</b> | <a href="README.md">Versión en Español</a> | <a href="README.zh.md">中文</a>
   </p>
 
-  <img src="https://img.shields.io/badge/Sear-Xena-6a00ff?style=for-the-badge&logo=search&logoColor=white" alt="searXena Logo"/>
+  <img src="core/static/banner.svg" alt="searXena Logo" width="600"/>
   <h1>searXena</h1>
 
   <p>
