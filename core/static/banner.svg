@@ -1,6 +1,6 @@
-<svg viewBox="0 0 650 160" xmlns="http://www.w3.org/2000/svg" aria-label="searXena">
+<svg viewBox="0 0 650 160" xmlns="http://www.w3.org/2000/svg" aria-label="searXena Mascot Banner">
     <style>
-        /* Tipografía manual y espaciado para emular Outfit en GitHub */
+        /* Tipografía Premium local para emular Outfit */
         .text-searxena-wrapper {
             animation: morphSearxena 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             transform-origin: center;
@@ -14,8 +14,6 @@
             animation: morphDog 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             transform-origin: center;
             opacity: 0;
-            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-weight: 800;
             fill: url(#neonGrad);
         }
 
@@ -31,7 +29,7 @@
             transform-box: fill-box;
         }
 
-        .dog-nose {
+        .dog-nose-path {
             animation: sniff 0.25s infinite alternate ease-in-out;
             transform-origin: center;
             transform-box: fill-box;
@@ -63,9 +61,9 @@
 
         @keyframes morphDog {
             0%, 15% { opacity: 0; filter: blur(10px); transform: scale(0.95); }
-            35% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(-3deg); }
+            33% { opacity: 1; filter: blur(0px); transform: scale(1.08) rotate(-2deg); }
             45%, 55% { opacity: 1; filter: blur(0px); transform: scale(1) rotate(0deg); }
-            65% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(3deg); }
+            67% { opacity: 1; filter: blur(0px); transform: scale(1.08) rotate(2deg); }
             85%, 100% { opacity: 0; filter: blur(10px); transform: scale(0.95); }
         }
     </style>
@@ -92,17 +90,22 @@
             </text>
         </g>
 
-        <!-- Mascota (Morphing) -->
-        <g class="text-dog-wrapper">
-            <!-- Rostro del Perrito Vectorizado (V•ᴥ•V) -->
-            <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52">
-                V<tspan class="dog-eye">•</tspan>
-                <tspan style="opacity: 0;">ᴥ</tspan>
-                <tspan class="dog-eye">•</tspan>V
-            </text>
-            <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52">
-                ᴥ
-            </text>
+        <!-- Mascota Vectorizada (Morphing) -->
+        <g class="text-dog-wrapper" transform="translate(18, 2)">
+            <!-- Oreja Izquierda (V) -->
+            <path d="M -45 -15 L -35 15 L -25 -15" fill="none" stroke="url(#neonGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+            
+            <!-- Ojo Izquierdo (•) -->
+            <circle class="dog-eye" cx="-12" cy="0" r="4.5" fill="url(#neonGrad)" />
+            
+            <!-- Hocico Vectorizado (ᴥ) - Recreación del carácter U+1D1D -->
+            <path class="dog-nose-path" d="M -4 2 C -4 8, 0 8, 0 2 C 0 8, 4 8, 4 2" fill="none" stroke="url(#neonGrad)" stroke-width="6" stroke-linecap="round" />
+            
+            <!-- Ojo Derecho (•) -->
+            <circle class="dog-eye" cx="12" cy="0" r="4.5" fill="url(#neonGrad)" />
+            
+            <!-- Oreja Derecha (V) -->
+            <path d="M 25 -15 L 35 15 L 45 -15" fill="none" stroke="url(#neonGrad)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
         </g>
     </g>
 </svg>
