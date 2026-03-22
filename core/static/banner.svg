@@ -1,15 +1,22 @@
 <svg viewBox="0 0 650 160" xmlns="http://www.w3.org/2000/svg" aria-label="searXena">
     <style>
-        /* CSS ANIMATIONS */
+        /* Tipografía manual y espaciado para emular Outfit en GitHub */
         .text-searxena-wrapper {
             animation: morphSearxena 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             transform-origin: center;
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: -3.5px;
+            fill: url(#neonGrad);
         }
 
         .text-dog-wrapper {
             animation: morphDog 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
             transform-origin: center;
             opacity: 0;
+            font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-weight: 800;
+            fill: url(#neonGrad);
         }
 
         .mag-glass {
@@ -18,10 +25,6 @@
             opacity: 0;
         }
 
-        /* 
-           V•ᴥ•V (Puppy Faces) 
-           Vectorized components to avoid font dependence
-        */
         .dog-eye {
             animation: blinkEye 4s infinite;
             transform-origin: center;
@@ -41,29 +44,29 @@
 
         @keyframes sniff {
             from { transform: translateY(0px) scale(1); }
-            to { transform: translateY(-1.5px) scale(1.03); }
+            to { transform: translateY(-1.5px) scale(1.02); }
         }
 
         @keyframes sweepGlass {
             0%, 15% { transform: translate(145px, 8px); opacity: 0; }
             20% { transform: translate(145px, 8px); opacity: 1; }
-            40%, 60% { transform: translate(-115px, 8px); opacity: 1; }
+            35%, 65% { transform: translate(-115px, 8px); opacity: 1; }
             80% { transform: translate(145px, 8px); opacity: 1; }
             85%, 100% { transform: translate(145px, 8px); opacity: 0; }
         }
 
         @keyframes morphSearxena {
-            0%, 20% { opacity: 1; filter: blur(0px); transform: scale(1); }
-            40%, 60% { opacity: 0; filter: blur(12px); transform: scale(0.95); }
-            80%, 100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            0%, 15% { opacity: 1; filter: blur(0px); transform: scale(1); }
+            35%, 65% { opacity: 0; filter: blur(10px); transform: scale(0.95); }
+            85%, 100% { opacity: 1; filter: blur(0px); transform: scale(1); }
         }
 
         @keyframes morphDog {
-            0%, 20% { opacity: 0; filter: blur(12px); transform: scale(0.9); }
-            40% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(-3deg); }
+            0%, 15% { opacity: 0; filter: blur(10px); transform: scale(0.95); }
+            35% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(-3deg); }
             45%, 55% { opacity: 1; filter: blur(0px); transform: scale(1) rotate(0deg); }
-            60% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(3deg); }
-            80%, 100% { opacity: 0; filter: blur(12px); transform: scale(0.9); }
+            65% { opacity: 1; filter: blur(0px); transform: scale(1.1) rotate(3deg); }
+            85%, 100% { opacity: 0; filter: blur(10px); transform: scale(0.95); }
         }
     </style>
 
@@ -73,39 +76,33 @@
             <stop offset="50%" stop-color="#c084fc" />
             <stop offset="100%" stop-color="#e879f9" />
         </linearGradient>
-
-        <g id="puppy-face">
-            <!-- Ears -->
-            <path d="M -45,-10 L -30,10 L -20,-10 Z" fill="url(#neonGrad)" />
-            <path d="M 45,-10 L 30,10 L 20,-10 Z" fill="url(#neonGrad)" />
-            <!-- Eyes -->
-            <circle class="dog-eye" cx="-12" cy="0" r="4" fill="url(#neonGrad)" />
-            <circle class="dog-eye" cx="12" cy="0" r="4" fill="url(#neonGrad)" />
-            <!-- Snout/Nose (The ᴥ part) -->
-            <g class="dog-nose">
-               <path d="M -6,6 Q 0,12 6,6 L 0,6 Z" fill="url(#neonGrad)" />
-               <circle cx="0" cy="5" r="2.5" fill="url(#neonGrad)" />
-            </g>
-        </g>
     </defs>
 
     <g transform="translate(325, 80)">
-        <!-- MAGNIFYING GLASS -->
+        <!-- Lupa (mag-glass) -->
         <g class="mag-glass">
             <circle cx="0" cy="0" r="14" fill="none" stroke="url(#neonGrad)" stroke-width="4" />
             <line x1="10" y1="10" x2="24" y2="24" stroke="url(#neonGrad)" stroke-width="4" stroke-linecap="round" />
         </g>
 
-        <!-- TEXT searXena -->
-        <g class="text-searxena-wrapper" font-family="'Inter', 'Segoe UI', 'Roboto', 'Helvetica', sans-serif">
-            <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80" font-weight="800" fill="url(#neonGrad)" letter-spacing="-4">
+        <!-- Texto searXena -->
+        <g class="text-searxena-wrapper">
+            <text x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="80">
                 searXena
             </text>
         </g>
 
-        <!-- PUPPY MASCOT -->
+        <!-- Mascota (Morphing) -->
         <g class="text-dog-wrapper">
-             <use href="#puppy-face" />
+            <!-- Rostro del Perrito Vectorizado (V•ᴥ•V) -->
+            <text x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52">
+                V<tspan class="dog-eye">•</tspan>
+                <tspan style="opacity: 0;">ᴥ</tspan>
+                <tspan class="dog-eye">•</tspan>V
+            </text>
+            <text class="dog-nose" x="18" y="2" text-anchor="middle" dominant-baseline="central" font-size="52">
+                ᴥ
+            </text>
         </g>
     </g>
 </svg>
