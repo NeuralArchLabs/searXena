@@ -277,7 +277,7 @@
             </div>
 
             <footer class="article-footer">
-                <p>{{ {'en': 'Extracted by O-ZEN from', 'zh': '由 O-ZEN 提取自'}.get(lang, 'Extraído por O-ZEN de') }} <a href="{{ url }}" target="_blank">{{ data.metadata.site_name }}</a></p>
+                <p>{{ {'en': 'Extracted with <b>O-ZEN Engine</b> from', 'zh': '使用 <b>O-ZEN Engine</b> 提取自'}.get(lang, 'Extraído con <b>O-ZEN Engine</b> de') | safe }} <a href="{{ url }}" target="_blank">{{ data.metadata.site_name }}</a></p>
                 <p>© {{ data.metadata.author }} {{ data.metadata.date }}</p>
             </footer>
         </article>
