@@ -74,6 +74,7 @@ Historically, open-source metasearch engines focused on privacy (like SearXNG or
 | **Startup Time** | Slow (Starts Docker Engine, then boots the stack) | **Instantaneous** (Less than a second) |
 | **Installation Experience** | Complex, sysadmin commands oriented to Linux | **Simple** (One-click `.ps1` auto-setup script) |
 | **LLM Tool Calling** | External community adapters required | **Native JSON API** built from day one |
+| **Data Extraction (RAG)** | Noisy HTML scraping (external) | **O-ZEN Engine** native (LLM-ready reader mode) |
 
 Unless you want to rent a VPS in the cloud, searXena is the only logical, viable, and high-performance answer for the demanding Windows user who desires *in-house* data sovereignty.
 

@@ -74,6 +74,7 @@ Históricamente, los metabuscadores open-source enfocados en privacidad (como Se
 | **Tiempo de Arranque** | Lento (Inicia Docker Engine, luego levanta el stack) | **Instantáneo** (Menor a un segundo) |
 | **Experiencia de Instalación** | Compleja, comandos de sysadmin orientados a Linux | **Simple** (Scripts `.ps1` auto-configurables) |
 | **Tool Calling LLM** | Adaptadores comunitarios externos requeridos | **API JSON Nativa** construida desde el día uno |
+| **Extracción de Datos (RAG)** | Scraping ruidoso de HTML (externo) | **O-ZEN Engine** nativo (Modo lectura listo para LLM) |
 
 A menos que quieras rentar un VPS en la nube, searXena es la única respuesta lógica, viable y de altísimo rendimiento para el usuario de Windows exigente que desea soberanía de datos *in-house*.
 
