@@ -1377,8 +1377,8 @@ body {
 .back-to-top {
     position: fixed;
     bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
+    right: 30px; /* Default for mobile/smaller screens */
+    transform: translateY(20px);
     width: 60px;
     height: 60px;
     background: var(--accent);
@@ -1399,18 +1399,33 @@ body {
 .back-to-top.visible {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
 }
 
 .back-to-top:hover {
-    transform: translateX(-50%) translateY(-5px) scale(1.1);
+    transform: translateY(-5px) scale(1.1);
     box-shadow: 0 15px 40px var(--accent-glow);
     background: #7c3aed;
+}
+
+@media (min-width: 1250px) {
+    .back-to-top {
+        left: calc(50% + 225px); /* Positioned in the gap between results and sidebar */
+        right: auto;
+        transform: translateX(-50%) translateY(20px);
+    }
+    .back-to-top.visible {
+        transform: translateX(-50%) translateY(0);
+    }
+    .back-to-top:hover {
+        transform: translateX(-50%) translateY(-5px) scale(1.1);
+    }
 }
 
 @media (max-width: 768px) {
     .back-to-top {
         bottom: 30px;
+        right: 20px;
         width: 50px;
         height: 50px;
     }
