@@ -39,7 +39,8 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 - **Servidor Web:** [Uvicorn](https://www.uvicorn.org/) (Soporte nativo ASGI).
 - **Procesamiento de Red:** `httpx` para peticiones HTTP/2 paralelas y asíncronas de bajísima latencia.
 - **Frontend / Rendering:** [Jinja2](https://jinja.palletsprojects.com/) acoplado con Vanilla JavaScript (cero frameworks tipo React) y CSS3 Puro garantizando velocidad instantánea.
-- **Scraping Estructurado:** `lxml` y `BeautifulSoup4` acoplado con selectores modulares para el análisis del DOM.
+- **Scraping y Extracción:** `O-ZEN Engine` (Núcleo de extracción de alto rendimiento para Reader Mode, basado en Trafilatura).
+- **Procesadores DOM:** `lxml` y `selectolax` acoplados con selectores modulares.
 
 ## ✨ Características Principales
 
@@ -49,6 +50,7 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 * 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador privado minimizando la telemetría externa hospedado localmente en tu sistema.
 * 📱 **UI/UX Moderna y Dinámica:** Animaciones fluidas, modo oscuro ultra refinado ("Space Violet"), interfaz responsiva y separada categóricamente en pestañas (General, TI/Ciencia, Mapas, Videos, Imágenes).
 * 🌎 **Rich Snippets Consolidados:** Lectura enriquecida consolidando datos de Wikipedia o Wikidata en recuadros laterales de rápido consumo ("Infoboxes") al estilo de los grandes motores comerciales.
+* 🧘 **O-ZEN Engine (Modo Lectura):** Integración nativa de un motor de extracción industrial que permite leer artículos, blogs y enciclopedias sin distracciones, anuncios ni scripts intrusivos.
 
 ## 🥊 ¿Por qué no tenemos rival en Windows? (searXena vs El Resto)
 

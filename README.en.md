@@ -39,7 +39,8 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 - **Web Server:** [Uvicorn](https://www.uvicorn.org/) (Native ASGI support).
 - **Network Processing:** `httpx` for parallel and asynchronous HTTP/2 requests with ultra-low latency.
 - **Frontend / Rendering:** [Jinja2](https://jinja.palletsprojects.com/) coupled with Vanilla JavaScript (zero frameworks like React) and Pure CSS3 ensuring instant speed.
-- **Structured Scraping:** `lxml` and `BeautifulSoup4` coupled with modular selectors for DOM analysis.
+- **Scraping & Extraction:** `O-ZEN Engine` (High-performance extraction core for Reader Mode, based on Trafilatura).
+- **DOM Processors:** `lxml` and `selectolax` coupled with modular selectors for DOM analysis.
 
 ## ✨ Main Features
 
@@ -49,6 +50,7 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 * 📦 **100% Native on Windows:** Zero complex dependencies. Just clone, install the libraries with `pip`, run the main `.py` file, and you have a private search engine minimizing external telemetry hosted locally on your system.
 * 📱 **Modern and Dynamic UI/UX:** Fluid animations, ultra-refined dark mode ("Space Violet"), responsive interface, and categorically separated into tabs (General, IT/Science, Maps, Videos, Images).
 * 🌎 **Consolidated Rich Snippets:** Enriched reading consolidating data from Wikipedia or Wikidata in quick-consumption side boxes ("Infoboxes") in the style of major commercial engines.
+* 🧘 **O-ZEN Engine (Reader Mode):** Native integration of an industrial extraction engine that allows reading articles, blogs, and encyclopedias without distractions, ads, or intrusive scripts.
 
 ## 🥊 Why We Have No Rival on Windows (searXena vs The Rest)
 

@@ -10,23 +10,26 @@ import json
 from engine_manager import EngineManager
 import engines.suggestions as suggestions
 
-from urllib.parse import quote_plus, urlparse
+from urllib.parse import quote_plus, urlparse, unquote
 import re
+from extractor import ZenaExtractor
 
 from contextlib import asynccontextmanager
 
 # Configuración de base
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Inicializar EngineManager con persistencia
+# Inicializar EngineManager con persistencia y Extractor
 manager = EngineManager(BASE_DIR)
+extractor = ZenaExtractor()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: El manager ya se inicializa arriba, pero podríamos moverlo aquí si quisiéramos
+    # Startup
     yield
-    # Shutdown: Cerrar conexiones abiertas y limpiar tareas
+    # Shutdown
     await manager.close()
+    await extractor.close()
 
 app = FastAPI(title="searXena", lifespan=lifespan)
 
@@ -349,6 +352,45 @@ async def api_tools_schema():
         }
       }
     }
+
+@app.get("/extract")
+async def extract_view(request: Request, url: str):
+    """Vista de 'Modo Lectura' para un artículo."""
+    if not url:
+        return RedirectResponse(url="/")
+        
+    try:
+        data = await extractor.extract(url)
+        if "error" in data:
+            return templates.TemplateResponse("error.html", {
+                "request": request, 
+                "error": data["error"],
+                "url": url,
+                "lang": manager.settings.get("general", {}).get("default_lang", "es")
+            })
+            
+        return templates.TemplateResponse("reader.html", {
+            "request": request,
+            "data": data,
+            "url": url,
+            "lang": manager.settings.get("general", {}).get("default_lang", "es")
+        })
+    except Exception as e:
+        import traceback
+        error_msg = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
+        print(f"Extraction error: {error_msg}")
+        return templates.TemplateResponse("error.html", {
+            "request": request,
+            "error": f"Internal Extractor Error: {str(e)}",
+            "url": url,
+            "lang": manager.settings.get("general", {}).get("default_lang", "es")
+        })
+
+@app.post("/api/v1/extract")
+async def api_extract(url: str = Body(..., embed=True)):
+    """API para extraer contenido de una URL (JSON)."""
+    data = await extractor.extract(url)
+    return JSONResponse(data)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
