@@ -4,7 +4,6 @@
   </p>
 
   <img src="core/static/banner.svg" alt="searXena Logo" width="600"/>
-  <h1>searXena</h1>
 
   <p>
     **Search locally, search privately, search the old way.**
