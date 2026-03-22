@@ -59,9 +59,10 @@ Para optimizar el uso de searXena, instruye a tu modelo con lo siguiente:
 
 1.  **Prioriza Consultas Simples:** Envía solo el campo `query` si no hay necesidades especiales para ahorrar latencia.
 2.  **Uso de Categorías:** Usa `category: "it"` para temas técnicos y `category: "shopping"` para productos.
-3.  **Gestión de Contexto (Metadata):** Observa la propiedad `meta.has_more`. Si necesitas profundizar, re-lanza la búsqueda aumentando el `limit`.
-4.  **Lógica de Ranking Unificada:** searXena filtra automáticamente el ruido. En la categoría `it`, se priorizan fuentes de alta curación (**HackerNews, Wikipedia, StackOverflow**) y se ocultan repositorios vacíos o PDFs densos de ArXiv/GitHub/NPM.
-5.  **Respuestas Directas:** Los "Infoboxes" aparecen como el primer elemento en categorías generales. Úsalos como respuesta prioritaria.
+3.  **Extracción de Contenido (O-ZEN Engine):** searXena utiliza el motor nativo **O-ZEN** para procesar el contenido web, eliminando anuncios y ruido visual para entregar solo la información relevante a tu modelo.
+4.  **Gestión de Contexto (Metadata):** Observa la propiedad `meta.has_more`. Si necesitas profundizar, re-lanza la búsqueda aumentando el `limit`.
+5.  **Lógica de Ranking Unificada:** searXena filtra automáticamente el ruido. En la categoría `it`, se priorizan fuentes de alta curación (**HackerNews, Wikipedia, StackOverflow**) y se ocultan repositorios vacíos o PDFs densos de ArXiv/GitHub/NPM.
+6.  **Respuestas Directas:** Los "Infoboxes" aparecen como el primer elemento en categorías generales. Úsalos como respuesta prioritaria.
 
 ## Integración Rápida (Python)
 
