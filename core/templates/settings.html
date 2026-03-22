@@ -111,8 +111,8 @@
                     <div class="setting-row">
                         <div class="setting-info">
                             <h3>{{ {'en': 'Search Language', 'zh': '搜索语言'}.get(lang, 'Idioma de búsqueda') }}</h3>
-                            <p>{{ {'en': 'Prioritize results in this language.', 'zh': '优先显示此语言的结果。'}.get(lang,
-                                'Priorizar resultados en este idioma.') }}</p>
+                            <p>{{ {'en': 'Prioritize results in this language (Changes the app language).', 'zh': '优先显示此语言的结果 (同时更改应用语言)。'}.get(lang,
+                                'Priorizar resultados en este idioma (Cambia el idioma de la app).') }}</p>
                         </div>
                         <select name="language" class="select-custom" title="Seleccionar idioma">
                             <option value="es" {% if general.get('default_lang', 'es' )=='es' %}selected{% endif %}>
