@@ -3,7 +3,7 @@
     <a href="README.en.md">English</a> | <a href="README.md">Versión en Español</a> | 🌎 <b>中文版</b>
   </p>
 
-  <img src="core/static/banner.svg" alt="searXena Logo" width="600"/>
+  <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
 
   <p>
     **Search locally, search privately, search the old way.**
