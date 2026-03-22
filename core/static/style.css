@@ -777,14 +777,19 @@ body {
 }
 
 .preview-title {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: white;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     word-wrap: break-word;
-    word-break: break-word;
+    word-break: normal;
     min-width: 0;
-    line-height: 1.25;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .preview-url {

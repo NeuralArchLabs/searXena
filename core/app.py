@@ -12,7 +12,7 @@ import engines.suggestions as suggestions
 
 from urllib.parse import quote_plus, urlparse, unquote
 import re
-from extractor import ZenaExtractor
+from extractor import OZENExtractor
 
 from contextlib import asynccontextmanager
 
@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Inicializar EngineManager con persistencia y Extractor
 manager = EngineManager(BASE_DIR)
-extractor = ZenaExtractor()
+extractor = OZENExtractor(cache_ttl=manager.settings.get("general", {}).get("cache_ttl", 600))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

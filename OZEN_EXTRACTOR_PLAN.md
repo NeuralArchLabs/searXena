@@ -1,6 +1,6 @@
-# Plan de Implementación: ZenaExtractor (Reader Mode)
+# Plan de Implementación: OZENExtractor (Reader Mode)
 
-Se ha integrado un sistema de extracción de contenido propio en **searXena**, siguiendo la arquitectura y mecanismos de la librería Trafilatura pero adaptado al estilo y stack tecnológico del proyecto (`selectolax`, `httpx`, `FastAPI`).
+Se ha integrado un sistema de extracción de contenido propio en **searXena**, siguiendo la arquitectura y mecanismos del motor **O-ZEN Engine** pero adaptado al estilo y stack tecnológico del proyecto (`selectolax`, `httpx`, `FastAPI`).
 
 ## 🛠️ Arquitectura Implementada
 
@@ -13,7 +13,7 @@ Se ha integrado un sistema de extracción de contenido propio en **searXena**, s
 - **Limpieza Selectiva**: Eliminación proactiva de ruido (`script`, `style`, `noscript`, `iframe`, `nav`, `footer`).
 - **Heurística de Ruido**: Penalización de nodos con clases/IDs relacionados con publicidad, menús o Sidebars (`NEGATIVE_PATTERN`).
 
-### 3. Inteligencia de Extracción (Heurísticas Trafilatura)
+### 3. Inteligencia de Extracción (**O-ZEN Engine**)
 - **Densidad de Texto**: Cálculo de relevancia basado en `word_count / (link_density + 1)`.
 - **Bonificación Semántica**: Priorización de etiquetas `<article>` y `<main>`, así como atributos con términos clave (`POSITIVE_PATTERN`).
 - **Cascada de Fallback**: Si no se identifica un contenedor principal claro, el sistema retrocede al `<body>` o utiliza el nodo con mayor puntuación acumulada.

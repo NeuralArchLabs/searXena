@@ -144,7 +144,7 @@ Open your browser (Brave, Edge, Firefox) and enter directly into `http://127.0.0
 ## ⚖️ License and Legal Disclaimer
 
 *   **License:** This project is free software, distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-*   **Engine Credits:** The **O-ZEN Engine** extraction motor is a derivative work that utilizes and adapts the processing core of [Trafilatura](https://github.com/adbar/trafilatura) (Copyright Adrien Barbaresi), integrated here under AGPLv3 to ensure user data sovereignty and professional copyleft compliance.
+*   **Engine Credits:** The **O-ZEN Engine** extraction motor is a native component of searXena designed to ensure user data sovereignty and professional copyleft compliance.
 *   **Acknowledgments:** We recognize the technical foundation established by the SearXNG ecosystem, whose privacy standards have inspired this native architecture.
 *   **Information Sources:** searXena acts as a public signal aggregator. We recognize and respect the immense indexing work and technological value provided by the various supported external search engines (Google, Bing, DuckDuckGo, etc.). This software functions as a tool for visualizing and anonymizing public data for the end user.
 *   **Educational and Research Use:** searXena is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service. searXena provides a neutral search experience; if you require the personalization and conveniences based on tracking algorithms, we recommend using commercial search platforms directly.

@@ -99,14 +99,14 @@ def determine_returnstring(document: Document, options: Extractor) -> str:
     return normalize_unicode(returnstring)
 
 
-def trafilatura_sequence(
+def ozen_sequence(
     cleaned_tree: HtmlElement,
     cleaned_tree_backup: HtmlElement,
     tree_backup: HtmlElement,
     options: Extractor,
 ) -> Tuple[_Element, str, int]:
-    "Execute the standard cascade of extractors used by Trafilatura."
-    # Trafilatura's main extractor
+    "Execute the standard cascade of extractors used by O-ZEN Engine."
+    # O-ZEN Engine's main extractor
     postbody, temp_text, len_text = extract_content(cleaned_tree, options)
 
     # comparison with external extractors
@@ -283,7 +283,7 @@ def bare_extraction(
         if options.focus == "precision":
             cleaned_tree = prune_unwanted_nodes(cleaned_tree, REMOVE_COMMENTS_XPATH)
 
-        postbody, temp_text, len_text = trafilatura_sequence(
+        postbody, temp_text, len_text = ozen_sequence(
             cleaned_tree, cleaned_tree_backup, tree, options
         )
 

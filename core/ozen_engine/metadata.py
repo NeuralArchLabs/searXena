@@ -498,7 +498,7 @@ def extract_metadata(
         author_blacklist: Provide a blacklist of Author Names as set() to filter out authors.
 
     Returns:
-        A trafilatura.settings.Document containing the extracted metadata information or None.
+        An O-ZEN Engine Document containing the extracted metadata information or None.
         The Document class has .as_dict() method that will return a copy as a dict.
     """
     # init
