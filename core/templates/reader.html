@@ -241,7 +241,7 @@
     <header>
         <a href="javascript:history.back()" class="back-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Volver
+            {{ {'en': 'Back', 'zh': '返回'}.get(lang, 'Volver') }}
         </a>
         <div class="source-tag">{{ data.metadata.site_name }}</div>
     </header>
@@ -267,7 +267,7 @@
 
                     <span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                        {{ data.word_count }} palabras
+                        {{ data.word_count }} {{ {'en': 'words', 'zh': '字'}.get(lang, 'palabras') }}
                     </span>
                 </div>
             </div>
@@ -277,7 +277,7 @@
             </div>
 
             <footer class="article-footer">
-                <p>Extraído por searXena de <a href="{{ url }}" target="_blank">{{ data.metadata.site_name }}</a></p>
+                <p>{{ {'en': 'Extracted by O-ZEN from', 'zh': '由 O-ZEN 提取自'}.get(lang, 'Extraído por O-ZEN de') }} <a href="{{ url }}" target="_blank">{{ data.metadata.site_name }}</a></p>
                 <p>© {{ data.metadata.author }} {{ data.metadata.date }}</p>
             </footer>
         </article>
