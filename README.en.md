@@ -53,7 +53,7 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 
 ## ✨ Main Features
 
-* 🚀 **Asynchronous Parallel Metasearch:** A single query from you triggers dozens of asynchronous requests to global engines (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.), consolidating them in less than 1 second.
+* 🚀 **Asynchronous Parallel Metasearch:** A single query from you triggers dozens of asynchronous requests to multiple global engines and information sources, consolidating them in less than 1 second.
 * 🤖 **AI-First Integration:** Native JSON formatting and pre-built Tools schemas, ready to connect your LLM deployment to the internet without overheads or unnecessary HTML scraping.
 * 🛡️ **Privacy Protection:** Acts as a neutral interface between the user and the global web. Promotes anonymity by transparently centralizing requests through its own network engine.
 * 📦 **100% Native on Windows:** Zero complex dependencies. Just clone, install the libraries with `pip`, run the main `.py` file, and you have a private search engine minimizing external telemetry hosted locally on your system.
@@ -116,9 +116,11 @@ Through the `/api/v1/search` route, your assistant can automate queries and rece
 * **AI-Ready Endpoints:**
   * `GET /api/v1/tools_schema`: Returns a literal `function_declarations` schema directly injectable into your LLM with all available enabled parameters.
   * `POST /api/v1/search`: Communication webhook that executes the search and returns deep analytical metadata.
-* **Anti-Hallucination Smart Ranking:** The heuristic filter processes the returns in favor of the agent; under the "IT" category, it hides advertising sites from the LLM and feeds it directly from StackOverflow, MDN Web Docs, and substantial GitHub repositories.
+* **Anti-Hallucination Smart Ranking:** The heuristic filter processes the returns in favor of the agent; under the "IT" category, it hides advertising sites from the LLM and feeds it directly from official technical documentation and substantial open-source repositories.
 
 > **Building a RAG Agent?** Take a deep look at the payloads, pre-built headers, and System Prompt recommendations hosted in the [**AI Integration Guide**](AI_INTEGRATION_GUIDE.md) included in this official repository.
+>
+> 🚀 **Coming Soon:** searXena will be included by default in our project in development **mikuBot Dashboard**, a personal AI assistant focused on the general public, also open source and coming soon.
 
 ## 🚀 Installation and Usage (Local Mode)
 
@@ -139,14 +141,14 @@ Through the `/api/v1/search` route, your assistant can automate queries and rece
    ```powershell
    .\run.ps1
    ```
-Open your browser (Brave, Edge, Firefox) and enter directly into `http://127.0.0.1:8000`. searXena is now ready to mask you.
+Open your personal or trusted browser and enter directly into `http://127.0.0.1:8000`. searXena is now ready to mask you.
 
 ## ⚖️ License and Legal Disclaimer
 
 *   **License:** This project is free software, distributed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 *   **Engine Credits:** The **O-ZEN Engine** extraction motor is a native component of searXena designed to ensure user data sovereignty and professional copyleft compliance.
 *   **Acknowledgments:** We recognize the technical foundation established by the SearXNG ecosystem, whose privacy standards have inspired this native architecture.
-*   **Information Sources:** searXena acts as a public signal aggregator. We recognize and respect the immense indexing work and technological value provided by the various supported external search engines (Google, Bing, DuckDuckGo, etc.). This software functions as a tool for visualizing and anonymizing public data for the end user.
+*   **Information Sources:** searXena acts as a public signal aggregator. We recognize and respect the immense indexing work and technological value provided by the various external search engines. This software functions as a tool for visualizing and anonymizing public data for the end user.
 *   **Educational and Research Use:** searXena is provided solely for research and personal use purposes. The developer does not promote nor is responsible for the use of this tool to violate third-party Terms of Service. searXena provides a neutral search experience; if you require the personalization and conveniences based on tracking algorithms, we recommend using commercial search platforms directly.
 
 **LEGAL NOTICE:** searXena is distributed "AS IS", without warranties of any kind. The user assumes all legal responsibility derived from the use of the software, including compliance with local laws and contracts with external data providers. The developer is not responsible for IP blocks, third-party legal actions, or any other damages resulting from the use of this code.

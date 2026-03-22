@@ -53,7 +53,7 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 
 ## ✨ Características Principales
 
-* 🚀 **Metabúsqueda Paralela Asíncrona:** Una sola consulta tuya dispara docenas de solicitudes asíncronas a motores globales (Google, Bing, DuckDuckGo, Brave, GitHub, Wikipedia, MDN, NPM, etc.) consolidándolas en menos de 1 segundo.
+* 🚀 **Metabúsqueda Paralela Asíncrona:** Una sola consulta tuya dispara docenas de solicitudes asíncronas a múltiples fuentes de información globales consolidándolas en menos de 1 segundo.
 * 🤖 **Integración IA First:** Formato JSON y esquemas Tools pre-construidos nativos, listos para conectar tu despliegue LLM a internet sin overheads ni scraping de HTML innecesario.
 * 🛡️ **Protección de Privacidad:** Actúa como una interfaz neutral entre el usuario y la web global. Promueve el anonimato al centralizar las peticiones de forma transparente a través de su propio motor de red.
 * 📦 **100% Nativo en Windows:** Cero dependencias complejas. Solo clona, instala las librerías con `pip`, corre el archivo `.py` principal y tienes un buscador privado minimizando la telemetría externa hospedado localmente en tu sistema.
@@ -116,9 +116,11 @@ A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas 
 * **Endpoints Listos para IA:**
   * `GET /api/v1/tools_schema`: Devuelve un esquema literal `function_declarations` inyectable directo hacia tu LLM con todos los parámetros habilitados disponibles.
   * `POST /api/v1/search`: Webhook de comunicación que ejecuta la búsqueda y devuelve metadata analítica de profundidad.
-* **Smart Ranking Anti-Alucinaciones:** El filtro heurístico procesa los retornos a favor del agente; bajo la categoría "TI", oculta de cara al LLM los sitios publicitarios y le alimenta directamente de StackOverflow, la MDN Web Docs, y repositorios sustanciales de GitHub.
+* **Smart Ranking Anti-Alucinaciones:** El filtro heurístico procesa los retornos a favor del agente; bajo la categoría "TI", oculta de cara al LLM los sitios publicitarios y le alimenta directamente de documentación técnica oficial y repositorios de código abierto sustanciales.
 
 > **¿Construyendo un Agente RAG?** Echa un vistazo profundo a los payloads, headers preconstruidos y recomendaciones del System Prompt alojados en la [**Guía de Integración AI**](AI_INTEGRATION_GUIDE.md) incluida en este repositorio oficial.
+>
+> 🚀 **Próximamente:** searXena vendrá incluido por defecto en nuestro proyecto en desarrollo **mikuBot Dashboard**, un asistente personal de IA enfocado al público general, también de código abierto y disponible próximamente.
 
 ## 🚀 Instalación y Uso (Modo Local)
 
@@ -139,14 +141,14 @@ A través de la ruta `/api/v1/search`, tu asistente puede automatizar consultas 
    ```powershell
    .\run.ps1
    ```
-Abre tu navegador (Brave, Edge, Firefox) y entra directamente en `http://127.0.0.1:8000`. searXena ya está listo para enmascararte.
+Abre tu navegador de confianza y entra directamente en `http://127.0.0.1:8000`. searXena ya está listo para enmascararte.
 
 ## ⚖️ Licencia y Renuncia de Responsabilidad
 
 *   **Licencia:** Este proyecto es software libre, distribuido bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 *   **Créditos del Motor:** El motor de extracción **O-ZEN Engine** es un componente nativo de searXena diseñado para garantizar la soberanía de datos del usuario y el cumplimiento del copyleft profesional.
 *   **Agradecimientos:** Reconocemos la base teórica y técnica establecida por el ecosistema SearXNG, cuyos estándares de privacidad han inspirado esta arquitectura nativa.
-*   **Fuentes de Información:** searXena actúa como un agregador de señales públicas. Reconocemos y respetamos la inmensa labor de indexación y el valor tecnológico proporcionado por los distintos motores de búsqueda externos compatibles (Google, Bing, DuckDuckGo, etc.). Este software funciona como una herramienta de visualización y anonimización de datos públicos para el usuario final.
+*   **Fuentes de Información:** searXena actúa como un agregador de señales públicas. Reconocemos y respetamos la inmensa labor de indexación y el valor tecnológico proporcionado por los distintos motores de búsqueda externos. Este software funciona como una herramienta de visualización y anonimización de datos públicos para el usuario final.
 *   **Uso Educativo y de Investigación:** searXena se proporciona únicamente con fines de investigación y uso personal. El desarrollador no promueve ni se responsabiliza por el uso de esta herramienta para violar los Términos de Servicio de terceros. searXena ofrece una experiencia de búsqueda neutral; si requiere de la personalización y comodidades basadas en algoritmos de seguimiento, le recomendamos el uso directo de plataformas comerciales de búsqueda.
 
 **AVISO LEGAL:** searXena se distribuye "TAL CUAL", sin garantías de ningún tipo. El usuario asume toda la responsabilidad legal derivada del uso del software, incluyendo el cumplimiento de las leyes locales y los contratos con proveedores de datos externos. El desarrollador no se hace responsable de bloqueos de IP, acciones legales de terceros o cualquier otro perjuicio derivado del uso de este código.
