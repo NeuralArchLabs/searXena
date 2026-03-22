@@ -3,7 +3,11 @@
     <a href="README.en.md">English</a> | <a href="README.md">Versión en Español</a> | 🌎 <b>中文版</b>
   </p>
 
-  
+  <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
+
+  <p>
+    **Search locally, search privately, search the old way.**
+
   <p>
     <img src="https://img.shields.io/badge/O--ZEN_Engine-2.0.0-6a00ff?style=for-the-badge&logoColor=white" alt="O-ZEN Engine"/>
     <img src="https://img.shields.io/badge/Windows-Native-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows Native"/>
@@ -11,11 +15,6 @@
     <img src="https://img.shields.io/badge/AI_Infra-Zero_API_Keys-ff9b00?style=for-the-badge" alt="AI Infra"/>
     <img src="https://img.shields.io/badge/License-AGPLv3-blueviolet?style=for-the-badge" alt="AGPLv3"/>
   </p>
-
-  <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
-
-  <p>
-    **Search locally, search privately, search the old way.**
 
 一个敏捷的原生元搜索引擎和高性能数据基础设施，旨在回归网络初衷。专为追求纯净搜索体验的人类以及需要绕过商业 API 密钥限制、降低开发成本的 AI 智能体而设计。
   </p>

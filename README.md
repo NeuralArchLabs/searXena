@@ -3,7 +3,11 @@
     <a href="README.en.md">English</a> | 🌎 <b>Versión en Español</b> | <a href="README.zh.md">中文</a>
   </p>
 
-  
+  <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
+
+  <p>
+    **Search locally, search privately, search the old way.**
+
   <p>
     <img src="https://img.shields.io/badge/O--ZEN_Engine-2.0.0-6a00ff?style=for-the-badge&logoColor=white" alt="O-ZEN Engine"/>
     <img src="https://img.shields.io/badge/Windows-Native-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows Native"/>
@@ -12,12 +16,7 @@
     <img src="https://img.shields.io/badge/License-AGPLv3-blueviolet?style=for-the-badge" alt="AGPLv3"/>
   </p>
 
-  <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
-
-  <p>
-    **Search locally, search privately, search the old way.**
-
-Un metabuscador nativo y una infraestructura de datos de alto rendimiento creada para recuperar la web útil. Diseñado para humanos que buscan relevancia sin anuncios y para agentes de IA que necesitan explorar internet sin las complicaciones de las llaves API comerciales y sus costos asociados.
+  Un metabuscador nativo y una infraestructura de datos de alto rendimiento creada para recuperar la web útil. Diseñado para humanos que buscan relevancia sin anuncios y para agentes de IA que necesitan explorar internet sin las complicaciones de las llaves API comerciales y sus costos asociados.
   </p>
   
   <p>
