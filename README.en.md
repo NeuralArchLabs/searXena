@@ -39,7 +39,7 @@ searXena leverages modern and ultra-lightweight technologies to enable hyper-flu
 - **Web Server:** [Uvicorn](https://www.uvicorn.org/) (Native ASGI support).
 - **Network Processing:** `httpx` for parallel and asynchronous HTTP/2 requests with ultra-low latency.
 - **Frontend / Rendering:** [Jinja2](https://jinja.palletsprojects.com/) coupled with Vanilla JavaScript (zero frameworks like React) and Pure CSS3 ensuring instant speed.
-- **Scraping & Extraction:** `O-ZEN Engine` (High-performance extraction core for Reader Mode, based on Trafilatura).
+- **Scraping & Extraction:** `O-ZEN Engine` (High-performance native extraction core).
 - **DOM Processors:** `lxml` and `selectolax` coupled with modular selectors for DOM analysis.
 
 ## ✨ Main Features

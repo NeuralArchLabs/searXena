@@ -1,0 +1,28 @@
+O-ZEN Engine Legal Notice & License
+===================================
+
+This directory contains the O-ZEN Engine, a native content extraction component 
+integrated into the searXena project.
+
+The O-ZEN Engine is a derivative work, partially based on and distilled from 
+the Trafilatura project (Copyright (c) 2018-present Adrien Barbaresi).
+
+Copyright (c) 2026 searXena Project Contributors.
+
+This software is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+-------------------------------------------------------------------------------
+The O-ZEN Engine is redistributed as an integral part of searXena under the 
+project's primary GNU AGPLv3 license for the end-user, while maintaining the 
+original Apache 2.0 terms for the inherited source files.
+-------------------------------------------------------------------------------

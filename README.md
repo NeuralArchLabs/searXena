@@ -39,7 +39,7 @@ searXena aprovecha tecnologías modernas y ultraligeras para permitir una ejecuc
 - **Servidor Web:** [Uvicorn](https://www.uvicorn.org/) (Soporte nativo ASGI).
 - **Procesamiento de Red:** `httpx` para peticiones HTTP/2 paralelas y asíncronas de bajísima latencia.
 - **Frontend / Rendering:** [Jinja2](https://jinja.palletsprojects.com/) acoplado con Vanilla JavaScript (cero frameworks tipo React) y CSS3 Puro garantizando velocidad instantánea.
-- **Scraping y Extracción:** `O-ZEN Engine` (Núcleo de extracción de alto rendimiento para Reader Mode, basado en Trafilatura).
+- **Scraping y Extracción:** `O-ZEN Engine` (Núcleo de extracción de alto rendimiento nativo).
 - **Procesadores DOM:** `lxml` y `selectolax` acoplados con selectores modulares.
 
 ## ✨ Características Principales
