@@ -3,6 +3,15 @@
     <a href="README.en.md">English</a> | 🌎 <b>Versión en Español</b> | <a href="README.zh.md">中文</a>
   </p>
 
+  
+  <p>
+    <img src="https://img.shields.io/badge/O--ZEN_Engine-2.0.0-6a00ff?style=for-the-badge&logoColor=white" alt="O-ZEN Engine"/>
+    <img src="https://img.shields.io/badge/Windows-Native-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows Native"/>
+    <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI"/>
+    <img src="https://img.shields.io/badge/AI_Infra-Zero_API_Keys-ff9b00?style=for-the-badge" alt="AI Infra"/>
+    <img src="https://img.shields.io/badge/License-AGPLv3-blueviolet?style=for-the-badge" alt="AGPLv3"/>
+  </p>
+
   <img src="core/static/searxena-banner-v2.svg" alt="searXena Logo" width="600"/>
 
   <p>
