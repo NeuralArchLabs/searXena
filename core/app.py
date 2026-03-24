@@ -42,7 +42,7 @@ templates.env.filters["urlencode"] = lambda s: quote_plus(str(s)) if s else ""
 @app.get("/")
 async def index(request: Request):
     lang = manager.settings.get("general", {}).get("default_lang", "es")
-    return templates.TemplateResponse("index.html", {"request": request, "lang": lang})
+    return templates.TemplateResponse(request, "index.html", {"lang": lang})
 
 @app.get("/robots.txt")
 async def robots():
@@ -68,8 +68,7 @@ async def get_settings(request: Request):
             "weight": module.WEIGHT
         })
     general_settings = manager.settings.get("general", {})
-    return templates.TemplateResponse("settings.html", {
-        "request": request, 
+    return templates.TemplateResponse(request, "settings.html", {
         "engines": engine_list,
         "general": general_settings,
         "lang": manager.settings.get("general", {}).get("default_lang", "es")
@@ -250,8 +249,7 @@ async def search(request: Request):
     ]
     random_tip = random.choice(tips_pool).get(lang, tips_pool[0]['en'])
 
-    response = templates.TemplateResponse("results.html", {
-        "request": request, 
+    response = templates.TemplateResponse(request, "results.html", {
         "query": q, 
         "results": full_results,
         "related_searches": related_searches,
@@ -362,15 +360,13 @@ async def extract_view(request: Request, url: str):
     try:
         data = await extractor.extract(url)
         if "error" in data:
-            return templates.TemplateResponse("error.html", {
-                "request": request, 
+            return templates.TemplateResponse(request, "error.html", {
                 "error": data["error"],
                 "url": url,
                 "lang": manager.settings.get("general", {}).get("default_lang", "es")
             })
             
-        return templates.TemplateResponse("reader.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "reader.html", {
             "data": data,
             "url": url,
             "lang": manager.settings.get("general", {}).get("default_lang", "es")
@@ -379,8 +375,7 @@ async def extract_view(request: Request, url: str):
         import traceback
         error_msg = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
         print(f"Extraction error: {error_msg}")
-        return templates.TemplateResponse("error.html", {
-            "request": request,
+        return templates.TemplateResponse(request, "error.html", {
             "error": f"Internal Extractor Error: {str(e)}",
             "url": url,
             "lang": manager.settings.get("general", {}).get("default_lang", "es")
