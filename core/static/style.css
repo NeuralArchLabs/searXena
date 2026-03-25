@@ -24,6 +24,30 @@ body {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    /* Firefox Standard Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--glass-border) var(--bg-dark);
+}
+
+/* WebKit/Chromium Custom Scrollbar Global */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--glass-border);
+    border-radius: 20px;
+    border: 3px solid var(--bg-dark);
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 
 /* Common UI Elements */
