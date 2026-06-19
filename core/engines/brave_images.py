@@ -6,6 +6,7 @@ WEIGHT = 1.0
 
 def request(query, params):
     params["url"] = f"https://search.brave.com/images?q={query}"
+    params["headers"]["Accept-Encoding"] = "gzip, deflate"
 
 def response(resp):
     results = []
