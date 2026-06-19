@@ -6,19 +6,20 @@ CATEGORIES = ["general"]
 WEIGHT = 1.8
 
 def request(query, params):
-    # DDG HTML version - GET request, stable and clean
+    # DDG HTML version - POST request to bypass bot block/captcha
     lang = params.get("language", "es")
     kl = LANGUAGE_MAP.get("duckduckgo", {}).get(lang, "wt-wt")
     
-    query_params = {
+    params["url"] = "https://html.duckduckgo.com/html/"
+    params["method"] = "POST"
+    params["data"] = {
         "q": query,
         "kl": kl,
-        "df": ""
+        "b": ""
     }
-    params["url"] = f"https://duckduckgo.com/html/?{urlencode(query_params)}"
-    params["method"] = "GET"
-    params["headers"]["Referer"] = "https://duckduckgo.com/"
+    params["headers"]["Referer"] = "https://html.duckduckgo.com/"
     params["headers"]["Accept-Language"] = f"{lang},en;q=0.8"
+    params["headers"]["Origin"] = "https://html.duckduckgo.com"
 
 def response(resp):
     results = []
