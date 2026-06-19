@@ -19,6 +19,7 @@ class EngineManager:
         self.engines = {}
         self._cache = {} 
         self._client = None
+        self._client_h2 = None
         self.load_engines()
 
         # Bangs map (SearXNG style)
@@ -76,21 +77,35 @@ class EngineManager:
         except Exception:
             pass
 
-    async def get_client(self):
-        if self._client is None or self._client.is_closed:
-            self._client = httpx.AsyncClient(
-                follow_redirects=True, 
-                timeout=self.settings["general"].get("timeout", 4.0),
-                limits=httpx.Limits(max_keepalive_connections=100, max_connections=500),
-                http2=False,  # HTTP/1.1: mejor compatibilidad (Yahoo/Brave fallan con HTTP/2)
-                verify=False
-            )
-        return self._client
+    async def get_client(self, http2: bool = False):
+        if http2:
+            if self._client_h2 is None or self._client_h2.is_closed:
+                self._client_h2 = httpx.AsyncClient(
+                    follow_redirects=True,
+                    timeout=self.settings["general"].get("timeout", 4.0),
+                    limits=httpx.Limits(max_keepalive_connections=100, max_connections=500),
+                    http2=True,
+                    verify=False
+                )
+            return self._client_h2
+        else:
+            if self._client is None or self._client.is_closed:
+                self._client = httpx.AsyncClient(
+                    follow_redirects=True, 
+                    timeout=self.settings["general"].get("timeout", 4.0),
+                    limits=httpx.Limits(max_keepalive_connections=100, max_connections=500),
+                    http2=False,  # HTTP/1.1: mejor compatibilidad (Yahoo/Brave fallan con HTTP/2)
+                    verify=False
+                )
+            return self._client
 
     async def close(self):
         if self._client:
             await self._client.aclose()
             self._client = None
+        if self._client_h2:
+            await self._client_h2.aclose()
+            self._client_h2 = None
         # También cerrar el cliente de sugerencias si fue importado
         if "engines.suggestions" in sys.modules:
             sugg = sys.modules["engines.suggestions"]
@@ -239,6 +254,7 @@ class EngineManager:
 
     async def call_engine(self, engine, query, category, pageno, timeout_limit, lang=None):
         try:
+            use_h2 = getattr(engine, "HTTP2", False)
             params = {
                 "query": query,
                 "pageno": pageno,
@@ -252,14 +268,13 @@ class EngineManager:
                     "User-Agent": gen_useragent(),
                     "Accept-Language": f"{lang or self.settings.get('general', {}).get('default_lang', 'es')},en;q=0.8",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-                    "Accept-Encoding": "gzip, deflate",  # Sin brotli: evita DecodingError en Brave/Yahoo
                     "Connection": "keep-alive"
                 },
                 "data": {},
                 "cookies": {},
                 "timeout": timeout_limit,
                 "engine_data": {},
-                "client": await self.get_client()
+                "client": await self.get_client(http2=use_h2)
             }
             
             # Ejecutar lógica del motor
@@ -289,15 +304,14 @@ class EngineManager:
                 else:
                     results = engine.response(FakeResponse(params))
             elif params.get("url"):
-                client = await self.get_client()
+                client = params["client"]
                 if params["method"] == "POST":
                     resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
                 else:
                     resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
                 
                 engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-2] if '.' in engine.__name__ else engine.__name__)
-                if engine_name in ["google", "bing", "duckduckgo"]:
-                        print(f"DEBUG: {engine_name} status: {resp.status_code}")
+                print(f"DEBUG: engine={engine_name} status={resp.status_code}")
                 
                 if resp.status_code in [200, 202]:
                     class ResponseWrapper:
