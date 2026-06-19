@@ -54,7 +54,9 @@ def response(resp):
                     img_src = item.get("img_src")
                     
                 thumbnail_obj = item.get("thumbnail", {})
-                thumbnail_src = thumbnail_obj.get("url") if isinstance(thumbnail_obj, dict) else None
+                thumbnail_src = None
+                if isinstance(thumbnail_obj, dict):
+                    thumbnail_src = thumbnail_obj.get("src") or thumbnail_obj.get("url")
 
                 if url and img_src and img_src.startswith("http"):
                     results.append({
