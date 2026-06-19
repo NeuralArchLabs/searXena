@@ -83,10 +83,10 @@
                     {% if featured.source == 'wikipedia' or 'wikimedia' in featured.img_src %}
                     <img src="{{ featured.img_src if featured.img_src.startswith('http') else 'https:' ~ featured.img_src }}"
                         alt="Info Image" class="featured-image"
-                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                        onerror="this.onerror=null; this.style.opacity='0'; this.style.display='none';">
                     {% else %}
                     <img src="/proxify?url={{ featured.img_src | urlencode }}" alt="Info Image" class="featured-image"
-                        onerror="this.onerror=null; this.src='/static/placeholder.png'; this.style.opacity='0';">
+                        onerror="this.onerror=null; this.style.opacity='0'; this.style.display='none';">
                     {% endif %}
                     {% endif %}
                     <div class="infobox-body-main">
@@ -128,7 +128,7 @@
                     data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
                     data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
                     <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
-                        alt="{{ result.title }}" loading="lazy" onerror="this.src='/static/placeholder.png';">
+                        alt="{{ result.title }}" loading="lazy" onerror="this.onerror=null; this.src='/static/placeholder.png';">
                     <div class="image-info">
                         <div class="image-source">{{ result.sources|join(', ') }}</div>
                         <div class="image-title-text">{{ result.title }}</div>
@@ -150,7 +150,7 @@
                     {% if result.img_src or result.thumbnail_src %}
                     <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer nofollow">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
-                            class="video-thumb" alt="{{ result.title }}" onerror="this.src='/static/placeholder.png';">
+                            class="video-thumb" alt="{{ result.title }}" onerror="this.onerror=null; this.src='/static/placeholder.png';">
                     </a>
                     {% endif %}
                     <div class="video-details">
@@ -179,12 +179,12 @@
                     <div class="shopping-image-container">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
                             class="shopping-thumb" alt="{{ result.title }}"
-                            onerror="this.parentElement.style.display='none';">
+                            onerror="this.onerror=null; this.parentElement.style.display='none';">
                     </div>
                     {% else %}
                     <div class="shopping-image-container no-image">
                         <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=128&domain=' ~ result.url) | urlencode }}"
-                            class="shopping-store-icon" alt="Favicon" onerror="this.style.display='none';">
+                            class="shopping-store-icon" alt="Favicon" onerror="this.onerror=null; this.style.display='none';">
                     </div>
                     {% endif %}
                     <div class="shopping-body">
@@ -245,7 +245,7 @@
                         <div class="result-header">
                             <div class="title-container">
                                 <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=32&domain=' ~ result.url) | urlencode }}"
-                                    alt="Favicon" class="result-favicon" onerror="this.style.opacity='0';">
+                                    alt="Favicon" class="result-favicon" onerror="this.onerror=null; this.style.opacity='0';">
                                 <a href="{{ result.url }}" class="result-title" target="_blank"
                                     rel="noopener noreferrer nofollow">{{ result.title|safe }}</a>
                             </div>
@@ -274,7 +274,7 @@
                     <div class="result-thumbnail-container">
                         <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
                             alt="{{ result.title }}" class="result-thumbnail"
-                            onerror="this.parentElement.style.display='none';">
+                            onerror="this.onerror=null; this.parentElement.style.display='none';">
                     </div>
                     {% endif %}
                 </div>
@@ -311,10 +311,10 @@
                 {% if info.img_src %}
                 {% if info.source == 'wikipedia' or 'wikimedia' in info.img_src %}
                 <img src="{{ info.img_src if info.img_src.startswith('http') else 'https:' ~ info.img_src }}" alt=""
-                    class="infobox-image" onerror="this.style.display='none';">
+                    class="infobox-image" onerror="this.onerror=null; this.style.display='none';">
                 {% else %}
                 <img src="/proxify?url={{ info.img_src | urlencode }}" alt="" class="infobox-image"
-                    onerror="this.style.display='none';">
+                    onerror="this.onerror=null; this.style.display='none';">
                 {% endif %}
                 {% endif %}
                 <p class="infobox-content-sidebar">{{ info.content|striptags }}</p>

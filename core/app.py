@@ -119,37 +119,53 @@ from fastapi.responses import StreamingResponse
 @app.get("/proxify")
 async def proxify(url: str):
     """Proxy local para imágenes y recursos externos para proteger la IP del usuario."""
-    if not url: return Response(status_code=400)
-    
-    # Intentar limpiar URLs de Google que a veces vienen mal
+    if not url:
+        return Response(status_code=400)
+
+    # Limpiar URLs de Google redirect
     if "google.com/url?q=" in url:
-        from urllib.parse import unquote
         url = unquote(url.split("?q=")[1].split("&")[0])
-        
+
     # Arreglar URLs relativas de Wikipedia
     if url.startswith("//"):
         url = "https:" + url
 
-    async def stream_resource():
-        client = await manager.get_client()
-        try:
-            # Limitar tamaño de descarga a 10MB para evitar OOM y abusos
-            max_size = 10 * 1024 * 1024
-            downloaded = 0
-            async with client.stream("GET", url, timeout=10.0) as resp:
-                if resp.status_code == 200:
-                    async for chunk in resp.aiter_bytes():
-                        downloaded += len(chunk)
-                        if downloaded > max_size:
-                            break
-                        yield chunk
-        except Exception:
-            pass
+    # Rechazar URLs que no sean HTTP(S) — evita SSRF a recursos internos
+    if not url.startswith("http://") and not url.startswith("https://"):
+        return Response(status_code=400)
 
-    headers = {
-        "Cache-Control": "public, max-age=604800" # Cachear localmente por una semana
-    }
-    return StreamingResponse(stream_resource(), media_type="image/png", headers=headers)
+    client = await manager.get_client()
+    try:
+        max_size = 10 * 1024 * 1024  # 10 MB máximo
+        downloaded = 0
+
+        async with client.stream("GET", url, timeout=10.0, follow_redirects=True) as resp:
+            # Si el servidor remoto falla, devolver 404 limpio (NO stream vacío)
+            if resp.status_code != 200:
+                return Response(status_code=404)
+
+            # Detectar content-type real (jpg, png, gif, webp, etc.)
+            content_type = resp.headers.get("content-type", "image/jpeg").split(";")[0].strip()
+            if not content_type.startswith("image/"):
+                content_type = "image/jpeg"
+
+            headers = {"Cache-Control": "public, max-age=604800"}
+
+            async def stream_bytes():
+                nonlocal downloaded
+                async for chunk in resp.aiter_bytes():
+                    downloaded += len(chunk)
+                    if downloaded > max_size:
+                        break
+                    yield chunk
+
+            return StreamingResponse(stream_bytes(), media_type=content_type, headers=headers)
+
+    except Exception:
+        # En caso de timeout o error de red: 404 limpio, NO stream vacío
+        return Response(status_code=404)
+
+
 
 # Meta-búsqueda orquestada con paginación
 @app.get("/search")
@@ -229,12 +245,24 @@ async def search(request: Request):
             
     if category == "shopping":
         results = reorganized
-    
+
+    # Sanitizar img_src y thumbnail_src: eliminar URLs relativas o inválidas
+    # antes de que lleguen al template para evitar loops de recarga en onerror
+    def _is_valid_img_url(u):
+        return bool(u) and (u.startswith("http://") or u.startswith("https://") or u.startswith("data:image/"))
+
+    for r in results + infoboxes:
+        if not _is_valid_img_url(r.get("img_src")):
+            r.pop("img_src", None)
+        if not _is_valid_img_url(r.get("thumbnail_src")):
+            r.pop("thumbnail_src", None)
+
     # Los infoboxes (como OSM) son esenciales en General y Mapas
     if category in ["general", "maps"]:
         full_results = infoboxes + results
     else:
         full_results = results
+
 
     # Sistema de Sugerencias Pro dinámicas
     tips_pool = [
