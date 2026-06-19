@@ -38,6 +38,43 @@ async def fetch_vqd(query: str, client) -> Optional[str]:
     except Exception:
         return None
 
+def detect_block(html: str, status_code: int, url: str) -> tuple[bool, str]:
+    """
+    Detecta bloqueos de WAF, Cloudflare y anti-bot genéricos.
+    Retorna (is_blocked: bool, reason: str).
+    """
+    if not html:
+        return False, ""
+
+    html_lower = html.lower()
+
+    # Cloudflare challenge
+    if (
+        "checking your browser" in html_lower
+        or "cf-browser-verification" in html_lower
+        or "__cf_chl_" in html
+        or "cloudflare" in html_lower and "challenge" in html_lower
+        or '<div id="cf-wrapper"' in html
+    ):
+        return True, "cloudflare"
+
+    # Generic WAF / bot detection
+    if (
+        "access denied" in html_lower
+        or "403 forbidden" in html_lower
+        or "bot detection" in html_lower
+        or "human verification" in html_lower
+        or "ddos protection" in html_lower
+        or "enable javascript and cookies" in html_lower
+    ):
+        return True, "waf"
+
+    # HTTP status blocks
+    if status_code in (403, 429, 503):
+        return True, f"http_{status_code}"
+
+    return False, ""
+
 # Mapeo de idiomas para motores específicos
 LANGUAGE_MAP = {
     "google": {
