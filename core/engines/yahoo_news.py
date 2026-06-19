@@ -1,3 +1,6 @@
+import urllib.request
+import urllib.parse
+import asyncio
 from selectolax.parser import HTMLParser
 from urllib.parse import urlencode, unquote
 from utils import LANGUAGE_MAP
@@ -15,14 +18,32 @@ def request(query, params):
         "b": (params.get("pageno", 1) - 1) * 10 + 1,
         "setlang": lang_code
     }
-    params["url"] = f"https://news.search.yahoo.com/search?{urlencode(query_params)}"
+    
+    # Bypass httpx fingerprint block by using urllib
+    real_url = f"https://news.search.yahoo.com/search?{urlencode(query_params)}"
+    params["engine_data"]["real_url"] = real_url
+    params["url"] = "internal://yahoo_news"
     params["headers"]["Accept-Language"] = f"{lang_code},{lang};q=0.9,en;q=0.8"
-    params["headers"]["Accept-Encoding"] = "gzip, deflate"
+    params["headers"]["Accept-Encoding"] = "identity"
     params["headers"]["Referer"] = "https://news.search.yahoo.com/"
 
-def response(resp):
+async def response(resp):
+    real_url = resp.search_params["engine_data"]["real_url"]
+    headers = resp.search_params["headers"]
+    
+    def fetch():
+        req = urllib.request.Request(real_url, headers=headers)
+        with urllib.request.urlopen(req, timeout=5) as response_obj:
+            return response_obj.read().decode('utf-8', errors='ignore')
+            
+    try:
+        html = await asyncio.to_thread(fetch)
+    except Exception as e:
+        print(f"Error fetching Yahoo News via urllib: {e}")
+        return []
+        
     results = []
-    tree = HTMLParser(resp.text)
+    tree = HTMLParser(html)
     
     for node in tree.css('div.NewsArticle, .algo-sr, li div.compTitle'):
         title_node = node.css_first('h4 a, h3 a, a.d-ib')

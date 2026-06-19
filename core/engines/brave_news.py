@@ -1,41 +1,64 @@
-from selectolax.parser import HTMLParser
+import json
 
 CATEGORIES = ["news"]
 WEIGHT = 1.5
 
+def resolve(val, data_list, memo=None):
+    if memo is None:
+        memo = {}
+        
+    if isinstance(val, int):
+        if val in memo:
+            return memo[val]
+        if 0 <= val < len(data_list):
+            memo[val] = "CIRCULAR"
+            res = resolve(data_list[val], data_list, memo)
+            memo[val] = res
+            return res
+        return val
+    elif isinstance(val, dict):
+        return {k: resolve(v, data_list, memo) for k, v in val.items()}
+    elif isinstance(val, list):
+        return [resolve(x, data_list, memo) for x in val]
+    else:
+        return val
+
 def request(query, params):
     offset = (params.get("pageno", 1) - 1) * 20
     lang = params.get("language", "es")
-    params["url"] = f"https://search.brave.com/news?q={query}&offset={offset}&hl={lang}"
+    params["url"] = f"https://search.brave.com/news/__data.json?q={query}&offset={offset}&hl={lang}"
+    params["headers"]["Accept"] = "*/*"
     params["headers"]["Accept-Encoding"] = "gzip, deflate"
 
 def response(resp):
     results = []
-    tree = HTMLParser(resp.text)
-    
-    for node in tree.css('div.snippet'):
-        title_link = node.css_first('a.l1, a[href^="http"]')
-        title_node = node.css_first('.title')
-        snippet_node = node.css_first('.description, .content, p')
+    try:
+        data = resp.json()
+        node_data = data["nodes"][1]["data"]
+        resolved_root = resolve(0, node_data)
         
-        # Extraer fuente o tiempo si lo hay
-        source_node = node.css_first('.netloc, .source')
-        time_node = node.css_first('.age, .time')
-        
-        if title_link and title_node:
-            url = title_link.attributes.get('href', '')
-            if url and "brave.com" not in url and url.startswith('http'):
-                
-                source_txt = source_node.text().strip() if source_node else "Noticia"
-                time_txt = time_node.text().strip() if time_node else ""
-                
-                content_prefix = f"{source_txt} ({time_txt}): " if time_txt else f"{source_txt}: "
-                snippet_txt = snippet_node.text().strip() if snippet_node else ""
-                
-                results.append({
-                    "title": title_node.text().strip(),
-                    "url": url,
-                    "content": content_prefix + snippet_txt,
-                    "source": "brave_news"
-                })
+        resp_obj = resolved_root.get("response", {}) if isinstance(resolved_root, dict) else {}
+        if isinstance(resp_obj, dict):
+            news_obj = resp_obj.get("news", {})
+            if isinstance(news_obj, dict):
+                items = news_obj.get("results", [])
+                for item in items:
+                    title = item.get("title", "")
+                    url = item.get("url", "")
+                    description = item.get("description", "")
+                    age = item.get("age", "")
+                    
+                    profile = item.get("profile", {})
+                    source_name = profile.get("name", "Noticia") if isinstance(profile, dict) else "Noticia"
+                    
+                    if url and "brave.com" not in url and url.startswith("http"):
+                        content_prefix = f"{source_name} ({age}): " if age else f"{source_name}: "
+                        results.append({
+                            "title": title,
+                            "url": url,
+                            "content": content_prefix + description,
+                            "source": "brave_news"
+                        })
+    except Exception as e:
+        print(f"Error parsing Brave News: {e}")
     return results
