@@ -56,11 +56,6 @@ def response(resp):
                 thumbnail_obj = item.get("thumbnail", {})
                 thumbnail_src = thumbnail_obj.get("url") if isinstance(thumbnail_obj, dict) else None
 
-                # Las URLs de Brave CDN (imgs.search.brave.com) requieren cookies de sesión
-                # y siempre fallan desde el proxy — usamos la URL original como thumbnail
-                if thumbnail_src and "search.brave.com" in thumbnail_src:
-                    thumbnail_src = img_src
-
                 if url and img_src and img_src.startswith("http"):
                     results.append({
                         "template": "images.html",

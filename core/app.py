@@ -139,7 +139,14 @@ async def proxify(url: str):
         try:
             max_size = 10 * 1024 * 1024
             downloaded = 0
-            async with client.stream("GET", url, timeout=10.0) as resp:
+            from utils import gen_useragent
+            headers = {
+                "User-Agent": gen_useragent(),
+                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+                "Connection": "keep-alive"
+            }
+            async with client.stream("GET", url, headers=headers, timeout=10.0) as resp:
                 if resp.status_code == 200:
                     async for chunk in resp.aiter_bytes():
                         downloaded += len(chunk)

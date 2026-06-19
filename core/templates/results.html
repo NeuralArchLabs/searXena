@@ -344,7 +344,8 @@
                     
                     <!-- Area para preview de imagen grande -->
                     <div id="preview-image-container" class="preview-image-container" onclick="openLightbox()">
-                        <img id="preview-image-main" src="" alt="Full Preview" class="preview-image-main">
+                        <img id="preview-image-main" src="" alt="" class="preview-image-main"
+                            onerror="this.onerror=null; this.parentElement.style.display='none';">
                     </div>
 
                     <p id="preview-content" class="preview-content-text"></p>
