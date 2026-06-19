@@ -7,96 +7,94 @@ from selectolax.parser import HTMLParser
 CATEGORIES = ["general", "news", "videos", "images"]
 WEIGHT = 1.5
 
+# Mobile UAs bypass Google's JS-only anti-bot page
+_MOBILE_UAS = [
+    "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+    "Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/124.0.0.0 Mobile/15E148 Safari/604.1",
+]
+
 def request(query, params):
-    # Google with udm=14 (clean Web view, less bot detection)
     offset = (params.get("pageno", 1) - 1) * 10
-    
-    lang_code = LANGUAGE_MAP.get("google", {}).get(params.get("language"), "es")
-    
-    query_params = {
-        "q": query,
-        "hl": lang_code,
-        "start": offset,
-        "udm": 14, # New Web search view
-    }
-    
-    if params.get("category") == "news":
+    lang = params.get("language", "es")
+    lang_code = LANGUAGE_MAP.get("google", {}).get(lang, "es")
+    category = params.get("category", "general")
+
+    query_params = {"q": query, "hl": lang_code, "start": offset}
+
+    if category == "news":
         query_params["tbm"] = "nws"
-        query_params.pop("udm", None)
-    elif params.get("category") == "videos":
+    elif category == "videos":
         query_params["tbm"] = "vid"
-        query_params.pop("udm", None)
-    elif params.get("category") == "images":
+    elif category == "images":
         query_params["tbm"] = "isch"
-        query_params.pop("udm", None)
-        
+
     params["url"] = f"https://www.google.com/search?{urlencode(query_params)}"
-    params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+    params["headers"]["User-Agent"] = random.choice(_MOBILE_UAS)
+    params["headers"]["Accept-Encoding"] = "gzip, deflate"
     params["headers"]["Referer"] = "https://www.google.com/"
-    
-    import random
+
     cb_val = random.randint(20230000, 20249999)
-    # Consent cookies to bypass 'Before you continue'
-    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.{params.get('language', 'es')}+FX+414"
+    params["cookies"]["CONSENT"] = f"YES+cb.{cb_val}-04-p0.{lang}+FX+414"
+    params["cookies"]["SOCS"] = "CAESHAgBEhJmb3NfbGVzcy9zZWFyY2gvaG9tZQ"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
-    
-    # 1. Main Search Results (Desktop/Modern)
-    # Improved selectors: .g, .MjjYud, .Gx5S9b (mobile)
-    for node in tree.css('div.g, .MjjYud, .Gx5S9b, div.WwS1ce, .ZIN69b, .MjjYud'):
-        title_node = node.css_first('h3, .vv14be, .BNeawe')
-        url_node = node.css_first('a[href]')
-        
-        # Snippets: .VwiC3b (modern), .s31JSe (mobile), .st (old)
-        snippet_node = node.css_first('div.VwiC3b, .BNeawe, .s3v9rd, span.st, .yXK7lf')
-        
-        # Miniatures
-        img_node = node.css_first('img')
-        
-        if title_node and url_node:
-            url = _clean_url(url_node.attributes.get('href', ''))
-            if _valid_url(url):
-                title = title_node.text().strip()
-                if title:
-                    item = {
-                        "title": title,
-                        "url": url,
-                        "content": snippet_node.text().strip() if snippet_node else "Google result.",
-                        "source": "google"
-                    }
-                    if img_node:
-                        src = img_node.attributes.get('src') or img_node.attributes.get('data-src')
-                        if src and 'http' in src:
-                            item["thumbnail_src"] = src
-                            item["img_src"] = src
-                    results.append(item)
-    
-    # 2. Ultra-Fallback: Any <h3> inside an <a> or similar
+
+    # Mobile Google layout uses these selectors
+    # .BVG0Nb = container, .DKV0Md = title, .iCjJK = snippet (mobile)
+    # Standard: div.g, div.MjjYud, h3.LC20lb, div.VwiC3b
+    selectors = [
+        ('div.MjjYud', 'h3.LC20lb, h3, .DKV0Md', 'div.VwiC3b, .iCjJK, .BNeawe'),
+        ('div.g', 'h3', 'div.VwiC3b, span.st, p'),
+        ('.Gx5S9b', 'h3, .vv14be', '.BNeawe, .s3v9rd'),
+        ('.kp-blk', 'h3', 'p'),
+    ]
+
+    for container_sel, title_sel, snippet_sel in selectors:
+        for node in tree.css(container_sel):
+            title_node = node.css_first(title_sel)
+            url_node = node.css_first('a[href]')
+            snippet_node = node.css_first(snippet_sel)
+
+            if title_node and url_node:
+                url = _clean_url(url_node.attributes.get('href', ''))
+                if _valid_url(url):
+                    title = title_node.text().strip()
+                    if title and len(title) > 3:
+                        results.append({
+                            "title": title,
+                            "url": url,
+                            "content": snippet_node.text().strip() if snippet_node else "",
+                            "source": "google"
+                        })
+        if results:
+            break
+
+    # Fallback: any h3 in a link
     if not results:
-        # Search for any h3 link
         for node in tree.css('h3'):
             link = node.parent
-            # Try to find the closest wrapping link
             limit = 5
             while link and link.tag != 'a' and limit > 0:
                 link = link.parent
                 limit -= 1
-            
             if link and link.tag == 'a':
                 url = _clean_url(link.attributes.get('href', ''))
                 if _valid_url(url):
-                    results.append({
-                        "title": node.text().strip(),
-                        "url": url,
-                        "content": "Ver en Google.",
-                        "source": "google"
-                    })
+                    title = node.text().strip()
+                    if title:
+                        results.append({
+                            "title": title,
+                            "url": url,
+                            "content": "",
+                            "source": "google"
+                        })
 
     # Images (isch)
-    if "tbm=isch" in resp.url:
-        for node in tree.css('div.isv-r, .isv-r'):
+    if "tbm=isch" in getattr(resp, 'url', ''):
+        for node in tree.css('div.isv-r, .isv-r, .oj9v4c'):
             img_node = node.css_first('img')
             link_node = node.css_first('a[href^="http"]')
             if img_node:
@@ -125,4 +123,7 @@ def _clean_url(url):
 
 def _valid_url(url):
     """Check if URL is a valid external result."""
-    return url.startswith('http') and "google.com" not in url
+    return (url.startswith('http') and
+            "google.com" not in url and
+            "google." not in url[:22] and
+            len(url) > 10)

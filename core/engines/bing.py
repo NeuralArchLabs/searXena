@@ -33,6 +33,7 @@ def request(query, params):
 
     params["url"] = f"https://www.bing.com/search?{urlencode(query_params)}"
     params["headers"]["Accept-Language"] = f"{lang_code},{lang};q=0.9,en;q=0.8"
+    params["headers"]["Accept-Encoding"] = "gzip, deflate"
 
 def response(resp):
     results = []

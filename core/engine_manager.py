@@ -82,8 +82,8 @@ class EngineManager:
                 follow_redirects=True, 
                 timeout=self.settings["general"].get("timeout", 4.0),
                 limits=httpx.Limits(max_keepalive_connections=100, max_connections=500),
-                http2=True,
-                verify=False # Mantener compatibilidad pero en un pool único
+                http2=False,  # HTTP/1.1: mejor compatibilidad (Yahoo/Brave fallan con HTTP/2)
+                verify=False
             )
         return self._client
 
@@ -252,6 +252,7 @@ class EngineManager:
                     "User-Agent": gen_useragent(),
                     "Accept-Language": f"{lang or self.settings.get('general', {}).get('default_lang', 'es')},en;q=0.8",
                     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate",  # Sin brotli: evita DecodingError en Brave/Yahoo
                     "Connection": "keep-alive"
                 },
                 "data": {},

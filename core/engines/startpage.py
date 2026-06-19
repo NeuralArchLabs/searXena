@@ -17,27 +17,31 @@ def request(query, params):
         "language": sp_lang,
         "engine0": "v1all",
         "t": "device",
-        "abp": "-1"
+        "abp": "-1",
+        "pg": params.get("pageno", 1),
     }
     params["url"] = "https://www.startpage.com/sp/search"
     params["method"] = "POST"
     params["data"] = query_params
     params["headers"]["Referer"] = "https://www.startpage.com/"
     params["headers"]["Origin"] = "https://www.startpage.com"
-    params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+    params["headers"]["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    params["headers"]["Accept-Encoding"] = "gzip, deflate"
+    params["cookies"]["preferences"] = "language_ui=english&search_engine=google&results_per_page=20"
+    params["cookies"]["post_parameters"] = "1"
 
 def response(resp):
     results = []
     tree = HTMLParser(resp.text)
-    
-    # Robust selectors for Startpage
-    for node in tree.css('div.result, .result, article.result'):
-        title_link = node.css_first('a.result-link, a.result-title, h2 a')
-        snippet_node = node.css_first('p.description, .result-snippet, .description')
-        
+
+    # Selectores modernos y fallback
+    for node in tree.css('div.result, article.result, .w-gl__result'):
+        title_link = node.css_first('a.w-gl__result-title, a.result-link, a.result-title, h2 a, h3 a')
+        snippet_node = node.css_first('p.w-gl__result-description, p.description, .result-snippet, .description')
+
         if title_link:
             url = title_link.attributes.get('href', '')
-            if url.startswith('http') and not "startpage.com" in url:
+            if url and url.startswith('http') and "startpage.com" not in url:
                 results.append({
                     "title": title_link.text().strip(),
                     "url": url,
