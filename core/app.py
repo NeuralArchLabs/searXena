@@ -134,37 +134,23 @@ async def proxify(url: str):
     if not url.startswith("http://") and not url.startswith("https://"):
         return Response(status_code=400)
 
-    client = await manager.get_client()
-    try:
-        max_size = 10 * 1024 * 1024  # 10 MB máximo
-        downloaded = 0
+    async def stream_resource():
+        client = await manager.get_client()
+        try:
+            max_size = 10 * 1024 * 1024
+            downloaded = 0
+            async with client.stream("GET", url, timeout=10.0) as resp:
+                if resp.status_code == 200:
+                    async for chunk in resp.aiter_bytes():
+                        downloaded += len(chunk)
+                        if downloaded > max_size:
+                            break
+                        yield chunk
+        except Exception:
+            pass
 
-        async with client.stream("GET", url, timeout=10.0, follow_redirects=True) as resp:
-            # Si el servidor remoto falla, devolver 404 limpio (NO stream vacío)
-            if resp.status_code != 200:
-                return Response(status_code=404)
-
-            # Detectar content-type real (jpg, png, gif, webp, etc.)
-            content_type = resp.headers.get("content-type", "image/jpeg").split(";")[0].strip()
-            if not content_type.startswith("image/"):
-                content_type = "image/jpeg"
-
-            headers = {"Cache-Control": "public, max-age=604800"}
-
-            async def stream_bytes():
-                nonlocal downloaded
-                async for chunk in resp.aiter_bytes():
-                    downloaded += len(chunk)
-                    if downloaded > max_size:
-                        break
-                    yield chunk
-
-            return StreamingResponse(stream_bytes(), media_type=content_type, headers=headers)
-
-    except Exception:
-        # En caso de timeout o error de red: 404 limpio, NO stream vacío
-        return Response(status_code=404)
-
+    headers = {"Cache-Control": "public, max-age=604800"}
+    return StreamingResponse(stream_resource(), media_type="image/jpeg", headers=headers)
 
 
 # Meta-búsqueda orquestada con paginación
