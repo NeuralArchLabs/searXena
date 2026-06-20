@@ -13,9 +13,10 @@ import os
 import sys
 import json
 import logging
+import re
 import time
-from typing import Optional, Dict, Any
-from urllib.parse import urlparse
+from typing import Optional, Dict, Any, List
+from urllib.parse import urlparse, urljoin, quote_plus
 
 # --- O-ZEN ENGINE ---
 try:
@@ -140,6 +141,18 @@ class OZENExtractor:
                 include_comments=False, include_images=True, include_tables=True
             )
 
+            # --- Post-process: clean ad placeholder labels ---
+            content_html = self._clean_ad_placeholders(content_html)
+
+            # --- Post-process: recover any images missed by O-ZEN ---
+            content_html = self._inject_missing_images(content_html, html, url)
+
+            # Hero image from metadata
+            hero_image = (doc.image or "").strip()
+            # If og:image is in content already, no need to show it twice
+            if hero_image and quote_plus(hero_image) in (content_html or ""):
+                hero_image = ""
+
             result = {
                 "metadata": {
                     "title": doc.title or "Sin título",
@@ -147,6 +160,7 @@ class OZENExtractor:
                     "date": doc.date or "",
                     "description": doc.description or "",
                     "image": doc.image or "",
+                    "hero_image": hero_image,
                     "site_name": doc.sitename or urlparse(url).netloc,
                     "url": doc.url or url
                 },
@@ -159,7 +173,339 @@ class OZENExtractor:
             return result
         except Exception as e:
             logger.error(f"Error en O-ZEN Engine: {e}")
-            return {"error": f"Error en el motor O-ZEN: {str(e)}"}
+            return {"error": f"Error en O-ZEN Engine: {e}"}
+
+    def _inject_missing_images(self, content_html: Optional[str], raw_html: str, page_url: str) -> Optional[str]:
+        """
+        Scan raw HTML for images that O-ZEN missed (lazy-loading, srcset-only patterns).
+        Uses a two-phase approach:
+          1. Prune known boilerplate sections (related posts, sidebars, ads, nav) first.
+          2. Only accept images that are genuine article content, not external link thumbnails.
+        Hard cap: 8 images maximum to avoid flooding the reader.
+        """
+        if not content_html or not raw_html:
+            return content_html
+
+        try:
+            from copy import deepcopy
+            from urllib.parse import unquote_plus, urlparse as _urlparse, urljoin
+            from lxml.html import fromstring as html_fromstring
+            from lxml.etree import strip_elements
+
+            tree = html_fromstring(raw_html)
+            page_domain = _urlparse(page_url).netloc.lower().lstrip('www.')
+
+            # ── Phase 1: prune boilerplate containers ────────────────────────────
+            # Any element whose class/id contains these strings is considered noise
+            BOILERPLATE_KEYWORDS = (
+                'related', 'recommend', 'suggestion', 'you-may', 'you-might',
+                'more-from', 'also-read', 'more-on', 'trending', 'popular',
+                'sidebar', 'widget', 'aside', 'newsletter', 'subscribe',
+                'advertisement', 'adsense', 'promo', 'sponsor', 'promoted',
+                'comment', 'disqus', 'navigation', 'breadcrumb', 'pagination',
+                'footer', 'header', 'menu', 'nav-', '-nav', 'social-share',
+                'share-', '-share', 'tag-cloud', 'author', 'avatar', 'profile', 'bio',
+                'cookie', 'gdpr', 'banner', 'sticky', 'modal', 'popup',
+                'outbrain', 'taboola', 'revcontent', 'zergnet',
+            )
+
+            work_tree = deepcopy(tree)
+            to_remove = []
+            for el in work_tree.iter('*'):
+                el_class = (el.get('class') or '').lower()
+                el_id    = (el.get('id')    or '').lower()
+                combined = el_class + ' ' + el_id
+                if any(kw in combined for kw in BOILERPLATE_KEYWORDS):
+                    to_remove.append(el)
+            # Remove collected elements (parent-first to avoid stale refs)
+            removed_ids = set()
+            for el in to_remove:
+                try:
+                    el_id = id(el)
+                    if el_id not in removed_ids and el.getparent() is not None:
+                        el.getparent().remove(el)
+                        removed_ids.add(el_id)
+                except Exception:
+                    pass
+
+            def _normalize_img_url(url_str: str) -> str:
+                """Normalize image URLs by stripping common size patterns and query arguments for deduplication."""
+                try:
+                    parsed = _urlparse(url_str)
+                    path = parsed.path.lower()
+                    
+                    # Remove common size/resolution patterns: -150x150, _840_560, -500x333, _500_333, etc.
+                    path = re.sub(r'[-_]\d+x\d+(?=\.[a-z]{3,4}$)', '', path)
+                    path = re.sub(r'[-_]\d+_\d+(?=\.[a-z]{3,4}$)', '', path)
+                    
+                    # Strip specific folder structures containing resolutions if they occur (e.g. /width/500/)
+                    path = re.sub(r'/width/\d+/', '/', path)
+                    path = re.sub(r'/height/\d+/', '/', path)
+                    
+                    # Remove size query params: ?w=500, ?width=500, ?resize=500, etc.
+                    query = parsed.query.lower()
+                    query = re.sub(r'(width|height|w|h|resize|size|scale|fit)=\d+&?', '', query)
+                    query = query.rstrip('&')
+                    
+                    norm = f"{parsed.netloc}{path}"
+                    if query:
+                        norm += f"?{query}"
+                    return norm
+                except Exception:
+                    return url_str.lower()
+
+            # ── Phase 2: collect already-proxified images from extracted content ─
+            existing_srcs: set = set()
+            existing_re = re.compile(r'proxify\?url=([^"&\s]+)')
+            for m in existing_re.finditer(content_html):
+                existing_srcs.add(unquote_plus(m.group(1)))
+            
+            existing_normalized = {_normalize_img_url(src) for src in existing_srcs}
+
+            # ── Phase 3: find candidate images in the pruned tree ────────────────
+            # Priority order: article > main > generic content containers
+            candidate_xpaths = [
+                './/article//img',
+                './/main//img',
+                './/*[contains(@class,"article-body")]//img',
+                './/*[contains(@class,"article-content")]//img',
+                './/*[contains(@class,"post-content")]//img',
+                './/*[contains(@class,"entry-content")]//img',
+                './/*[contains(@class,"story-body")]//img',
+                './/*[contains(@class,"article")]//img',
+                './/*[contains(@class,"content")]//img',
+            ]
+
+            def _resolve_img(img_el) -> Optional[str]:
+                """Extract the best available image URL from an element."""
+                # Direct src attributes, prioritise data-src patterns (lazy loading)
+                for attr in ('data-src', 'data-lazy-src', 'data-original',
+                             'data-lazy', 'data-image', 'data-full-src', 'src'):
+                    val = (img_el.get(attr) or '').strip()
+                    if val and val.startswith('http'):
+                        return val
+                # srcset / data-srcset — pick the widest entry
+                for attr in ('srcset', 'data-srcset'):
+                    srcset = (img_el.get(attr) or '').strip()
+                    if srcset:
+                        best_url, best_w = '', 0
+                        for entry in srcset.split(','):
+                            parts = entry.strip().split()
+                            if not parts or not parts[0].startswith('http'):
+                                continue
+                            w = 0
+                            if len(parts) > 1:
+                                try:
+                                    w = int(parts[1].rstrip('w'))
+                                except ValueError:
+                                    pass
+                            if w > best_w:
+                                best_w, best_url = w, parts[0]
+                        if best_url:
+                            return best_url
+                # Relative URL fallback
+                src = (img_el.get('src') or '').strip()
+                if src and not src.startswith('data:'):
+                    return urljoin(page_url, src)
+                return None
+
+            def _is_inside_external_link(img_el) -> bool:
+                """Return True if the image is wrapped in an <a> pointing to a different page/article."""
+                current = img_el.getparent()
+                depth = 0
+                while current is not None and depth < 5:
+                    if current.tag == 'a':
+                        href = (current.get('href') or '').strip()
+                        if href:
+                            abs_href = urljoin(page_url, href)
+                            parsed_link = _urlparse(abs_href)
+                            link_domain = parsed_link.netloc.lower().lstrip('www.')
+                            
+                            # If it's a link directly to an image file (lightbox), don't treat it as external article
+                            if any(parsed_link.path.lower().endswith(ext) for ext in ('.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg')):
+                                break
+                            
+                            # If pointing to a different domain, it's an external link
+                            if link_domain != page_domain:
+                                return True
+                                
+                            # If pointing to the same domain but a different path, it's a related article link
+                            page_path = _urlparse(page_url).path.rstrip('/')
+                            link_path = parsed_link.path.rstrip('/')
+                            if page_path != link_path:
+                                return True
+                        break
+                    current = current.getparent()
+                    depth += 1
+                return False
+
+            def _is_inside_boilerplate(img_el) -> bool:
+                """Double-check: traverse ancestors for boilerplate markers."""
+                current = img_el.getparent()
+                depth = 0
+                while current is not None and depth < 8:
+                    el_class = (current.get('class') or '').lower()
+                    el_id    = (current.get('id')    or '').lower()
+                    combined = el_class + ' ' + el_id
+                    if any(kw in combined for kw in BOILERPLATE_KEYWORDS):
+                        return True
+                    current = current.getparent()
+                    depth += 1
+                return False
+
+            # URL and ALT fragments to always skip
+            NOISE_TERMS = (
+                'pixel', 'tracking', 'beacon', '.svg', 'logo', 'avatar',
+                'author', 'profile', 'byline', 'placeholder', 'spinner', 'spacer',
+                '1x1', '0x0', 'blank', 'gravatar', 'wp-includes', 'comentario',
+                'comment', 'button', 'badge', 'ad-', '-ad', 'advertisement',
+                'banner', 'newsletter', 'subscribe'
+            )
+
+            seen: set = set()
+            seen_normalized: set = set()
+            recovered_imgs: list = []
+            MAX_IMAGES = 6  # hard cap — keep the reader focused
+
+            for xpath in candidate_xpaths:
+                if len(recovered_imgs) >= MAX_IMAGES:
+                    break
+                for img in work_tree.xpath(xpath):
+                    if len(recovered_imgs) >= MAX_IMAGES:
+                        break
+
+                    img_url = _resolve_img(img)
+                    if not img_url:
+                        continue
+
+                    norm_url = _normalize_img_url(img_url)
+                    if img_url in seen or norm_url in seen_normalized or norm_url in existing_normalized:
+                        continue
+
+                    # Grab alt early to check it for noise
+                    alt = (img.get('alt') or '').strip()
+
+                    # Skip noise in URLs and ALTs
+                    if any(p in img_url.lower() for p in NOISE_TERMS) or any(p in alt.lower() for p in NOISE_TERMS):
+                        continue
+
+                    # Skip tiny declared dimensions (icons / thumbnails)
+                    try:
+                        w = int(img.get('width', 300))
+                        h = int(img.get('height', 200))
+                        if w < 150 or h < 80:
+                            continue
+                    except (ValueError, TypeError):
+                        pass
+
+                    # Skip images inside external/related-article links
+                    if _is_inside_external_link(img):
+                        continue
+
+                    # Belt-and-suspenders boilerplate check on the original tree
+                    if _is_inside_boilerplate(img):
+                        continue
+
+                    seen.add(img_url)
+                    seen_normalized.add(norm_url)
+
+                    # Grab figcaption if the parent is a <figure>
+                    parent = img.getparent()
+                    caption = ''
+                    if parent is not None and parent.tag == 'figure':
+                        fig_cap = parent.find('.//figcaption')
+                        if fig_cap is not None:
+                            caption = (fig_cap.text_content() or '').strip()
+
+                    recovered_imgs.append((img_url, alt, caption or alt))
+
+            if not recovered_imgs:
+                return content_html
+
+            # ── Phase 4: build and inject the gallery ─────────────────────────────
+            img_blocks = []
+            for img_url, alt, caption in recovered_imgs:
+                proxified = f"/proxify?url={quote_plus(img_url)}"
+                safe_caption = caption.replace('<', '&lt;').replace('>', '&gt;')
+                cap_html = (f'<figcaption class="reader-img-caption">{safe_caption}</figcaption>'
+                            if safe_caption else '')
+                img_blocks.append(
+                    f'<figure class="reader-recovered-img">'
+                    f'<img src="{proxified}" alt="{alt}" loading="lazy">'
+                    f'{cap_html}</figure>'
+                )
+
+            gallery_section = (
+                f'<div class="recovered-images-section">'
+                f'<hr class="reader-divider">'
+                + '\n'.join(img_blocks) +
+                f'</div>'
+            )
+
+            for closing in ('</body>', '</html>'):
+                if closing in content_html:
+                    return content_html.replace(closing, gallery_section + closing, 1)
+            return content_html + gallery_section
+
+        except Exception as e:
+            logger.warning(f"Image recovery failed: {e}")
+            return content_html
+
+    def _clean_ad_placeholders(self, content_html: Optional[str]) -> Optional[str]:
+        """Remove any elements (paragraphs, divs, etc.) that contain only ad labels (e.g. 'PUBLICIDAD')."""
+        if not content_html:
+            return content_html
+
+        try:
+            from lxml.html import fromstring as html_fromstring, tostring
+            
+            # Check if it has html or body tags
+            has_html_wrapper = ('<html' in content_html.lower() or '<body' in content_html.lower())
+            
+            if not has_html_wrapper:
+                tree = html_fromstring(f"<div>{content_html}</div>")
+            else:
+                tree = html_fromstring(content_html)
+            
+            AD_LABELS = {
+                'publicidad', 'anuncio', 'anuncios', 'advertisement', 'advertising',
+                'sponsored', 'patrocinado', 'patrocinados', 'promo', 'promocion',
+                'promoción', 'ads', 'ad'
+            }
+            
+            to_remove = []
+            for el in tree.iter('*'):
+                if el.tag in ('p', 'div', 'span', 'strong', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'):
+                    text = (el.text_content() or '').strip()
+                    if text:
+                        cleaned = ''.join(c for c in text if c.isalnum() or c.isspace()).lower().strip()
+                        if cleaned in AD_LABELS:
+                            to_remove.append(el)
+            
+            # Remove elements (parent-first to avoid stale refs)
+            removed_ids = set()
+            for el in to_remove:
+                try:
+                    el_id = id(el)
+                    if el_id not in removed_ids and el.getparent() is not None:
+                        el.getparent().remove(el)
+                        removed_ids.add(el_id)
+                except Exception:
+                    pass
+            
+            res = tostring(tree, encoding='utf-8').decode('utf-8')
+            if not has_html_wrapper:
+                if res.startswith('<div>') and res.endswith('</div>'):
+                    res = res[5:-6]
+                elif '<body>' in res:
+                    start = res.find('<body>') + 6
+                    end = res.rfind('</body>')
+                    res = res[start:end]
+            return res
+            
+        except Exception as e:
+            logger.warning(f"Error cleaning ad placeholders: {e}")
+            return content_html
 
     async def _extract_site_specific(self, url: str) -> Optional[Dict]:
         """Site-specific extraction using O-ZEN's site_extractors module."""

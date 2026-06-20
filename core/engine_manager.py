@@ -8,7 +8,7 @@ import time
 from typing import List, Dict, Any, Set
 from collections import defaultdict
 
-from utils import gen_useragent
+from utils import gen_useragent, detect_block
 
 class EngineManager:
     def __init__(self, base_dir: str):
@@ -36,7 +36,8 @@ class EngineManager:
             "!pd": "pydoc", "!gl": "gitlab", "!sf": "sourceforge",
             "!do": "docker", "!eb": "ebay", "!wh": "wallhaven",
             "!ls": "librestock", "!fl": "flickr", "!gp": "giphy",
-            "!pi": "pinterest", "!un": "unsplash"
+            "!pi": "pinterest", "!un": "unsplash", "!am": "amazon",
+            "!az": "amazon", "!ml": "mercadolibre"
         }
 
         # Ad-block global list (SearXNG style)
@@ -52,6 +53,14 @@ class EngineManager:
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        ]
+
+        self.mobile_ua_list = [
+            "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+            "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+            "Mozilla/5.0 (Linux; Android 12; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+            "Mozilla/5.0 (Linux; Android 13; SM-S911B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36"
         ]
 
     def load_settings(self):
@@ -156,7 +165,7 @@ class EngineManager:
                 except Exception:
                     pass
 
-    async def search(self, query: str, category: str = "general", pageno: int = 1, lang: str = None, include_engines: list = None, exclude_engines: list = None):
+    async def search(self, query: str, category: str = "general", pageno: int = 1, lang: str = None, include_engines: list = None, exclude_engines: list = None, bypass_cache: bool = False):
         # 1. Handle Bangs
         target_engine = None
         clean_query = query
@@ -175,7 +184,7 @@ class EngineManager:
         # ya que el limit se aplica en la capa de la API sobre el set completo cacheado.
         cache_key = f"{clean_query}:{category}:{pageno}:{target_engine}:{lang}:{include_engines}:{exclude_engines}"
         now = time.time()
-        if cache_key in self._cache:
+        if not bypass_cache and cache_key in self._cache:
             results, expiry = self._cache[cache_key]
             if now < expiry:
                 return results
@@ -224,6 +233,7 @@ class EngineManager:
                 tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit, lang=lang))
 
         # Parallel Wait (Buscamos que sean ultra-veloces)
+        results_list = []
         try:
             # Añadimos un pequeño margen sobre el timeout_limit para que wait_for no mate antes de tiempo el httpx interno
             results_list = await asyncio.wait_for(
@@ -246,9 +256,27 @@ class EngineManager:
 
         results, infoboxes = self.process_and_rank(valid_results, category, clean_query)
         
+        # Cache Protection: Do not cache if any primary engine returned 0 results or failed
+        cache_this_result = True
+        if not results_list or len(results_list) < len(tasks):
+            cache_this_result = False
+        else:
+            for idx, r in enumerate(results_list):
+                if isinstance(r, list) and len(r) == 0:
+                    if idx < len(selection):
+                        engine = selection[idx]
+                        engine_name = getattr(engine, "NAME", "")
+                        if engine_name in ["google", "duckduckgo", "amazon", "ebay", "mercadolibre"]:
+                            cache_this_result = False
+                            break
+                elif isinstance(r, Exception):
+                    cache_this_result = False
+                    break
+        
         # Cache Result
-        ttl = self.settings["general"].get("cache_ttl", 600)
-        self._cache[cache_key] = ((results, infoboxes), now + ttl)
+        if cache_this_result:
+            ttl = self.settings["general"].get("cache_ttl", 600)
+            self._cache[cache_key] = ((results, infoboxes), now + ttl)
         
         return results, infoboxes
 
@@ -305,15 +333,46 @@ class EngineManager:
                     results = engine.response(FakeResponse(params))
             elif params.get("url"):
                 client = params["client"]
-                if params["method"] == "POST":
-                    resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
-                else:
-                    resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
+                max_retries = 3
+                resp = None
+                import random
+                
+                for attempt in range(max_retries):
+                    try:
+                        if params["method"] == "POST":
+                            resp = await client.post(params["url"], data=params["data"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
+                        else:
+                            resp = await client.get(params["url"], headers=params["headers"], cookies=params["cookies"], timeout=params["timeout"])
+                        
+                        is_blocked, reason = detect_block(resp.text, resp.status_code, str(resp.url))
+                        if is_blocked or resp.status_code not in [200, 202]:
+                            current_ua = params["headers"].get("User-Agent", "")
+                            is_mobile = "mobile" in current_ua.lower() or "android" in current_ua.lower() or "iphone" in current_ua.lower()
+                            if is_mobile:
+                                params["headers"]["User-Agent"] = random.choice(self.mobile_ua_list)
+                            else:
+                                params["headers"]["User-Agent"] = random.choice(self.ua_list)
+                            
+                            # Random delay to bypass WAF
+                            await asyncio.sleep(random.uniform(0.1, 0.4))
+                            continue
+                        else:
+                            break
+                    except Exception as e:
+                        if attempt == max_retries - 1:
+                            raise e
+                        current_ua = params["headers"].get("User-Agent", "")
+                        is_mobile = "mobile" in current_ua.lower() or "android" in current_ua.lower() or "iphone" in current_ua.lower()
+                        if is_mobile:
+                            params["headers"]["User-Agent"] = random.choice(self.mobile_ua_list)
+                        else:
+                            params["headers"]["User-Agent"] = random.choice(self.ua_list)
+                        await asyncio.sleep(random.uniform(0.1, 0.4))
                 
                 engine_name = getattr(engine, "NAME", engine.__name__.split('.')[-2] if '.' in engine.__name__ else engine.__name__)
-                print(f"DEBUG: engine={engine_name} status={resp.status_code}")
+                print(f"DEBUG: engine={engine_name} status={resp.status_code if resp else 'None'}")
                 
-                if resp.status_code in [200, 202]:
+                if resp and resp.status_code in [200, 202]:
                     class ResponseWrapper:
                         def __init__(self, r, p):
                             self.text = r.text

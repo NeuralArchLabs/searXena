@@ -160,8 +160,18 @@
                         </div>
                         <a href="{{ result.url }}" class="video-title" target="_blank"
                             rel="noopener noreferrer nofollow">{{ result.title|safe }}</a>
-                        <p class="result-content">{{ result.content|safe }}</p>
+                        <div class="result-url-line">
+                            <span class="result-url-text" title="{{ result.url }}">{{ result.url }}</span>
+                        </div>
+                        <p class="result-content" style="margin-bottom: 0;">{{ result.content|safe }}</p>
                     </div>
+                    <a href="/extract?url={{ result.url | urlencode }}" class="reader-link-badge video-badge" onclick="event.stopPropagation();" title="{{ {'en': 'Reader Mode', 'zh': 'Modo Lectura'}.get(lang, 'Modo Lectura') }}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>{{ {'en': 'Watch', 'zh': '观看'}.get(lang, 'Ver') }}</span>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -174,7 +184,10 @@
                     data-title="{{ result.title|striptags|e }}" 
                     data-content="{{ result.content|striptags|e }}" 
                     data-url="{{ result.url|e }}"
-                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
+                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}"
+                    {% if result.img_src or result.thumbnail_src %}
+                    data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
+                    {% endif %}>
                     {% if result.img_src or result.thumbnail_src %}
                     <div class="shopping-image-container">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
@@ -239,7 +252,10 @@
                 data-content="{{ result.content|striptags|e }}" 
                 data-url="{{ result.url|e }}"
                 data-source="{{ result.sources|join(', ')|e }}"
-                data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}">
+                data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.url|urlencode }}"
+                {% if result.img_src or result.thumbnail_src %}
+                data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
+                {% endif %}>
                 <div class="result-card-inner">
                     <div class="result-body">
                         <div class="result-header">
@@ -351,7 +367,7 @@
                     <p id="preview-content" class="preview-content-text"></p>
                     <div class="preview-actions">
                         <a id="preview-link" href="#" target="_blank" class="preview-btn-main">{{ {'en': 'Visit Website', 'zh': '访问网站'}.get(lang, 'Visitar Sitio Web') }}</a>
-                        <a id="preview-reader-link" href="#" class="preview-btn-reader">{{ {'en': 'Reader Mode', 'zh': 'Modo Lectura'}.get(lang, 'Modo Lectura') }}</a>
+                        <a id="preview-reader-link" href="#" class="preview-btn-reader">{{ {'en': 'Read with O-Zen', 'zh': '使用 O-Zen 阅读'}.get(lang, 'Leer con O-Zen') }}</a>
                     </div>
                 </div>
 

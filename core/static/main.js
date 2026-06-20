@@ -238,6 +238,14 @@ function setPreview(el) {
     const readerLink = document.getElementById('preview-reader-link');
     if (readerLink) {
         readerLink.href = `/extract?url=${encodeURIComponent(url)}`;
+        if (!readerLink.hasAttribute('data-original-text')) {
+            readerLink.setAttribute('data-original-text', readerLink.textContent);
+        }
+        if (el.classList.contains('video-card')) {
+            readerLink.textContent = 'Ver con O-ZEN';
+        } else {
+            readerLink.textContent = readerLink.getAttribute('data-original-text');
+        }
     }
 
     // Manejar preview de imagen grande

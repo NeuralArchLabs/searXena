@@ -261,8 +261,8 @@
         },
         {
             "name": "ebay",
-            "enabled": false,
-            "weight": 0.7
+            "enabled": true,
+            "weight": 1.2
         },
         {
             "name": "instant_answers",
@@ -281,8 +281,13 @@
         },
         {
             "name": "amazon",
-            "enabled": false,
+            "enabled": true,
             "weight": 1.5
+        },
+        {
+            "name": "mercadolibre",
+            "enabled": true,
+            "weight": 1.0
         },
         {
             "name": "osm",

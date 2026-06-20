@@ -6,7 +6,7 @@ STATUS = "experimental"
 import random
 import re
 from urllib.parse import urlencode, unquote
-from utils import LANGUAGE_MAP
+from utils import LANGUAGE_MAP, fetch_fallback_search, detect_block
 from selectolax.parser import HTMLParser
 
 CATEGORIES = ["general"]
@@ -48,78 +48,89 @@ def request(query, params):
     params["cookies"]["SOCS"] = "CAESHAgBEhJmb3NfbGVzcy9zZWFyY2gvaG9tZQ"
 
 
-def response(resp):
+async def response(resp):
     results = []
     html = resp.text
 
-    # Check if blocked (redirected to JS challenge)
-    if "httpservice/retry/enablejs" in html:
-        return results
+    # Check if blocked (redirected to JS challenge or captcha)
+    is_blocked, _ = detect_block(html, resp.status_code, resp.url)
 
-    tree = HTMLParser(html)
+    if not is_blocked:
+        tree = HTMLParser(html)
 
-    # Strategy 1: Mobile GSA layout — containers with h3 titles
-    # GSA returns divs with class Gx5Zad, xpd, etc.
-    selector_sets = [
-        # Modern mobile GSA layout
-        ("div.Gx5Zad, div.xpd, div.BVG0Nb", "h3, .vv14be, .DKV0Md", "div.BNeawe.s31JSe, div.iCjJK, .BNeawe"),
-        # Desktop/alternate layout
-        ("div.MjjYud, div.g", "h3.LC20lb, h3", "div.VwiC3b, div.lEBKkf"),
-        # Fallback containers
-        ("div.egMi0, div.kCrYT", "h3, div.BNeawe.vv14be", "div.BNeawe.s3v9rd, div.BNeawe"),
-    ]
+        # Strategy 1: Mobile GSA layout — containers with h3 titles
+        # GSA returns divs with class Gx5Zad, xpd, etc.
+        selector_sets = [
+            # Modern mobile GSA layout
+            ("div.Gx5Zad, div.xpd, div.BVG0Nb", "h3, .vv14be, .DKV0Md", "div.BNeawe.s31JSe, div.iCjJK, .BNeawe"),
+            # Desktop/alternate layout
+            ("div.MjjYud, div.g", "h3.LC20lb, h3", "div.VwiC3b, div.lEBKkf"),
+            # Fallback containers
+            ("div.egMi0, div.kCrYT", "h3, div.BNeawe.vv14be", "div.BNeawe.s3v9rd, div.BNeawe"),
+        ]
 
-    seen_urls = set()
+        seen_urls = set()
 
-    for container_sel, title_sel, snippet_sel in selector_sets:
-        for node in tree.css(container_sel):
-            title_node = node.css_first(title_sel)
-            url_node = node.css_first("a[href]")
-            snippet_node = node.css_first(snippet_sel)
+        for container_sel, title_sel, snippet_sel in selector_sets:
+            for node in tree.css(container_sel):
+                title_node = node.css_first(title_sel)
+                url_node = node.css_first("a[href]")
+                snippet_node = node.css_first(snippet_sel)
 
-            if not title_node or not url_node:
-                continue
+                if not title_node or not url_node:
+                    continue
 
-            url = _clean_url(url_node.attributes.get("href", ""))
-            if not _valid_url(url) or url in seen_urls:
-                continue
+                url = _clean_url(url_node.attributes.get("href", ""))
+                if not _valid_url(url) or url in seen_urls:
+                    continue
 
-            title = title_node.text().strip()
-            if not title or len(title) < 4:
-                continue
+                title = title_node.text().strip()
+                if not title or len(title) < 4:
+                    continue
 
-            seen_urls.add(url)
-            results.append({
-                "title": title,
-                "url": url,
-                "content": snippet_node.text().strip() if snippet_node else "",
-                "source": "google",
-            })
+                seen_urls.add(url)
+                results.append({
+                    "title": title,
+                    "url": url,
+                    "content": snippet_node.text().strip() if snippet_node else "",
+                    "source": "google",
+                })
 
-        if results:
-            break
+            if results:
+                break
 
-    # Strategy 2: Fallback — any h3 that has an ancestor <a> link
-    if not results:
-        for h3 in tree.css("h3"):
-            node = h3.parent
-            limit = 6
-            while node and node.tag != "a" and limit > 0:
-                node = node.parent
-                limit -= 1
+        # Strategy 2: Fallback — any h3 that has an ancestor <a> link
+        if not results:
+            for h3 in tree.css("h3"):
+                node = h3.parent
+                limit = 6
+                while node and node.tag != "a" and limit > 0:
+                    node = node.parent
+                    limit -= 1
 
-            if node and node.tag == "a":
-                url = _clean_url(node.attributes.get("href", ""))
-                if _valid_url(url) and url not in seen_urls:
-                    title = h3.text().strip()
-                    if title and len(title) > 4:
-                        seen_urls.add(url)
-                        results.append({
-                            "title": title,
-                            "url": url,
-                            "content": "",
-                            "source": "google",
-                        })
+                if node and node.tag == "a":
+                    url = _clean_url(node.attributes.get("href", ""))
+                    if _valid_url(url) and url not in seen_urls:
+                        title = h3.text().strip()
+                        if title and len(title) > 4:
+                            seen_urls.add(url)
+                            results.append({
+                                "title": title,
+                                "url": url,
+                                "content": "",
+                                "source": "google",
+                            })
+
+    # Fallback to Brave/DDG if Google is blocked or returns 0 results
+    if not results or is_blocked:
+        try:
+            lang = resp.search_params.get("language", "es")
+            fallback_results = await fetch_fallback_search(resp.search_params.get("query", ""), lang, resp.client)
+            for r in fallback_results:
+                r["source"] = "google"
+                results.append(r)
+        except Exception as e:
+            print(f"Google fallback failed: {e}")
 
     return results
 

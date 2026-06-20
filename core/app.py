@@ -178,6 +178,11 @@ async def search(request: Request):
 
     lang = manager.settings.get("general", {}).get("default_lang", "es")
 
+    # Detect reload/refresh request headers to bypass caching
+    cache_control = request.headers.get("Cache-Control", "")
+    pragma = request.headers.get("Pragma", "")
+    bypass_cache = "no-cache" in cache_control or "max-age=0" in cache_control or "no-cache" in pragma
+
     # Sistema de Bangs (SearXNG style)
     if q.startswith("!"):
         parts = q.split(" ", 1)
@@ -196,9 +201,9 @@ async def search(request: Request):
         search_q = q if any(w in q.lower() for w in ["comprar", "precio", "oferta", "tienda"]) else f"{q} comprar"
         
         # Petición única y normal, sin paginaciones dobles raras.
-        results, infoboxes = await manager.search(search_q, category=category, pageno=pageno, lang=lang)
+        results, infoboxes = await manager.search(search_q, category=category, pageno=pageno, lang=lang, bypass_cache=bypass_cache)
     else:
-        results, infoboxes = await manager.search(q, category=category, pageno=pageno, lang=lang)
+        results, infoboxes = await manager.search(q, category=category, pageno=pageno, lang=lang, bypass_cache=bypass_cache)
     
     # Filtrado y reorganización inteligente para compras
     reorganized = []
