@@ -86,7 +86,7 @@ def response(resp):
 
         results.append({
             "template": "images.html",
-            "title": title or query,
+            "title": title or "Imagen",
             "url": source_url or real_src or "#",
             "img_src": real_src or tbn_src,
             "thumbnail_src": tbn_src or real_src,
