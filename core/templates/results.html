@@ -202,6 +202,14 @@
                     {% endif %}
                     <div class="shopping-body">
                         <div class="shopping-title">{{ result.title|safe }}</div>
+                        {% if result.rating %}
+                        <div class="shopping-rating" title="{{ result.rating }}">
+                            <span class="stars">★</span> {{ result.rating.split(' ')[0] }}
+                            {% if result.reviews %}
+                            <span class="shopping-reviews">({{ result.reviews }})</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                         {% if result.price %}
                         <div class="shopping-price">{{ result.price }}</div>
                         {% endif %}
@@ -268,10 +276,12 @@
                         </div>
                         <div class="result-url-line">
                             <span class="result-url-text" title="{{ result.url }}">{{ result.url }}</span>
+                            {% if not (result.img_src or result.thumbnail_src) %}
                             <a href="/extract?url={{ result.url | urlencode }}" class="reader-link-badge" title="{{ {'en': 'Reader Mode', 'zh': '阅读模式'}.get(lang, 'Modo Lectura') }}">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                                 <span>{{ {'en': 'Read', 'zh': '阅读'}.get(lang, 'Leer') }}</span>
                             </a>
+                            {% endif %}
                         </div>
 
                         {% if result.price %}
@@ -287,10 +297,16 @@
                         </div>
                     </div>
                     {% if result.img_src or result.thumbnail_src %}
-                    <div class="result-thumbnail-container">
-                        <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
-                            alt="{{ result.title }}" class="result-thumbnail"
-                            onerror="this.onerror=null; this.parentElement.style.display='none';">
+                    <div class="result-aside">
+                        <div class="result-thumbnail-container">
+                            <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
+                                alt="{{ result.title }}" class="result-thumbnail"
+                                onerror="this.onerror=null; this.parentElement.style.display='none';">
+                        </div>
+                        <a href="/extract?url={{ result.url | urlencode }}" class="reader-link-badge" title="{{ {'en': 'Reader Mode', 'zh': '阅读模式'}.get(lang, 'Modo Lectura') }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <span>{{ {'en': 'Read', 'zh': '阅读'}.get(lang, 'Leer') }}</span>
+                        </a>
                     </div>
                     {% endif %}
                 </div>

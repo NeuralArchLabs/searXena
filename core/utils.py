@@ -63,8 +63,9 @@ def detect_block(html: str, status_code: int, url: str) -> tuple[bool, str]:
         "checking your browser" in html_lower
         or "cf-browser-verification" in html_lower
         or "__cf_chl_" in html
-        or "cloudflare" in html_lower and "challenge" in html_lower
         or '<div id="cf-wrapper"' in html
+        or ("just a moment..." in html_lower and "cloudflare" in html_lower)
+        or ("attention required!" in html_lower and "cloudflare" in html_lower)
     ):
         return True, "cloudflare"
 

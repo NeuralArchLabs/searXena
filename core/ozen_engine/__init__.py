@@ -33,6 +33,14 @@ from .site_extractors import (
     extract_youtube_video_id,
     build_youtube_oembed_url,
     build_youtube_reader_html,
+    extract_msn_article_id,
+    extract_msn_locale,
+    build_msn_api_url,
+    process_msn_body,
+    extract_milenio_liveblog,
+    inject_missing_embeds,
+    extract_nextjs_liveblog,
+    extract_url,
 )
 from .utils import load_html
 
@@ -63,4 +71,12 @@ __all__ = [
     "extract_youtube_video_id",
     "build_youtube_oembed_url",
     "build_youtube_reader_html",
+    "extract_msn_article_id",
+    "extract_msn_locale",
+    "build_msn_api_url",
+    "process_msn_body",
+    "extract_milenio_liveblog",
+    "inject_missing_embeds",
+    "extract_nextjs_liveblog",
+    "extract_url",
 ]

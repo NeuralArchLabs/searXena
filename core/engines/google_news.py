@@ -54,8 +54,12 @@ def response(resp):
         pub_date = item.findtext("pubDate", "").strip()
 
         source_el = item.find("source")
-        source_name = source_el.text.strip() if source_el is not None else "Google News"
-        source_url = source_el.attrib.get("url", "") if source_el is not None else ""
+        source_name = "Google News"
+        source_url = ""
+        if source_el is not None:
+            if source_el.text:
+                source_name = source_el.text.strip()
+            source_url = source_el.attrib.get("url", "")
 
         # Clean HTML tags from description
         import re
@@ -67,9 +71,8 @@ def response(resp):
         if not title or not link:
             continue
 
-        # Use source URL as the canonical article URL if available
         # Google's internal link always redirects to the real article
-        url = source_url if source_url else link
+        url = link
 
         results.append({
             "title": title,

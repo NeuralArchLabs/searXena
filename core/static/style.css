@@ -290,6 +290,28 @@ body {
     overflow: hidden;
 }
 
+.shopping-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.85rem;
+    color: #fbbf24;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.shopping-rating .stars {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.shopping-reviews {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    margin-left: 2px;
+    font-weight: 400;
+}
+
 .shopping-price {
     font-size: 1.4rem;
     font-weight: 800;
@@ -452,6 +474,20 @@ body {
 .result-card-inner {
     display: flex;
     gap: 20px;
+}
+
+.result-aside {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+    justify-content: flex-start;
+}
+
+.result-url-line .reader-link-badge {
+    position: absolute;
+    right: 24px;
 }
 
 .result-thumbnail-container {
@@ -1522,8 +1558,6 @@ body {
 
 /* Reader Mode Styles */
 .reader-link-badge {
-    position: absolute;
-    right: 24px;
     display: inline-flex;
     align-items: center;
     gap: 5px;

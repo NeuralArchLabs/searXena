@@ -72,9 +72,25 @@ class EngineManager:
         except Exception:
             return self.get_default_settings()
 
+    def get_system_region(self) -> str:
+        import locale
+        try:
+            default_loc = locale.getdefaultlocale()[0]
+            if default_loc and "_" in default_loc:
+                return default_loc.split("_")[-1].upper()
+        except Exception:
+            pass
+        return "MX"
+
     def get_default_settings(self):
         return {
-            "general": {"timeout": 4.0, "cache_ttl": 600, "instance_name": "searXena"},
+            "general": {
+                "timeout": 4.0, 
+                "cache_ttl": 600, 
+                "instance_name": "searXena",
+                "default_region": self.get_system_region(),
+                "default_lang": "es"
+            },
             "engines": []
         }
 
@@ -227,10 +243,10 @@ class EngineManager:
         selection = category_engines[:15]
         
         if target_engine and target_engine in self.engines:
-             tasks = [self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit, lang=lang)]
+             tasks = [asyncio.create_task(self.call_engine(self.engines[target_engine], clean_query, category, pageno, timeout_limit, lang=lang))]
         else:
             for engine in selection:
-                tasks.append(self.call_engine(engine, clean_query, category, pageno, timeout_limit, lang=lang))
+                tasks.append(asyncio.create_task(self.call_engine(engine, clean_query, category, pageno, timeout_limit, lang=lang)))
 
         # Parallel Wait (Buscamos que sean ultra-veloces)
         results_list = []
@@ -289,6 +305,7 @@ class EngineManager:
                 "category": category,
                 "safesearch": self.settings.get("general", {}).get("safe_search", 1),
                 "language": lang or self.settings.get("general", {}).get("default_lang", "es"),
+                "region": self.settings.get("general", {}).get("default_region") or self.get_system_region(),
                 "time_range": None,
                 "url": None,
                 "method": "GET",

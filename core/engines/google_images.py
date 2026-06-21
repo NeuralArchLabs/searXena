@@ -52,37 +52,25 @@ def response(resp):
 
     tree = HTMLParser(html)
 
-    # Extract real image URLs and encrypted-tbn thumbnail URLs from script/JSON data.
-    # These appear as parallel arrays in the HTML — one real URL and one tbn per result.
-    real_imgs = re.findall(
-        r'"(https?://(?!www\.gstatic|encrypted-tbn|maps\.gstatic)[^"]{15,}?\.(?:jpg|jpeg|png|webp)(?:[^"]*?))"',
-        html,
-    )
-    tbn_imgs = re.findall(r'"(https?://encrypted-tbn[^"]+)"', html)
+    for node in tree.css("div.isv-r"):
+        title = node.attributes.get("data-pt") or ""
+        real_src = node.attributes.get("data-ou")
+        source_url = node.attributes.get("data-ru")
 
-    # Parse isv-r containers for source page URLs and titles
-    for i, node in enumerate(tree.css("div.isv-r")):
-        img_node = node.css_first("img.islir, img")
-        alt = img_node.attributes.get("alt", "") if img_node else ""
-        title = alt.replace("Image result for ", "").strip() if alt else ""
+        img_node = node.css_first("img")
+        tbn_src = None
+        if img_node:
+            tbn_src = img_node.attributes.get("data-src") or img_node.attributes.get("src")
 
-        # Get source page URL
-        source_url = ""
-        for a in node.css("a[href]"):
-            href = a.attributes.get("href", "")
-            if "/url?q=" in href:
-                source_url = unquote(href.split("/url?q=")[1].split("&sa=")[0])
-                break
-            elif href.startswith("http") and "google.com" not in href:
-                source_url = href
-                break
-
-        # Match real image and thumbnail from parallel arrays
-        real_src = real_imgs[i] if i < len(real_imgs) else None
-        tbn_src = tbn_imgs[i] if i < len(tbn_imgs) else None
+        if tbn_src and (tbn_src.startswith("data:image/gif") or len(tbn_src) < 100):
+            tbn_src = None
 
         if not real_src and not tbn_src:
             continue
+
+        # Clean title prefix
+        if title.startswith("Resultado de imagen para "):
+            title = title[len("Resultado de imagen para "):]
 
         results.append({
             "template": "images.html",

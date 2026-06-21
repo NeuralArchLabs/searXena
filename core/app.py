@@ -104,6 +104,7 @@ async def save_settings(request: Request):
     general = current.get("general", {})
     general["safe_search"] = int(form.get("safesearch", 0))
     general["default_lang"] = form.get("language", "es")
+    general["default_region"] = form.get("region", "MX").upper()
     general["autocomplete"] = form.get("autocomplete", "google")
     current["general"] = general
 

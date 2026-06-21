@@ -203,7 +203,6 @@
         }
 
         /* --- Videos / iFrames --- */
-        .content iframe,
         .content video,
         .content embed,
         .content object {
@@ -217,6 +216,26 @@
             margin: 2.5rem 0;
             background: #000;
             display: block;
+        }
+
+        .content iframe {
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: var(--img-radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            margin: 2.5rem 0;
+            background: #000;
+            display: block;
+        }
+
+        /* Default aspect ratio for video iframes (like YouTube, Vimeo) to keep them responsive */
+        .content iframe[src*="youtube.com"],
+        .content iframe[src*="youtu.be"],
+        .content iframe[src*="vimeo.com"],
+        .content iframe[src*="dailymotion.com"] {
+            aspect-ratio: 16 / 9;
+            height: auto;
         }
 
         /* --- Paragraphs / headings / lists --- */
@@ -482,6 +501,145 @@
     </button>
 
     <script>
+        // Dynamic platform script injection for reader view (Twitter, Instagram, TikTok)
+        const contentHtml = document.querySelector('.content');
+        if (contentHtml) {
+            if (contentHtml.querySelector('.twitter-tweet') && !document.getElementById('twitter-wjs')) {
+                const s = document.createElement('script');
+                s.id = 'twitter-wjs';
+                s.src = 'https://platform.twitter.com/widgets.js';
+                s.async = true;
+                document.body.appendChild(s);
+            }
+            if (contentHtml.querySelector('.instagram-media') && !document.getElementById('instagram-wjs')) {
+                const s = document.createElement('script');
+                s.id = 'instagram-wjs';
+                s.src = 'https://www.instagram.com/embed.js';
+                s.async = true;
+                document.body.appendChild(s);
+            }
+            if (contentHtml.querySelector('.tiktok-embed') && !document.getElementById('tiktok-wjs')) {
+                const s = document.createElement('script');
+                s.id = 'tiktok-wjs';
+                s.src = 'https://www.tiktok.com/embed.js';
+                s.async = true;
+                document.body.appendChild(s);
+            }
+        }
+
+        // Dynamic iframe resizing & scrolling behavior
+        function resizeIframe(iframe) {
+            try {
+                if (iframe.contentWindow && iframe.contentWindow.document) {
+                    const doc = iframe.contentWindow.document;
+                    const height = Math.max(
+                        doc.body.scrollHeight,
+                        doc.documentElement.scrollHeight,
+                        doc.body.offsetHeight,
+                        doc.documentElement.offsetHeight
+                    );
+                    if (height > 0) {
+                        iframe.style.height = height + 'px';
+                        iframe.style.overflow = 'hidden';
+                        iframe.setAttribute('scrolling', 'no');
+                    }
+                }
+            } catch (e) {
+                // Cross-origin, cannot access document
+            }
+        }
+
+        // Setup message listener for platform dynamic height updates (Twitter, Instagram, TikTok, etc)
+        window.addEventListener('message', function(e) {
+            try {
+                let data = e.data;
+                if (typeof data === 'string') {
+                    if (data.startsWith('{')) {
+                        try { data = JSON.parse(data); } catch(err) {}
+                    } else if (data.startsWith('height:')) {
+                        let parsedH = parseInt(data.split(':')[1], 10);
+                        if (!isNaN(parsedH)) {
+                            setIframeHeight(e.source, parsedH);
+                        }
+                        return;
+                    }
+                }
+                
+                if (data && typeof data === 'object') {
+                    let height = null;
+                    
+                    // Twitter / X widgets height
+                    if (data.action === 'twttr.private.setHeight' && data.params && data.params[0]) {
+                        height = data.params[0].height;
+                    } else if (data.method === 'resize' && data.params && data.params[0]) {
+                        height = data.params[0].height;
+                    }
+                    // Instagram MEASURE
+                    else if (data.type === 'MEASURE' && data.details && data.details.height) {
+                        height = data.details.height;
+                    }
+                    // TikTok height
+                    else if ((data.type === 'embed-size' || data.type === 'resize') && data.height) {
+                        height = data.height;
+                    }
+                    // General properties
+                    else if (data.height) {
+                        height = data.height;
+                    } else if (data.details && data.details.height) {
+                        height = data.details.height;
+                    }
+
+                    if (height) {
+                        setIframeHeight(e.source, height);
+                    }
+                }
+            } catch (err) {}
+        });
+
+        function setIframeHeight(sourceWindow, height) {
+            const iframes = document.querySelectorAll('.content iframe');
+            for (const iframe of iframes) {
+                if (iframe.contentWindow === sourceWindow) {
+                    iframe.style.height = height + 'px';
+                    iframe.style.overflow = 'hidden';
+                    iframe.setAttribute('scrolling', 'no');
+                    break;
+                }
+            }
+        }
+
+        // Initialize iframe sizing
+        document.querySelectorAll('.content iframe').forEach(iframe => {
+            // Apply scrolling="no" by default to prevent ugly scrollbars while loading/resizing
+            iframe.setAttribute('scrolling', 'no');
+            iframe.style.overflow = 'hidden';
+
+            iframe.addEventListener('load', () => {
+                resizeIframe(iframe);
+                try {
+                    if (iframe.contentWindow && iframe.contentWindow.document) {
+                        const observer = new MutationObserver(() => resizeIframe(iframe));
+                        observer.observe(iframe.contentWindow.document.body, {
+                            childList: true,
+                            subtree: true,
+                            attributes: true
+                        });
+                    }
+                } catch(e) {}
+            });
+
+            resizeIframe(iframe);
+
+            // Default min-height for non-video cross-origin iframes without explicit height
+            if (!iframe.style.height && !iframe.getAttribute('height')) {
+                const src = iframe.getAttribute('src') || '';
+                const isVideo = src.includes('youtube.com') || src.includes('youtu.be') || src.includes('vimeo.com') || src.includes('dailymotion.com');
+                if (!isVideo) {
+                    iframe.style.height = '600px'; 
+                }
+            }
+        });
+
         // Mark lazy images as loaded once they finish loading (removes shimmer)
         document.querySelectorAll('img[loading="lazy"]').forEach(img => {
             if (img.complete) {
@@ -491,7 +649,7 @@
                 img.addEventListener('error', () => {
                     // Hide broken images gracefully
                     img.closest('figure') ? img.closest('figure').style.display = 'none'
-                                          : img.style.display = 'none';
+                                           : img.style.display = 'none';
                 });
             }
         });

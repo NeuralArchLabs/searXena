@@ -47,6 +47,33 @@ PRESERVE_IMG_CLEANING = {"figure", "picture", "source"}
 CODE_INDICATORS = ["{", "(\"", "('", "\n    "]
 
 
+IFRAME_WHITELIST = {
+    "youtube.com",
+    "youtu.be",
+    "youtube-nocookie.com",
+    "vimeo.com",
+    "twitter.com",
+    "x.com",
+    "instagram.com",
+    "tiktok.com",
+    "facebook.com",
+    "spotify.com",
+    "soundcloud.com",
+}
+
+
+def _is_whitelisted_embed(element: _Element) -> bool:
+    if element.tag not in ("iframe", "embed"):
+        return False
+    for attr in ("src", "data-src", "data-lazy-src"):
+        src = element.get(attr)
+        if src:
+            src_lower = src.lower()
+            if any(domain in src_lower for domain in IFRAME_WHITELIST):
+                return True
+    return False
+
+
 def tree_cleaning(tree: HtmlElement, options: Extractor) -> HtmlElement:
     "Prune the tree by discarding unwanted elements."
     # determine cleaning strategy, use lists to keep it deterministic
@@ -69,14 +96,18 @@ def tree_cleaning(tree: HtmlElement, options: Extractor) -> HtmlElement:
     if options.focus == "recall" and tree.find(".//p") is not None:
         tcopy = deepcopy(tree)
         for expression in cleaning_list:
-            for element in tree.iter(expression):
+            for element in list(tree.iter(expression)):
+                if expression in ("iframe", "embed") and _is_whitelisted_embed(element):
+                    continue
                 delete_element(element)
         if tree.find(".//p") is None:
             tree = tcopy
     # delete targeted elements
     else:
         for expression in cleaning_list:
-            for element in tree.iter(expression):
+            for element in list(tree.iter(expression)):
+                if expression in ("iframe", "embed") and _is_whitelisted_embed(element):
+                    continue
                 delete_element(element)
 
     return prune_html(tree, options.focus)

@@ -127,6 +127,27 @@
 
                     <div class="setting-row">
                         <div class="setting-info">
+                            <h3>{{ {'en': 'Search Region', 'zh': '搜索地区'}.get(lang, 'Región de búsqueda') }}</h3>
+                            <p>{{ {'en': 'Filter and prioritize results by country or region.', 'zh': '按国家或地区过滤并优先显示结果。'}.get(lang,
+                                'Filtrar y priorizar resultados por país o región.') }}</p>
+                        </div>
+                        <select name="region" class="select-custom" title="Seleccionar región">
+                            <option value="MX" {% if general.get('default_region', 'MX')=='MX' %}selected{% endif %}>México (MX)</option>
+                            <option value="ES" {% if general.get('default_region')=='ES' %}selected{% endif %}>España (ES)</option>
+                            <option value="US" {% if general.get('default_region')=='US' %}selected{% endif %}>United States (US)</option>
+                            <option value="BR" {% if general.get('default_region')=='BR' %}selected{% endif %}>Brasil (BR)</option>
+                            <option value="AR" {% if general.get('default_region')=='AR' %}selected{% endif %}>Argentina (AR)</option>
+                            <option value="CL" {% if general.get('default_region')=='CL' %}selected{% endif %}>Chile (CL)</option>
+                            <option value="CO" {% if general.get('default_region')=='CO' %}selected{% endif %}>Colombia (CO)</option>
+                            <option value="GB" {% if general.get('default_region')=='GB' %}selected{% endif %}>United Kingdom (GB)</option>
+                            <option value="DE" {% if general.get('default_region')=='DE' %}selected{% endif %}>Deutschland (DE)</option>
+                            <option value="FR" {% if general.get('default_region')=='FR' %}selected{% endif %}>France (FR)</option>
+                            <option value="IT" {% if general.get('default_region')=='IT' %}selected{% endif %}>Italia (IT)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
                             <h3>{{ {'en': 'Safe Search', 'zh': '安全搜索'}.get(lang, 'Búsqueda Segura') }}</h3>
                             <p>{{ {'en': 'Filter explicit content from results.', 'zh': '从结果中过滤露骨内容。'}.get(lang,
                                 'Filtrar contenido explícito de los resultados.') }}</p>

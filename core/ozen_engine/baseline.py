@@ -54,6 +54,38 @@ def _walk_jsonld(obj: Any) -> List[str]:
     return results
 
 
+def _extract_liveblog_updates(data: Any) -> Optional[List[str]]:
+    """Recursively search for liveBlogUpdate list and extract text from updates."""
+    if isinstance(data, dict):
+        updates = data.get("liveBlogUpdate")
+        if isinstance(updates, list) and updates:
+            extracted = []
+            for item in updates:
+                if isinstance(item, dict):
+                    headline = (item.get("headline") or "").strip()
+                    body = (item.get("articleBody") or item.get("text") or "").strip()
+                    parts = []
+                    if headline:
+                        parts.append(headline)
+                    if body:
+                        parts.append(body)
+                    if parts:
+                        extracted.append("\n".join(parts))
+            if extracted:
+                return extracted
+        
+        for v in data.values():
+            res = _extract_liveblog_updates(v)
+            if res:
+                return res
+    elif isinstance(data, list):
+        for item in data:
+            res = _extract_liveblog_updates(item)
+            if res:
+                return res
+    return None
+
+
 def extract_jsonld_content(filecontent: Any) -> Optional[Dict[str, str]]:
     """
     Extract content from JSON-LD scripts (schema.org, etc.).
@@ -68,8 +100,7 @@ def extract_jsonld_content(filecontent: Any) -> Optional[Dict[str, str]]:
     if tree is None:
         return None
 
-    result = {"content": None, "title": None, "description": None, "image": None, "type": None}
-
+    # First pass: search for liveBlogUpdate across all JSON-LD elements
     for elem in tree.iterfind('.//script[@type="application/ld+json"]'):
         if not elem.text:
             continue
@@ -78,7 +109,35 @@ def extract_jsonld_content(filecontent: Any) -> Optional[Dict[str, str]]:
         except (json.JSONDecodeError, ValueError):
             continue
 
-        # Find body text recursively
+        updates = _extract_liveblog_updates(data)
+        if updates:
+            result = {"content": "\n\n".join(updates), "title": None, "description": None, "image": None, "type": "liveblog"}
+            if isinstance(data, dict):
+                if isinstance(data.get("headline"), str):
+                    result["title"] = data["headline"]
+                elif isinstance(data.get("name"), str):
+                    result["title"] = data["name"]
+                if isinstance(data.get("description"), str):
+                    result["description"] = data["description"]
+                if isinstance(data.get("image"), str):
+                    result["image"] = data["image"]
+                elif isinstance(data.get("image"), list) and data["image"]:
+                    if isinstance(data["image"][0], str):
+                        result["image"] = data["image"][0]
+                elif isinstance(data.get("image"), dict) and isinstance(data["image"].get("url"), str):
+                    result["image"] = data["image"]["url"]
+            return result
+
+    # Second pass: standard recursive content extraction
+    for elem in tree.iterfind('.//script[@type="application/ld+json"]'):
+        if not elem.text:
+            continue
+        try:
+            data = json.loads(elem.text)
+        except (json.JSONDecodeError, ValueError):
+            continue
+
+        result = {"content": None, "title": None, "description": None, "image": None, "type": None}
         bodies = _walk_jsonld(data)
         if bodies:
             result["content"] = max(bodies, key=len)
@@ -96,13 +155,15 @@ def extract_jsonld_content(filecontent: Any) -> Optional[Dict[str, str]]:
             elif isinstance(data.get("image"), list) and data["image"]:
                 if isinstance(data["image"][0], str):
                     result["image"] = data["image"][0]
+            elif isinstance(data.get("image"), dict) and isinstance(data["image"].get("url"), str):
+                result["image"] = data["image"]["url"]
             if isinstance(data.get("@type"), str):
-                result["type"] = data["@type"]
+                result["type"] = result["type"] or data["@type"]
 
         if result["content"] and len(result["content"]) > 100:
             return result
 
-    return result if result["content"] else None
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -282,25 +343,46 @@ def baseline(filecontent: Any) -> Tuple[_Element, str, int]:
     jsonld_result = extract_jsonld_content(filecontent)
     if jsonld_result and jsonld_result.get("content") and len(jsonld_result["content"]) > 100:
         text = trim(jsonld_result["content"])
-        SubElement(postbody, 'p').text = text
+        for part in text.split("\n\n"):
+            part_trimmed = trim(part)
+            if part_trimmed:
+                for subpart in part_trimmed.split("\n"):
+                    sp_trimmed = trim(subpart)
+                    if sp_trimmed:
+                        SubElement(postbody, 'p').text = sp_trimmed
         LOGGER.debug("baseline: JSON-LD extracted %s chars", len(text))
-        return postbody, text, len(text)
+        normalized_text = "\n\n".join(trim(p.text) for p in postbody if p.text)
+        return postbody, normalized_text, len(normalized_text)
 
     # ── Strategy 2: __NEXT_DATA__ (Next.js) ───────────────────────
     next_result = extract_next_data(filecontent)
     if next_result and next_result.get("content") and len(next_result["content"]) > 100:
         text = trim(next_result["content"])
-        SubElement(postbody, 'p').text = text
+        for part in text.split("\n\n"):
+            part_trimmed = trim(part)
+            if part_trimmed:
+                for subpart in part_trimmed.split("\n"):
+                    sp_trimmed = trim(subpart)
+                    if sp_trimmed:
+                        SubElement(postbody, 'p').text = sp_trimmed
         LOGGER.debug("baseline: __NEXT_DATA__ extracted %s chars", len(text))
-        return postbody, text, len(text)
+        normalized_text = "\n\n".join(trim(p.text) for p in postbody if p.text)
+        return postbody, normalized_text, len(normalized_text)
 
     # ── Strategy 3: <noscript> fallback ───────────────────────────
     noscript_result = extract_noscript_content(filecontent)
     if noscript_result and noscript_result.get("content") and len(noscript_result["content"]) > 100:
         text = trim(noscript_result["content"])
-        SubElement(postbody, 'p').text = text
+        for part in text.split("\n\n"):
+            part_trimmed = trim(part)
+            if part_trimmed:
+                for subpart in part_trimmed.split("\n"):
+                    sp_trimmed = trim(subpart)
+                    if sp_trimmed:
+                        SubElement(postbody, 'p').text = sp_trimmed
         LOGGER.debug("baseline: noscript extracted %s chars", len(text))
-        return postbody, text, len(text)
+        normalized_text = "\n\n".join(trim(p.text) for p in postbody if p.text)
+        return postbody, normalized_text, len(normalized_text)
 
     # ── Strategy 4: Original JSON-LD (articleBody only, backward compat) ──
     temp_text = ""

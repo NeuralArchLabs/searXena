@@ -11,8 +11,13 @@ CATEGORIES = ["shopping"]
 WEIGHT = 1.0
 
 ML_DOMAINS = {
-    "es": "articulo.mercadolibre.com.mx",  # Default Spanish to MX
-    "pt": "produto.mercadolivre.com.br",  # Brazil
+    "mx": "articulo.mercadolibre.com.mx",
+    "br": "produto.mercadolivre.com.br",
+    "ar": "articulo.mercadolibre.com.ar",
+    "cl": "articulo.mercadolibre.cl",
+    "co": "articulo.mercadolibre.com.co",
+    "es": "articulo.mercadolibre.com.mx",  # Fallback to MX
+    "pt": "produto.mercadolivre.com.br"   # Brazil
 }
 
 _GSA_UAS = [
@@ -54,7 +59,8 @@ def find_best_image(product_title, images, used_indices):
 
 def request(query, params):
     lang = params.get("language", "es")
-    domain = ML_DOMAINS.get(lang, "articulo.mercadolibre.com.mx")
+    region = params.get("region", "mx").lower()
+    domain = ML_DOMAINS.get(region, ML_DOMAINS.get(lang, "articulo.mercadolibre.com.mx"))
     offset = (params.get("pageno", 1) - 1) * 10
     
     price_term = "precio" if lang in ("es", "pt") else "price"
@@ -181,9 +187,41 @@ async def response(resp):
         except Exception as e:
             print(f"EXCEPTION in mercadolibre fallback: {e}")
 
-    # Fetch DDG Images batch
-    images = []
+    # Enrich results with actual O-zen extraction in parallel
     if results:
+        try:
+            from ozen_engine.site_extractors import extract_site_specific
+            
+            async def enrich_result(r):
+                try:
+                    product_data = await asyncio.wait_for(
+                        extract_site_specific(r["url"], resp.client),
+                        timeout=1.8
+                    )
+                    if product_data and "metadata" in product_data:
+                        meta = product_data["metadata"]
+                        if meta.get("image"):
+                            r["img_src"] = meta["image"]
+                            r["thumbnail_src"] = meta["image"]
+                        if meta.get("price") and meta["price"] != "No disponible":
+                            r["price"] = meta["price"]
+                        if meta.get("rating"):
+                            r["rating"] = meta["rating"]
+                        if meta.get("reviews"):
+                            r["reviews"] = meta["reviews"]
+                        if meta.get("description"):
+                            r["content"] = meta["description"]
+                except Exception:
+                    pass
+            
+            await asyncio.gather(*(enrich_result(r) for r in results[:5]))
+        except Exception as e:
+            print(f"Exception enriching ML results: {e}")
+
+    # Fetch DDG Images batch as backup for results that still don't have an img_src
+    results_needing_image = [r for r in results if not r.get("img_src")]
+    if results_needing_image:
+        images = []
         try:
             from engines import duckduckgo_images
             async with httpx.AsyncClient(verify=False, timeout=6.0) as client:
@@ -208,12 +246,13 @@ async def response(resp):
         except Exception:
             pass
 
-    used_indices = set()
-    for r in results:
-        matched_img = find_best_image(r["title"], images, used_indices)
-        if matched_img:
-            r["img_src"] = matched_img
-            r["thumbnail_src"] = matched_img
+        used_indices = set()
+        for r in results:
+            if not r.get("img_src"):
+                matched_img = find_best_image(r["title"], images, used_indices)
+                if matched_img:
+                    r["img_src"] = matched_img
+                    r["thumbnail_src"] = matched_img
                     
     return results
 
