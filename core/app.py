@@ -255,6 +255,8 @@ async def search(request: Request):
             r.pop("img_src", None)
         if not _is_valid_img_url(r.get("thumbnail_src")):
             r.pop("thumbnail_src", None)
+        if "domain" not in r and r.get("url"):
+            r["domain"] = urlparse(r["url"]).netloc.lower()
 
     # Los infoboxes (como OSM) son esenciales en General y Mapas
     if category in ["general", "maps"]:
