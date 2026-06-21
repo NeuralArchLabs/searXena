@@ -126,7 +126,8 @@
                     data-content="{{ result.source|default('') }}" 
                     data-url="{{ result.url|e }}"
                     data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
-                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.domain|urlencode }}">
+                    data-icon="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=64&domain=' ~ result.domain) | urlencode }}"
+                    data-domain="{{ result.domain }}">
                     <img src="/proxify?url={{ (result.thumbnail_src or result.img_src) | urlencode }}"
                         alt="{{ result.title }}" loading="lazy" onerror="this.onerror=null; this.src='/static/placeholder.png';">
                     <div class="image-info">
@@ -146,7 +147,8 @@
                     data-title="{{ result.title|striptags|e }}" 
                     data-content="{{ result.content|striptags|e }}" 
                     data-url="{{ result.url|e }}"
-                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.domain|urlencode }}">
+                    data-icon="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=64&domain=' ~ result.domain) | urlencode }}"
+                    data-domain="{{ result.domain }}">
                     {% if result.img_src or result.thumbnail_src %}
                     <a href="{{ result.url }}" target="_blank" rel="noopener noreferrer nofollow">
                         <img src="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
@@ -184,7 +186,8 @@
                     data-title="{{ result.title|striptags|e }}" 
                     data-content="{{ result.content|striptags|e }}" 
                     data-url="{{ result.url|e }}"
-                    data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.domain|urlencode }}"
+                    data-icon="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=64&domain=' ~ result.domain) | urlencode }}"
+                    data-domain="{{ result.domain }}"
                     {% if result.img_src or result.thumbnail_src %}
                     data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
                     {% endif %}>
@@ -198,7 +201,7 @@
                     <div class="shopping-image-container no-image">
                         <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=128&domain=' ~ result.domain) | urlencode }}"
                             class="shopping-store-icon" alt="Favicon" 
-                            onerror="this.onerror=null; this.src='/proxify?url={{ ('https://icons.duckduckgo.com/ip3/' ~ result.domain ~ '.ico') | urlencode }}'; this.onerror=function(){this.style.display='none';};">
+                            onerror="handleFaviconError(this, '{{ result.domain }}')">
                     </div>
                     {% endif %}
                     <div class="shopping-body">
@@ -261,7 +264,8 @@
                 data-content="{{ result.content|striptags|e }}" 
                 data-url="{{ result.url|e }}"
                 data-source="{{ result.sources|join(', ')|e }}"
-                data-icon="https://www.google.com/s2/favicons?sz=64&domain={{ result.domain|urlencode }}"
+                data-icon="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=64&domain=' ~ result.domain) | urlencode }}"
+                data-domain="{{ result.domain }}"
                 {% if result.img_src or result.thumbnail_src %}
                 data-full-img="/proxify?url={{ (result.img_src or result.thumbnail_src) | urlencode }}"
                 {% endif %}>
@@ -271,7 +275,7 @@
                             <div class="title-container">
                                 <img src="/proxify?url={{ ('https://www.google.com/s2/favicons?sz=32&domain=' ~ result.domain) | urlencode }}"
                                     alt="Favicon" class="result-favicon" 
-                                    onerror="this.onerror=null; this.src='/proxify?url={{ ('https://icons.duckduckgo.com/ip3/' ~ result.domain ~ '.ico') | urlencode }}'; this.onerror=function(){this.style.opacity='0';};">
+                                    onerror="handleFaviconError(this, '{{ result.domain }}')">
                                 <a href="{{ result.url }}" class="result-title" target="_blank"
                                     rel="noopener noreferrer nofollow">{{ result.title|safe }}</a>
                             </div>
@@ -371,7 +375,7 @@
                 <div id="preview-pane" class="preview-container sidebar-box">
                     <div class="preview-close-btn" onclick="closePreview()">×</div>
                     <div class="preview-header">
-                        <img id="preview-icon" src="" alt="" class="preview-favicon">
+                        <img id="preview-icon" src="" alt="" class="preview-favicon" onerror="handleFaviconError(this, this.dataset.domain)">
                         <h3 id="preview-title" class="preview-title"></h3>
                     </div>
                     <div id="preview-url" class="preview-url"></div>
