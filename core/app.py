@@ -305,6 +305,15 @@ class ToolSearchRequest(BaseModel):
     exclude_engines: Optional[List[str]] = Field(None, description="Motores a ignorar.")
     limit: Optional[int] = Field(10, description="Límite de resultados para optimizar contexto.")
 
+@app.get("/api/v1/status")
+async def api_status():
+    """Health endpoint for local clients supervising the engine."""
+    return {
+        "ok": True,
+        "engine": "searXena",
+        "loaded_engines": len(manager.engines),
+    }
+
 @app.post("/api/v1/search")
 async def api_search(request_data: ToolSearchRequest):
     """
