@@ -248,35 +248,36 @@ class EngineManager:
             for engine in selection:
                 tasks.append(asyncio.create_task(self.call_engine(engine, clean_query, category, pageno, timeout_limit, lang=lang)))
 
-        # A slow or blocked provider must not erase answers that have already
-        # arrived from other providers. ``wait_for(gather())`` cancels the whole
-        # gather on timeout, which used to turn valid searches into empty output.
+        # Preserve answers that complete before the global deadline.  Using
+        # wait_for(gather(...)) cancels the whole gather when one provider is
+        # slow, losing results that were already available from other engines.
         results_list = []
         valid_results = []
-        if tasks:
-            try:
+        try:
+            if tasks:
                 done, pending = await asyncio.wait(tasks, timeout=timeout_limit + 1.0)
+            else:
+                done, pending = set(), set()
 
-                for task in pending:
-                    task.cancel()
-                if pending:
-                    await asyncio.gather(*pending, return_exceptions=True)
+            for task in pending:
+                task.cancel()
+            if pending:
+                await asyncio.gather(*pending, return_exceptions=True)
 
-                # Retain the original order for the cache guard below. Pending
-                # and failed providers prevent caching, while completed answers
-                # remain available to the caller.
-                for task in tasks:
-                    if not task.done() or task.cancelled():
-                        results_list.append(asyncio.TimeoutError())
-                        continue
-                    try:
-                        results_list.append(task.result())
-                    except Exception as exc:
-                        results_list.append(exc)
+            # Keep the original provider order for cache diagnostics while
+            # retaining every completed provider response.
+            for task in tasks:
+                if task.cancelled():
+                    results_list.append(asyncio.TimeoutError())
+                    continue
+                try:
+                    results_list.append(task.result())
+                except Exception as exc:
+                    results_list.append(exc)
 
-                valid_results = [result for result in results_list if isinstance(result, list)]
-            except Exception as exc:
-                print(f"ERROR waiting for search providers: {exc!r}")
+            valid_results = [result for result in results_list if isinstance(result, list)]
+        except Exception as exc:
+            print(f"ERROR waiting for search providers: {exc!r}")
         
         # 4. Prune Cache periodically
         if int(now) % 10 == 0:
@@ -302,8 +303,9 @@ class EngineManager:
                     break
         
         # Cache Result
-        # Empty searches are generally transient (timeouts, CAPTCHA pages or a
-        # network interruption); caching them poisons the query for the TTL.
+        # An empty result is normally transient (a timeout, CAPTCHA or network
+        # failure); retaining it would hide later healthy results for the cache
+        # TTL.
         if cache_this_result and (results or infoboxes):
             ttl = self.settings["general"].get("cache_ttl", 600)
             self._cache[cache_key] = ((results, infoboxes), now + ttl)
@@ -673,7 +675,7 @@ class EngineManager:
         # Ordenación Final de resultados por Score
         final.sort(key=lambda x: x["score"], reverse=True)
         
-        # Limitar resultados para limpieza absoluta
-        limited_results = final[:40]
-        
-        return limited_results, final_infoboxes
+        # La paginación pertenece a la API. Conservamos todo el conjunto
+        # agregado para que el consumidor pueda solicitar páginas posteriores
+        # sin repetir la búsqueda ni perder resultados válidos.
+        return final, final_infoboxes
